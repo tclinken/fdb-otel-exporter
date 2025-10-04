@@ -1,0 +1,12 @@
+apiVersion: 1
+
+providers:
+  - name: Local Dashboards
+    orgId: 1
+    folder: FDB Metrics
+    type: file
+    disableDeletion: false
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards/json

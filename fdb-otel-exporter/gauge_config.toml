@@ -1,0 +1,118 @@
+[[gauge]]
+trace_type = "StorageMetrics"
+gauge_name = "ss_durable_version"
+field_name = "DurableVersion"
+gauge_type = "Simple"
+description = "Storage server durable version"
+
+[[gauge]]
+trace_type = "StorageMetrics"
+gauge_name = "ss_version"
+field_name = "Version"
+gauge_type = "Simple"
+description = "Storage server version"
+
+[[gauge]]
+trace_type = "StorageMetrics"
+gauge_name = "ss_bytes_input"
+field_name = "BytesInput"
+gauge_type = "CounterTotal"
+description = "Total input bytes on storage server"
+
+[[gauge]]
+trace_type = "StorageMetrics"
+gauge_name = "ss_bytes_durable"
+field_name = "BytesDurable"
+gauge_type = "CounterTotal"
+description = "Total durable bytes on storage server"
+
+[[gauge]]
+trace_type = "StorageMetrics"
+gauge_name = "ss_bytes_queried"
+field_name = "BytesQueried"
+gauge_type = "CounterRate"
+description = "Rate of bytes queried per second on storage server"
+
+[[gauge]]
+trace_type = "StorageMetrics"
+gauge_name = "ss_mutations"
+field_name = "Mutations"
+gauge_type = "CounterRate"
+description = "Rate of mutations per second on storage server"
+
+[[gauge]]
+trace_type = "StorageMetrics"
+gauge_name = "ss_mutation_bytes"
+field_name = "MutationBytes"
+gauge_type = "CounterRate"
+description = "Mutation throughput in bytes per second on storage server"
+
+[[gauge]]
+trace_type = "StorageMetrics"
+gauge_name = "ss_get_range_queries"
+field_name = "GetRangeQueries"
+gauge_type = "CounterRate"
+description = "Range queries per second on storage server"
+
+[[gauge]]
+trace_type = "StorageMetrics"
+gauge_name = "ss_get_value_queries"
+field_name = "GetValueQueries"
+gauge_type = "CounterRate"
+description = "Value queries per second on storage server"
+
+[[gauge]]
+trace_type = "StorageMetrics"
+gauge_name = "ss_get_key_queries"
+field_name = "GetKeyQueries"
+gauge_type = "CounterRate"
+description = "Key queries per second on storage server"
+
+[[gauge]]
+trace_type = "ProxyMetrics"
+gauge_name = "cp_txn_commit_in"
+field_name = "TxnCommitIn"
+gauge_type = "CounterRate"
+description = "Transaction commits per second on commit proxy"
+
+[[gauge]]
+trace_type = "ProxyMetrics"
+gauge_name = "cp_txn_conflicts"
+field_name = "TxnConflicts"
+gauge_type = "CounterRate"
+description = "Transaction conflict rate on commit proxy"
+
+[[gauge]]
+trace_type = "GrvProxyMetrics"
+gauge_name = "gp_txn_start_in"
+field_name = "TxnStartIn"
+gauge_type = "CounterRate"
+description = "Rate of transactions attempting to start on GRV proxy"
+
+[[gauge]]
+trace_type = "GrvProxyMetrics"
+gauge_name = "gp_grv_req_in"
+field_name = "TxnRequestIn"
+gauge_type = "CounterRate"
+description = "Rate of GRV requests on GRV proxy"
+
+[[gauge]]
+trace_type = "MovingData"
+gauge_name = "dd_shards_in_flight"
+field_name = "InFlight"
+gauge_type = "Simple"
+description = "Shards in flight, reported by data distributor"
+
+[[gauge]]
+trace_type = "MovingData"
+gauge_name = "dd_shards_in_queue"
+field_name = "InQueue"
+gauge_type = "Simple"
+description = "Shards in DD queue, reported by data distributor"
+
+[[gauge]]
+trace_type = "MovingData"
+gauge_name = "dd_average_shard_size"
+field_name = "AverageShardSize"
+gauge_type = "Simple"
+description = "Average shard size in bytes, reported by data distributor"
