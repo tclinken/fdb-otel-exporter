@@ -116,3 +116,10 @@ gauge_name = "dd_average_shard_size"
 field_name = "AverageShardSize"
 gauge_type = "Simple"
 description = "Average shard size in bytes, reported by data distributor"
+
+[[gauge]]
+trace_type = "RkUpdate"
+gauge_name = "rk_tps_limit"
+field_name = "TPSLimit"
+gauge_type = "Simple"
+description = "TPS limit enforced by ratekeeper"

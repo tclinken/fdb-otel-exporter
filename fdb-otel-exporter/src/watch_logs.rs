@@ -103,7 +103,11 @@ async fn run_log_tailer(path: PathBuf, metrics: LogMetrics) -> Result<()> {
                             }
 
                             match serde_json::from_str::<TraceEvent>(trimmed) {
-                                Ok(record) => metrics.record(&record)?,
+                                Ok(record) => {
+                                    if let Err(error) = metrics.record(&record) {
+                                        tracing::warn!(?error, raw_line = %trimmed, "failed to record log line");
+                                    }
+                                }
                                 Err(error) => {
                                     tracing::warn!(?error, raw_line = %trimmed, "failed to parse log line");
                                 }

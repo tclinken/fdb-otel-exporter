@@ -12,7 +12,7 @@ pub trait FDBGauge: Send + Sync {
 pub struct SimpleFDBGauge {
     trace_type: String,
     field_name: String,
-    gauge: Gauge<u64>,
+    gauge: Gauge<f64>,
 }
 
 impl SimpleFDBGauge {
@@ -29,7 +29,7 @@ impl SimpleFDBGauge {
             trace_type: trace_type.into(),
             field_name: field_name.into(),
             gauge: meter
-                .u64_gauge(gauge_name)
+                .f64_gauge(gauge_name)
                 .with_description(description)
                 .init(),
         }
@@ -48,7 +48,7 @@ impl FDBGauge for SimpleFDBGauge {
                 .get(self.field_name.as_str())
                 .and_then(|v| v.as_str())
                 .with_context(|| format!("Missing {} field", self.field_name))?;
-            self.gauge.record(value.parse::<u64>()?, labels);
+            self.gauge.record(value.parse::<f64>()?, labels);
         }
         Ok(())
     }

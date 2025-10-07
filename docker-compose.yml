@@ -24,5 +24,6 @@ services:
       - GENERATE_SAMPLE_LOGS=0
     volumes:
       - ${FDB_LOG_DIR}:/fdb-logs:ro
+      - ./fdb-otel-exporter/logs:/logs
 volumes:
   grafana-data: {}
