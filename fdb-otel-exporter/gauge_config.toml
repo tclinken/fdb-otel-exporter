@@ -123,3 +123,10 @@ gauge_name = "rk_tps_limit"
 field_name = "TPSLimit"
 gauge_type = "Simple"
 description = "TPS limit enforced by ratekeeper"
+
+[[gauge]]
+trace_type = "RkUpdate"
+gauge_name = "rk_released_tps"
+field_name = "ReleasedTPS"
+gauge_type = "Simple"
+description = "TPS released, reported by ratekeeper"
