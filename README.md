@@ -2,6 +2,8 @@
 
 The FDB OTEL exporter tails JSON FoundationDB logs and emits OTEL metrics. This project also sets up a simple local Prometheus and Grafana containers for local analysis of FDB logs. It is not intended for production use, and has only been tested locally on a Mac.
 
+![Example Dashboard](./GrafanaImage.png)
+
 ## Prerequisites
 
 - Install Docker
