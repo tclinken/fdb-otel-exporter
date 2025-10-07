@@ -144,3 +144,24 @@ gauge_name = "dd_total_kv_size"
 field_name = "TotalSizeBytes"
 gauge_type = "Simple"
 description = "Total KV size, reported by data distributor"
+
+[[gauge]]
+trace_type = "TLogMetrics"
+gauge_name = "tl_bytes_input"
+field_name = "BytesInput"
+gauge_type = "CounterRate"
+description = "Input byte rate on the tlog"
+
+[[gauge]]
+trace_type = "TLogMetrics"
+gauge_name = "tl_empty_peek_rate"
+field_name = "EmptyPeeks"
+gauge_type = "CounterRate"
+description = "Rate of empty peek requests on the tlog"
+
+[[gauge]]
+trace_type = "TLogMetrics"
+gauge_name = "tl_non_empty_peek_rate"
+field_name = "NonEmptyPeeks"
+gauge_type = "CounterRate"
+description = "Rate of non-empty peek requests on the tlog"
