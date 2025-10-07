@@ -1,12 +1,9 @@
-mod fake_trace_event;
 mod fdb_gauge;
 mod gauge_config;
 mod log_metrics;
 mod metrics_handler;
-mod sample_log_writer;
 mod watch_logs;
 use metrics_handler::{metrics_handler, AppState};
-use sample_log_writer::generate_samples;
 use watch_logs::watch_logs;
 
 use std::{
@@ -25,7 +22,6 @@ use tracing_subscriber::{fmt, EnvFilter};
 
 const LOG_DIR_ENV: &str = "LOG_DIR";
 const DEFAULT_LOG_DIR: &str = "logs";
-const GENERATE_SAMPLE_LOGS_ENV: &str = "GENERATE_SAMPLE_LOGS";
 const TRACE_LOG_FILE_ENV: &str = "TRACE_LOG_FILE";
 const DEFAULT_TRACE_LOG_FILE: &str = "logs/tracing.log";
 
@@ -40,14 +36,6 @@ async fn main() -> Result<()> {
     tracing::info!(log_dir, "watching JSON logs directory");
     let log_dir_path = PathBuf::from(&log_dir);
     watch_logs(&log_dir_path, Arc::clone(&meter_provider)).await?;
-
-    let should_generate_samples = env::var(GENERATE_SAMPLE_LOGS_ENV)
-        .map(|value| matches!(value.as_str(), "1" | "true" | "TRUE"))
-        .unwrap_or(false);
-
-    if should_generate_samples {
-        generate_samples(log_dir_path.clone());
-    }
 
     let app_state = AppState::new(registry.clone());
 

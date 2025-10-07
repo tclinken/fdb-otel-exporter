@@ -1,4 +1,4 @@
-use crate::log_metrics::{LogMetrics, LogRecord};
+use crate::log_metrics::{LogMetrics, TraceEvent};
 use anyhow::{Context, Result};
 use opentelemetry::metrics::MeterProvider;
 use opentelemetry_sdk::metrics::SdkMeterProvider;
@@ -102,7 +102,7 @@ async fn run_log_tailer(path: PathBuf, metrics: LogMetrics) -> Result<()> {
                                 continue;
                             }
 
-                            match serde_json::from_str::<LogRecord>(trimmed) {
+                            match serde_json::from_str::<TraceEvent>(trimmed) {
                                 Ok(record) => metrics.record(&record)?,
                                 Err(error) => {
                                     tracing::warn!(?error, raw_line = %trimmed, "failed to parse log line");
