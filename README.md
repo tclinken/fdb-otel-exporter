@@ -12,7 +12,7 @@ The FDB OTEL exporter tails JSON FoundationDB logs and emits OTEL metrics. This 
 Run:
 
 ```
-docker compose --build -d up
+docker compose up --build -d
 ```
 
 Open `localhost:3000` in your browser and login with `admin:admin` credentials. Then navigate in Grafana to the FDB Metrics dashboard to view FDB process metrics.
