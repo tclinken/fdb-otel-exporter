@@ -18,3 +18,28 @@ docker compose up --build -d
 ```
 
 Open `localhost:3000` in your browser and login with `admin:admin` credentials. Then navigate in Grafana to the FDB Metrics dashboard to view FDB process metrics.
+
+## Configuration
+
+Reported metrics are configured in the `gauge_config.toml` file. There are currently 4 types of gauges that can be reported from JSON trace files:
+
+- `Simple`: Reports the numeric value of the field
+- `CounterTotal`: Reports the total value from a counter (the third space-delimited value of the field)
+- `CounterRate`: Reports the rate from a counter (the first space-delimited value of the field)
+- `ElapsedRate`: Reports the numeric value of the field divided by the `Elapsed` field in the same trace event
+
+For each gauge, the `trace_type`, `field_name`, `gauge_name`, `gauge_type`, and `description` must be configured. For example, the following gauge configuration:
+
+```
+[[gauge]]
+trace_type = "StorageMetrics"
+gauge_name = "ss_bytes_input"
+field_name = "BytesInput"
+gauge_type = "CounterTotal"
+description = "Total input bytes on storage server"
+```
+
+will report a gauge from trace events of the form:
+```
+{ "Type": "StorageMetrics", "Time": "<trace_time>", "BytesInput": "<rate> <roughness> <total>", "Machine": "<process_address>" }
+```
