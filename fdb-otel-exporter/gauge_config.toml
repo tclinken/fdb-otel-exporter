@@ -130,3 +130,10 @@ gauge_name = "rk_released_tps"
 field_name = "ReleasedTPS"
 gauge_type = "Simple"
 description = "TPS released, reported by ratekeeper"
+
+[[gauge]]
+trace_type = "ProcessMetrics"
+gauge_name = "process_cpu_util"
+field_name = "CPUSeconds"
+gauge_type = "ElapsedRate"
+description = "Process CPU utilization as a ratio"

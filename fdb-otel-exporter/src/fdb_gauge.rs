@@ -158,3 +158,55 @@ impl FDBGauge for RateCounterFDBGauge {
         Ok(())
     }
 }
+
+#[derive(Clone)]
+pub struct ElapsedRateFDBGauge {
+    trace_type: String,
+    field_name: String,
+    gauge: Gauge<f64>,
+}
+
+impl ElapsedRateFDBGauge {
+    pub fn new(
+        trace_type: impl Into<String>,
+        field_name: impl Into<String>,
+        gauge_name: impl Into<String>,
+        description: impl Into<String>,
+        meter: &Meter,
+    ) -> Self {
+        let gauge_name = gauge_name.into();
+        let description = description.into();
+        Self {
+            trace_type: trace_type.into(),
+            field_name: field_name.into(),
+            gauge: meter
+                .f64_gauge(gauge_name)
+                .with_description(description)
+                .init(),
+        }
+    }
+}
+
+impl FDBGauge for ElapsedRateFDBGauge {
+    fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
+        let trace_type = trace_event
+            .get("Type")
+            .and_then(|value| value.as_str())
+            .with_context(|| "Missing trace type")?;
+
+        if trace_type == self.trace_type {
+            let value = trace_event
+                .get(self.field_name.as_str())
+                .and_then(|v| v.as_str())
+                .with_context(|| format!("Missing {} field", self.field_name))?
+                .parse::<f64>()?;
+            let elapsed = trace_event
+                .get("Elapsed")
+                .and_then(|v| v.as_str())
+                .with_context(|| "Missing Elapsed field")?
+                .parse::<f64>()?;
+            self.gauge.record(value / elapsed, labels);
+        }
+        Ok(())
+    }
+}

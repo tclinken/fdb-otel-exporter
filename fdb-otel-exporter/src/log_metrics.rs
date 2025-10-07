@@ -1,5 +1,7 @@
 use crate::{
-    fdb_gauge::{FDBGauge, RateCounterFDBGauge, SimpleFDBGauge, TotalCounterFDBGauge},
+    fdb_gauge::{
+        ElapsedRateFDBGauge, FDBGauge, RateCounterFDBGauge, SimpleFDBGauge, TotalCounterFDBGauge,
+    },
     gauge_config::{read_gauge_config_file, GaugeConfig, GaugeType},
 };
 use anyhow::{Context, Result};
@@ -56,6 +58,20 @@ impl LogMetrics {
                         description,
                         gauge_type: GaugeType::CounterRate,
                     } => Arc::new(RateCounterFDBGauge::new(
+                        trace_type,
+                        field_name,
+                        gauge_name,
+                        description,
+                        meter,
+                    )),
+
+                    GaugeConfig {
+                        trace_type,
+                        field_name,
+                        gauge_name,
+                        description,
+                        gauge_type: GaugeType::ElapsedRate,
+                    } => Arc::new(ElapsedRateFDBGauge::new(
                         trace_type,
                         field_name,
                         gauge_name,

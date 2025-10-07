@@ -35,7 +35,10 @@ async fn main() -> Result<()> {
     let log_dir = env::var(LOG_DIR_ENV).unwrap_or_else(|_| DEFAULT_LOG_DIR.to_string());
     tracing::info!(log_dir, "watching JSON logs directory");
     let log_dir_path = PathBuf::from(&log_dir);
-    watch_logs(&log_dir_path, Arc::clone(&meter_provider)).await?;
+    if let Err(err) = watch_logs(&log_dir_path, Arc::clone(&meter_provider)).await {
+        tracing::error!(?err, "watch_logs failed");
+        return Err(err);
+    }
 
     let app_state = AppState::new(registry.clone());
 

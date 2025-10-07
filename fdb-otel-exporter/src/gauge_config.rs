@@ -8,6 +8,7 @@ pub enum GaugeType {
     Simple,
     CounterTotal,
     CounterRate,
+    ElapsedRate,
 }
 
 #[derive(Debug, Clone, Deserialize)]
