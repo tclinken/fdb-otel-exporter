@@ -165,3 +165,10 @@ gauge_name = "tl_non_empty_peek_rate"
 field_name = "NonEmptyPeeks"
 gauge_type = "CounterRate"
 description = "Rate of non-empty peek requests on the tlog"
+
+[[gauge]]
+trace_type = "GRVLatencyMetrics"
+gauge_name = "gp_p99_grv_latency"
+field_name = "P99"
+gauge_type = "Simple"
+description = "P99 server-side GRV latency reported by GRV proxy"
