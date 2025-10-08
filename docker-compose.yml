@@ -21,7 +21,6 @@ services:
       - "9200:9200"
     environment:
       - LOG_DIR=/fdb-logs
-      - GENERATE_SAMPLE_LOGS=0
     volumes:
       - ${FDB_LOG_DIR}:/fdb-logs:ro
       - ./fdb-otel-exporter/logs:/logs
