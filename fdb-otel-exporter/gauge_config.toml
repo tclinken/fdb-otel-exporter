@@ -1,230 +1,197 @@
-[[gauge]]
+[[simple_gauge]]
 trace_type = "StorageMetrics"
 gauge_name = "ss_durable_version"
 field_name = "DurableVersion"
-gauge_type = "Simple"
 description = "Storage server durable version"
 
-[[gauge]]
+[[simple_gauge]]
 trace_type = "StorageMetrics"
 gauge_name = "ss_version"
 field_name = "Version"
-gauge_type = "Simple"
 description = "Storage server version"
 
-[[gauge]]
+[[counter_total_gauge]]
 trace_type = "StorageMetrics"
 gauge_name = "ss_bytes_input"
 field_name = "BytesInput"
-gauge_type = "CounterTotal"
 description = "Total input bytes on storage server"
 
-[[gauge]]
+[[counter_total_gauge]]
 trace_type = "StorageMetrics"
 gauge_name = "ss_bytes_durable"
 field_name = "BytesDurable"
-gauge_type = "CounterTotal"
 description = "Total durable bytes on storage server"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "StorageMetrics"
 gauge_name = "ss_bytes_queried"
 field_name = "BytesQueried"
-gauge_type = "CounterRate"
 description = "Rate of bytes queried per second on storage server"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "StorageMetrics"
 gauge_name = "ss_mutations"
 field_name = "Mutations"
-gauge_type = "CounterRate"
 description = "Rate of mutations per second on storage server"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "StorageMetrics"
 gauge_name = "ss_mutation_bytes"
 field_name = "MutationBytes"
-gauge_type = "CounterRate"
 description = "Mutation throughput in bytes per second on storage server"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "StorageMetrics"
 gauge_name = "ss_get_range_queries"
 field_name = "GetRangeQueries"
-gauge_type = "CounterRate"
 description = "Range queries per second on storage server"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "StorageMetrics"
 gauge_name = "ss_get_value_queries"
 field_name = "GetValueQueries"
-gauge_type = "CounterRate"
 description = "Value queries per second on storage server"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "StorageMetrics"
 gauge_name = "ss_get_key_queries"
 field_name = "GetKeyQueries"
-gauge_type = "CounterRate"
 description = "Key queries per second on storage server"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "ProxyMetrics"
 gauge_name = "cp_txn_commit_in"
 field_name = "TxnCommitIn"
-gauge_type = "CounterRate"
 description = "Transaction commits per second on commit proxy"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "ProxyMetrics"
 gauge_name = "cp_txn_conflicts"
 field_name = "TxnConflicts"
-gauge_type = "CounterRate"
 description = "Transaction conflict rate on commit proxy"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "GrvProxyMetrics"
 gauge_name = "gp_txn_start_in"
 field_name = "TxnStartIn"
-gauge_type = "CounterRate"
 description = "Rate of transactions attempting to start on GRV proxy"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "GrvProxyMetrics"
 gauge_name = "gp_grv_req_in"
 field_name = "TxnRequestIn"
-gauge_type = "CounterRate"
 description = "Rate of GRV requests on GRV proxy"
 
-[[gauge]]
+[[simple_gauge]]
 trace_type = "MovingData"
 gauge_name = "dd_shards_in_flight"
 field_name = "InFlight"
-gauge_type = "Simple"
 description = "Shards in flight, reported by data distributor"
 
-[[gauge]]
+[[simple_gauge]]
 trace_type = "MovingData"
 gauge_name = "dd_shards_in_queue"
 field_name = "InQueue"
-gauge_type = "Simple"
 description = "Shards in DD queue, reported by data distributor"
 
-[[gauge]]
+[[simple_gauge]]
 trace_type = "MovingData"
 gauge_name = "dd_average_shard_size"
 field_name = "AverageShardSize"
-gauge_type = "Simple"
 description = "Average shard size in bytes, reported by data distributor"
 
-[[gauge]]
+[[simple_gauge]]
 trace_type = "RkUpdate"
 gauge_name = "rk_tps_limit"
 field_name = "TPSLimit"
-gauge_type = "Simple"
 description = "TPS limit enforced by ratekeeper"
 
-[[gauge]]
+[[simple_gauge]]
 trace_type = "RkUpdate"
 gauge_name = "rk_released_tps"
 field_name = "ReleasedTPS"
-gauge_type = "Simple"
 description = "TPS released, reported by ratekeeper"
 
-[[gauge]]
+[[elapsed_rate_gauge]]
 trace_type = "ProcessMetrics"
 gauge_name = "process_cpu_util"
 field_name = "CPUSeconds"
-gauge_type = "ElapsedRate"
 description = "Process CPU utilization as a ratio"
 
-[[gauge]]
+[[simple_gauge]]
 trace_type = "DDTrackerStats"
 gauge_name = "dd_total_kv_size"
 field_name = "TotalSizeBytes"
-gauge_type = "Simple"
 description = "Total KV size, reported by data distributor"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "TLogMetrics"
 gauge_name = "tl_bytes_input"
 field_name = "BytesInput"
-gauge_type = "CounterRate"
 description = "Input byte rate on the tlog"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "TLogMetrics"
 gauge_name = "tl_empty_peek_rate"
 field_name = "EmptyPeeks"
-gauge_type = "CounterRate"
 description = "Rate of empty peek requests on the tlog"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "TLogMetrics"
 gauge_name = "tl_non_empty_peek_rate"
 field_name = "NonEmptyPeeks"
-gauge_type = "CounterRate"
 description = "Rate of non-empty peek requests on the tlog"
 
-[[gauge]]
+[[simple_gauge]]
 trace_type = "GRVLatencyMetrics"
 gauge_name = "gp_p99_grv_latency"
 field_name = "P99"
-gauge_type = "Simple"
 description = "P99 server-side GRV latency reported by GRV proxy"
 
-[[gauge]]
+[[simple_gauge]]
 trace_type = "CommitLatencyMetrics"
 gauge_name = "cp_p99_commit_latency"
 field_name = "P99"
-gauge_type = "Simple"
 description = "P99 server-side commit latency reported by commit proxy"
 
-[[gauge]]
+[[simple_gauge]]
 trace_type = "ReadLatencyMetrics"
 gauge_name = "ss_p99_read_latency"
 field_name = "P99"
-gauge_type = "Simple"
 description = "P99 server-side read latency reported by storage server"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "MasterMetrics"
 gauge_name = "ms_live_committed_version_reqs"
 field_name = "GetLiveCommittedVersionRequests"
-gauge_type = "CounterRate"
 description = "Rate of live committed version requests, reported by master"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "MasterMetrics"
 gauge_name = "ms_commit_version_reqs"
 field_name = "GetCommitVersionRequests"
-gauge_type = "CounterRate"
 description = "Rate of commit version requests, reported by master"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "MasterMetrics"
 gauge_name = "ms_report_live_committed_version_reqs"
 field_name = "ReportLiveCommittedVersionRequests"
-gauge_type = "CounterRate"
 description = "Rate of live committed version report requests, reported by master"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "ResolverMetrics"
 gauge_name = "rv_txns_resolved"
 field_name = "ResolvedTransactions"
-gauge_type = "CounterRate"
 description = "Rate of transactions resolved by resolver"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "ResolverMetrics"
 gauge_name = "rv_bytes_resolved"
 field_name = "ResolvedBytes"
-gauge_type = "CounterRate"
 description = "Bytes resolved per second by resolver"
 
-[[gauge]]
+[[counter_rate_gauge]]
 trace_type = "ResolverMetrics"
 gauge_name = "rv_batches_resolved"
 field_name = "ResolveBatchIn"
-gauge_type = "CounterRate"
 description = "Rate of batches sent to resolver"
