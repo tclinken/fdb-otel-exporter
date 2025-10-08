@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use serde::Deserialize;
 use std::{fs, path::Path};
 use toml::Value;
@@ -67,16 +67,6 @@ struct HistogramGaugeConfigEntry {
     description: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
-struct LegacyGaugeConfig {
-    trace_type: String,
-    gauge_name: String,
-    field_name: String,
-    #[serde(default)]
-    gauge_type: GaugeType,
-    description: String,
-}
-
 pub fn read_gauge_config_file(toml_config: &Path) -> Result<Vec<GaugeDefinition>> {
     let contents = fs::read_to_string(toml_config)
         .with_context(|| format!("failed to read gauge config file {}", toml_config.display()))?;
@@ -92,38 +82,16 @@ pub fn read_gauge_config_file(toml_config: &Path) -> Result<Vec<GaugeDefinition>
         )
     })?;
 
-    if let Some(gauges) = parse_typed_gauge_configs(&parsed_value, toml_config)? {
-        return Ok(gauges);
-    }
-
-    #[derive(Deserialize)]
-    struct GaugeConfigWrapper {
-        gauge: Vec<LegacyGaugeConfig>,
-    }
-
-    let gauges: Vec<LegacyGaugeConfig> = toml::from_str::<GaugeConfigWrapper>(&contents)
-        .map(|wrapper| wrapper.gauge)
-        .or_else(|_| toml::from_str::<Vec<LegacyGaugeConfig>>(&contents))
-        .with_context(|| {
-            format!(
-                "failed to parse gauge config file {}",
-                toml_config.display()
-            )
-        })?;
-
-    gauges
-        .into_iter()
-        .map(|config| config.into_definition())
-        .collect()
+    parse_typed_gauge_configs(&parsed_value, toml_config)
 }
 
-fn parse_typed_gauge_configs(
-    value: &Value,
-    toml_config: &Path,
-) -> Result<Option<Vec<GaugeDefinition>>> {
-    let Some(table) = value.as_table() else {
-        return Ok(None);
-    };
+fn parse_typed_gauge_configs(value: &Value, toml_config: &Path) -> Result<Vec<GaugeDefinition>> {
+    let table = value.as_table().with_context(|| {
+        format!(
+            "expected gauge config file {} to be a TOML table",
+            toml_config.display()
+        )
+    })?;
 
     let mut gauges = Vec::new();
     let mut recognized_any = false;
@@ -207,26 +175,11 @@ fn parse_typed_gauge_configs(
     }
 
     if recognized_any {
-        Ok(Some(gauges))
+        Ok(gauges)
     } else {
-        Ok(None)
-    }
-}
-
-impl LegacyGaugeConfig {
-    fn into_definition(self) -> Result<GaugeDefinition> {
-        let standard = StandardGaugeDefinition {
-            trace_type: self.trace_type,
-            gauge_name: self.gauge_name,
-            field_name: self.field_name,
-            description: self.description,
-        };
-
-        Ok(match self.gauge_type {
-            GaugeType::Simple => GaugeDefinition::Simple(standard),
-            GaugeType::CounterTotal => GaugeDefinition::CounterTotal(standard),
-            GaugeType::CounterRate => GaugeDefinition::CounterRate(standard),
-            GaugeType::ElapsedRate => GaugeDefinition::ElapsedRate(standard),
-        })
+        bail!(
+            "gauge config file {} did not contain any recognized sections",
+            toml_config.display()
+        )
     }
 }
