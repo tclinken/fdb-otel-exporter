@@ -3,7 +3,10 @@ use crate::{
         ElapsedRateFDBGauge, FDBGauge, HistogramPercentileFDBGauge, RateCounterFDBGauge,
         SimpleFDBGauge, TotalCounterFDBGauge,
     },
-    gauge_config::{read_gauge_config_file, GaugeConfig, GaugeType},
+    gauge_config::{
+        read_gauge_config_file, GaugeDefinition, HistogramPercentileGaugeDefinition,
+        StandardGaugeDefinition,
+    },
 };
 use anyhow::{Context, Result};
 use opentelemetry::{metrics::Meter, KeyValue};
@@ -22,58 +25,68 @@ impl LogMetrics {
         let config_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("gauge_config.toml");
         let configs = read_gauge_config_file(&config_path)?;
 
-        let mut gauges: Vec<Arc<dyn FDBGauge>> = configs
+        let gauges: Vec<Arc<dyn FDBGauge>> = configs
             .into_iter()
             .map(|config| -> Arc<dyn FDBGauge> {
                 match config {
-                    GaugeConfig {
+                    GaugeDefinition::Simple(StandardGaugeDefinition {
                         trace_type,
                         field_name,
                         gauge_name,
                         description,
-                        gauge_type: GaugeType::Simple,
-                    } => Arc::new(SimpleFDBGauge::new(
-                        trace_type,
-                        field_name,
-                        gauge_name,
-                        description,
-                        meter,
-                    )),
-                    GaugeConfig {
-                        trace_type,
-                        field_name,
-                        gauge_name,
-                        description,
-                        gauge_type: GaugeType::CounterTotal,
-                    } => Arc::new(TotalCounterFDBGauge::new(
+                    }) => Arc::new(SimpleFDBGauge::new(
                         trace_type,
                         field_name,
                         gauge_name,
                         description,
                         meter,
                     )),
-                    GaugeConfig {
+                    GaugeDefinition::CounterTotal(StandardGaugeDefinition {
                         trace_type,
                         field_name,
                         gauge_name,
                         description,
-                        gauge_type: GaugeType::CounterRate,
-                    } => Arc::new(RateCounterFDBGauge::new(
+                    }) => Arc::new(TotalCounterFDBGauge::new(
                         trace_type,
                         field_name,
                         gauge_name,
                         description,
                         meter,
                     )),
-                    GaugeConfig {
+                    GaugeDefinition::CounterRate(StandardGaugeDefinition {
                         trace_type,
                         field_name,
                         gauge_name,
                         description,
-                        gauge_type: GaugeType::ElapsedRate,
-                    } => Arc::new(ElapsedRateFDBGauge::new(
+                    }) => Arc::new(RateCounterFDBGauge::new(
                         trace_type,
                         field_name,
+                        gauge_name,
+                        description,
+                        meter,
+                    )),
+                    GaugeDefinition::ElapsedRate(StandardGaugeDefinition {
+                        trace_type,
+                        field_name,
+                        gauge_name,
+                        description,
+                    }) => Arc::new(ElapsedRateFDBGauge::new(
+                        trace_type,
+                        field_name,
+                        gauge_name,
+                        description,
+                        meter,
+                    )),
+                    GaugeDefinition::HistogramPercentile(HistogramPercentileGaugeDefinition {
+                        group,
+                        op,
+                        percentile,
+                        gauge_name,
+                        description,
+                    }) => Arc::new(HistogramPercentileFDBGauge::new(
+                        group,
+                        op,
+                        percentile,
                         gauge_name,
                         description,
                         meter,
@@ -81,15 +94,6 @@ impl LogMetrics {
                 }
             })
             .collect();
-
-        gauges.push(Arc::new(HistogramPercentileFDBGauge::new(
-            "tLog",
-            "commit",
-            0.5,
-            "tl_median_commit_latency",
-            "Median tlog commit latency",
-            meter,
-        )));
 
         Ok(Self { gauges })
     }

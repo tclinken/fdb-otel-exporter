@@ -195,3 +195,10 @@ trace_type = "ResolverMetrics"
 gauge_name = "rv_batches_resolved"
 field_name = "ResolveBatchIn"
 description = "Rate of batches sent to resolver"
+
+[[histogram_percentile_gauge]]
+group = "tLog"
+op = "commit"
+percentile = 0.5
+gauge_name = "tl_median_commit_latency"
+description = "Median tlog commit latency"
