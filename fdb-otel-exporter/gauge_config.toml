@@ -172,3 +172,17 @@ gauge_name = "gp_p99_grv_latency"
 field_name = "P99"
 gauge_type = "Simple"
 description = "P99 server-side GRV latency reported by GRV proxy"
+
+[[gauge]]
+trace_type = "CommitLatencyMetrics"
+gauge_name = "cp_p99_commit_latency"
+field_name = "P99"
+gauge_type = "Simple"
+description = "P99 server-side commit latency reported by commit proxy"
+
+[[gauge]]
+trace_type = "ReadLatencyMetrics"
+gauge_name = "ss_p99_read_latency"
+field_name = "P99"
+gauge_type = "Simple"
+description = "P99 server-side read latency reported by storage server"
