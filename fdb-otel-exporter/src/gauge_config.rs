@@ -184,14 +184,14 @@ fn parse_typed_gauge_configs(value: &Value, toml_config: &Path) -> Result<Vec<Ga
                     let base_gauge_name = gauge_name.clone();
                     let base_description = description.clone();
 
-                    for (idx, percentile) in percentiles.into_iter().enumerate() {
-                        let gauge_name = if total == 1 || idx == 0 {
+                    for percentile in percentiles.into_iter() {
+                        let gauge_name = if total == 1 {
                             base_gauge_name.clone()
                         } else {
                             format!("{}_{}", base_gauge_name, percentile_suffix(percentile))
                         };
 
-                        let description = if total == 1 || idx == 0 {
+                        let description = if total == 1 {
                             base_description.clone()
                         } else {
                             format!("{} (p{})", base_description, percentile_display(percentile))
