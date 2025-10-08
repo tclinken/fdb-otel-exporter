@@ -207,3 +207,24 @@ gauge_name = "ms_report_live_committed_version_reqs"
 field_name = "ReportLiveCommittedVersionRequests"
 gauge_type = "CounterRate"
 description = "Rate of live committed version report requests, reported by master"
+
+[[gauge]]
+trace_type = "ResolverMetrics"
+gauge_name = "rv_txns_resolved"
+field_name = "ResolvedTransactions"
+gauge_type = "CounterRate"
+description = "Rate of transactions resolved by resolver"
+
+[[gauge]]
+trace_type = "ResolverMetrics"
+gauge_name = "rv_bytes_resolved"
+field_name = "ResolvedBytes"
+gauge_type = "CounterRate"
+description = "Bytes resolved per second by resolver"
+
+[[gauge]]
+trace_type = "ResolverMetrics"
+gauge_name = "rv_batches_resolved"
+field_name = "ResolveBatchIn"
+gauge_type = "CounterRate"
+description = "Rate of batches sent to resolver"
