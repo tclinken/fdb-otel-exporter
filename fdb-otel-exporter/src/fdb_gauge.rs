@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use opentelemetry::metrics::{Gauge, Meter};
 use opentelemetry::KeyValue;
 use serde_json::Value;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 pub trait FDBGauge: Send + Sync {
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()>;
@@ -184,6 +184,83 @@ impl FDBGauge for ElapsedRateFDBGauge {
             let elapsed = get_trace_field(trace_event, "Elapsed")?.parse::<f64>()?;
             self.gauge_impl.gauge.record(value / elapsed, labels);
         }
+        Ok(())
+    }
+}
+
+// Because histograms are precomputed, interpolate percentiles and emit as gauge
+pub struct HistogramPercentileFDBGauge {
+    percentile: f64,
+    group: String,
+    op: String,
+    gauge: Gauge<f64>,
+}
+
+impl HistogramPercentileFDBGauge {
+    pub fn new(
+        group: impl Into<String>,
+        op: impl Into<String>,
+        percentile: f64,
+        gauge_name: impl Into<String>,
+        description: impl Into<String>,
+        meter: &Meter,
+    ) -> Self {
+        Self {
+            percentile,
+            group: group.into(),
+            op: op.into(),
+            gauge: meter
+                .f64_gauge(gauge_name.into())
+                .with_description(description.into())
+                .init(),
+        }
+    }
+}
+
+impl FDBGauge for HistogramPercentileFDBGauge {
+    fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
+        if get_trace_field(trace_event, "Type")? != "Histogram" {
+            return Ok(());
+        }
+        if get_trace_field(trace_event, "Group")? != self.group {
+            return Ok(());
+        }
+        if get_trace_field(trace_event, "Op")? != self.op {
+            return Ok(());
+        }
+
+        // FIXME: Only milliseconds supported for now:
+        if get_trace_field(trace_event, "Unit")? != "milliseconds" {
+            return Ok(());
+        }
+
+        let total_count = get_trace_field(trace_event, "TotalCount")?.parse::<u64>()?;
+        let mut hist: BTreeMap<u64, u64> = BTreeMap::new();
+
+        for (k, v) in trace_event {
+            if k.starts_with("LessThan") {
+                let bucket_ms = k.strip_prefix("LessThan").unwrap().parse::<f64>()?;
+                let bucket_micros = (bucket_ms * 1000.0) as u64;
+                let count = v
+                    .as_str()
+                    .with_context(|| "Trace event values should be strings")?
+                    .parse::<u64>()?;
+                hist.insert(bucket_micros, count);
+            }
+        }
+
+        let cutoff = self.percentile * (total_count as f64);
+        let mut seen = 0;
+
+        // TODO: Perform interpolation here:
+        for (micros, count) in hist {
+            seen += count;
+            if (seen as f64) >= cutoff {
+                self.gauge.record((micros as f64) / 1000000.0, labels);
+                break;
+            }
+        }
+
         Ok(())
     }
 }

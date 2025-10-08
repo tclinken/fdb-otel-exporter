@@ -1,6 +1,7 @@
 use crate::{
     fdb_gauge::{
-        ElapsedRateFDBGauge, FDBGauge, RateCounterFDBGauge, SimpleFDBGauge, TotalCounterFDBGauge,
+        ElapsedRateFDBGauge, FDBGauge, HistogramPercentileFDBGauge, RateCounterFDBGauge,
+        SimpleFDBGauge, TotalCounterFDBGauge,
     },
     gauge_config::{read_gauge_config_file, GaugeConfig, GaugeType},
 };
@@ -21,7 +22,7 @@ impl LogMetrics {
         let config_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("gauge_config.toml");
         let configs = read_gauge_config_file(&config_path)?;
 
-        let gauges: Vec<Arc<dyn FDBGauge>> = configs
+        let mut gauges: Vec<Arc<dyn FDBGauge>> = configs
             .into_iter()
             .map(|config| -> Arc<dyn FDBGauge> {
                 match config {
@@ -64,7 +65,6 @@ impl LogMetrics {
                         description,
                         meter,
                     )),
-
                     GaugeConfig {
                         trace_type,
                         field_name,
@@ -81,6 +81,15 @@ impl LogMetrics {
                 }
             })
             .collect();
+
+        gauges.push(Arc::new(HistogramPercentileFDBGauge::new(
+            "tLog",
+            "commit",
+            0.5,
+            "tl_median_commit_latency",
+            "Median tlog commit latency",
+            meter,
+        )));
 
         Ok(Self { gauges })
     }
