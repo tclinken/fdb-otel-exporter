@@ -1,31 +1,31 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- `fdb-otel-exporter/` contains the Rust telemetry service (`src/main.rs`) and Cargo manifests. Logs generated or tailed locally live in `fdb-otel-exporter/logs/`.
-- `docker-compose.yml`, `prometheus.yml`, and `grafana-provisioning/` define the local observability stack.
-- `dashboards/` holds Grafana dashboards; adjust JSON definitions under `grafana-provisioning/dashboards/` when shipping UI updates.
+- Primary service code lives in `fdb-otel-exporter/src/main.rs`; place supporting modules under `fdb-otel-exporter/src/`.
+- Logs generated locally land in `fdb-otel-exporter/logs/`; reuse this directory for fixtures referenced by tests.
+- Docker stack definitions sit in `docker-compose.yml`, `prometheus.yml`, and `grafana-provisioning/`; Grafana dashboards live in `dashboards/` and ship via `grafana-provisioning/dashboards/`.
 
 ## Build, Test, and Development Commands
-- `cargo fmt` (run in `fdb-otel-exporter/`) formats Rust sources using `rustfmt`.
-- `cargo check` validates compilation without producing binaries; run before commits for quick feedback.
-- `cargo test` executes unit/integration tests (add new tests under `fdb-otel-exporter/tests/` when needed).
-- `docker compose up --build -d` rebuilds the service image, applies environment changes (e.g., `LOG_DIR`, `GENERATE_SAMPLE_LOGS=1`), and starts Grafana/Prometheus/Rust services.
+- `cargo fmt` (run inside `fdb-otel-exporter/`) formats Rust sources; execute before every commit.
+- `cargo check` validates compilation without producing binaries.
+- `cargo test` runs the unit and integration suites, including files under `fdb-otel-exporter/tests/`.
+- `docker compose up --build -d` rebuilds the service image, applies env changes (e.g., `LOG_DIR`, `GENERATE_SAMPLE_LOGS=1`), and starts the observability stack.
 
 ## Coding Style & Naming Conventions
-- Rust code targets edition 2021 with 4-space indentation; prefer descriptive `snake_case` for functions and variables, and `CamelCase` for types.
-- Keep modules small and focused; place new async tasks or metrics helpers in their own files under `fdb-otel-exporter/src/` when complexity grows.
-- Always run `cargo fmt` before committing; CI assumes formatted output.
+- Target Rust 2021 with 4-space indentation; use `snake_case` for functions/variables and `CamelCase` for types.
+- Keep modules focused; break out new async tasks or metrics helpers into dedicated files under `fdb-otel-exporter/src/`.
+- Always run `cargo fmt` before pushing; CI rejects unformatted code.
 
 ## Testing Guidelines
-- Use Rust’s built-in test framework; colocate simple tests with the code via `#[cfg(test)]` modules, and reserve `tests/` for end-to-end flows.
-- Name tests after the behavior under test (e.g., `parses_storage_metrics_version`).
-- When adding metrics handlers, provide fixtures under `fdb-otel-exporter/logs/` and assert parsed values with `cargo test`.
+- Use Rust’s built-in framework; colocate simple unit tests with `#[cfg(test)]` modules and reserve `fdb-otel-exporter/tests/` for end-to-end flows.
+- Name tests after behavior, e.g., `parses_storage_metrics_version`.
+- Store sample events in `fdb-otel-exporter/logs/trace.json`; update fixtures when introducing new metrics parsers.
 
 ## Commit & Pull Request Guidelines
-- Follow the repository’s precedent of short, imperative commit subjects (e.g., “Add fdb-otel-exporter crate”).
-- Squash work-in-progress commits before opening a PR; each PR should describe intent, linked issues, and any dashboard or metric impact.
-- Include CLI output for critical changes (e.g., `cargo check`, `docker compose up --build`) and attach screenshots when altering Grafana dashboards.
+- Write short, imperative commit subjects (e.g., “Add fdb-otel-exporter crate”).
+- Squash WIP commits before opening a PR; describe intent, link issues, and call out dashboard or metric impact.
+- Attach relevant CLI output (e.g., `cargo check`) and screenshots when modifying Grafana dashboards.
 
 ## Observability & Configuration Tips
-- Default metrics target `http://localhost:9200/metrics`. Prometheus discovers the service via `prometheus.yml`; update scrape intervals there when tuning load.
-- Use `LOG_DIR` to point at trace archives and `GENERATE_SAMPLE_LOGS=1` to seed `trace.json` with sample `StorageMetrics` events during local development.
+- Default metrics endpoint is `http://localhost:9200/metrics`; adjust Prometheus scrape intervals via `prometheus.yml`.
+- Set `LOG_DIR` to point at archived traces; enable `GENERATE_SAMPLE_LOGS=1` locally to seed sample `StorageMetrics` events.
