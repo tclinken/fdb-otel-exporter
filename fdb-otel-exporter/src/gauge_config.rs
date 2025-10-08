@@ -1,4 +1,5 @@
 use anyhow::{bail, Context, Result};
+use serde::de::{self, Deserializer};
 use serde::Deserialize;
 use std::{fs, path::Path};
 use toml::Value;
@@ -22,6 +23,56 @@ impl GaugeType {
             _ => None,
         }
     }
+}
+
+fn deserialize_percentiles<'de, D>(deserializer: D) -> Result<Vec<f64>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let percentiles = Vec::<f64>::deserialize(deserializer)?;
+
+    if percentiles.is_empty() {
+        return Err(de::Error::custom("percentiles list cannot be empty"));
+    }
+
+    percentiles
+        .into_iter()
+        .map(|value| validate_percentile::<D::Error>(value))
+        .collect()
+}
+
+fn validate_percentile<E: de::Error>(value: f64) -> Result<f64, E> {
+    if !value.is_finite() {
+        return Err(de::Error::custom("percentile must be finite"));
+    }
+
+    if !(0.0..=1.0).contains(&value) {
+        return Err(de::Error::custom(format!(
+            "percentile {} must be between 0.0 and 1.0",
+            value
+        )));
+    }
+
+    Ok(value)
+}
+
+fn percentile_suffix(percentile: f64) -> String {
+    let display = percentile_display(percentile).replace('.', "_");
+    format!("p{}", display)
+}
+
+fn percentile_display(percentile: f64) -> String {
+    let mut value = format!("{:.6}", percentile * 100.0);
+
+    while value.contains('.') && value.ends_with('0') {
+        value.pop();
+    }
+
+    if value.ends_with('.') {
+        value.pop();
+    }
+
+    value
 }
 
 #[derive(Debug, Clone)]
@@ -62,7 +113,8 @@ struct GaugeConfigEntry {
 struct HistogramGaugeConfigEntry {
     group: String,
     op: String,
-    percentile: f64,
+    #[serde(deserialize_with = "deserialize_percentiles")]
+    percentiles: Vec<f64>,
     gauge_name: String,
     description: String,
 }
@@ -109,9 +161,9 @@ fn parse_typed_gauge_configs(value: &Value, toml_config: &Path) -> Result<Vec<Ga
                     )
                 })?;
 
-                for (index, entry) in array.iter().enumerate() {
+                for (index, entry_value) in array.iter().enumerate() {
                     let entry: HistogramGaugeConfigEntry =
-                        entry.clone().try_into().with_context(|| {
+                        entry_value.clone().try_into().with_context(|| {
                             format!(
                                 "failed to parse {} entry {} in {}",
                                 section,
@@ -120,15 +172,41 @@ fn parse_typed_gauge_configs(value: &Value, toml_config: &Path) -> Result<Vec<Ga
                             )
                         })?;
 
-                    gauges.push(GaugeDefinition::HistogramPercentile(
-                        HistogramPercentileGaugeDefinition {
-                            group: entry.group,
-                            op: entry.op,
-                            percentile: entry.percentile,
-                            gauge_name: entry.gauge_name,
-                            description: entry.description,
-                        },
-                    ));
+                    let HistogramGaugeConfigEntry {
+                        group,
+                        op,
+                        percentiles,
+                        gauge_name,
+                        description,
+                    } = entry;
+
+                    let total = percentiles.len();
+                    let base_gauge_name = gauge_name.clone();
+                    let base_description = description.clone();
+
+                    for (idx, percentile) in percentiles.into_iter().enumerate() {
+                        let gauge_name = if total == 1 || idx == 0 {
+                            base_gauge_name.clone()
+                        } else {
+                            format!("{}_{}", base_gauge_name, percentile_suffix(percentile))
+                        };
+
+                        let description = if total == 1 || idx == 0 {
+                            base_description.clone()
+                        } else {
+                            format!("{} (p{})", base_description, percentile_display(percentile))
+                        };
+
+                        gauges.push(GaugeDefinition::HistogramPercentile(
+                            HistogramPercentileGaugeDefinition {
+                                group: group.clone(),
+                                op: op.clone(),
+                                percentile,
+                                gauge_name,
+                                description,
+                            },
+                        ));
+                    }
                 }
             }
             _ => {

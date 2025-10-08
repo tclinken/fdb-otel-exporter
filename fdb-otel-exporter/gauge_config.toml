@@ -199,6 +199,6 @@ description = "Rate of batches sent to resolver"
 [[histogram_percentile_gauge]]
 group = "tLog"
 op = "commit"
-percentile = 0.5
+percentiles = [0.5, 0.99]
 gauge_name = "tl_median_commit_latency"
 description = "Median tlog commit latency"
