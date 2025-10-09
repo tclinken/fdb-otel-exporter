@@ -364,3 +364,57 @@ op = "QueueDepth"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "rv_queue_depth"
 description = "resolver queue depth"
+
+[[simple_gauge]]
+trace_type = "AsyncFileKAIOReadLatency"
+gauge_name = "process_p50_async_file_kaio_read_latency"
+field_name = "Median"
+description = "P50 latency for AsyncFileKAIO read operations"
+
+[[simple_gauge]]
+trace_type = "AsyncFileKAIOReadLatency"
+gauge_name = "process_p99_async_file_kaio_read_latency"
+field_name = "P99"
+description = "P99 latency for AsyncFileKAIO read operations"
+
+[[simple_gauge]]
+trace_type = "AsyncFileKAIOReadLatency"
+gauge_name = "process_p999_async_file_kaio_read_latency"
+field_name = "P99.9"
+description = "P999 latency for AsyncFileKAIO read operations"
+
+[[simple_gauge]]
+trace_type = "AsyncFileKAIOWriteLatency"
+gauge_name = "process_p50_async_file_kaio_write_latency"
+field_name = "Median"
+description = "P50 latency for AsyncFileKAIO write operations"
+
+[[simple_gauge]]
+trace_type = "AsyncFileKAIOWriteLatency"
+gauge_name = "process_p99_async_file_kaio_write_latency"
+field_name = "P99"
+description = "P99 latency for AsyncFileKAIO write operations"
+
+[[simple_gauge]]
+trace_type = "AsyncFileKAIOWriteLatency"
+gauge_name = "process_p999_async_file_kaio_write_latency"
+field_name = "P99.9"
+description = "P999 latency for AsyncFileKAIO write operations"
+
+[[simple_gauge]]
+trace_type = "AsyncFileKAIOSyncLatency"
+gauge_name = "process_p50_async_file_kaio_sync_latency"
+field_name = "Median"
+description = "P50 latency for AsyncFileKAIO sync operations"
+
+[[simple_gauge]]
+trace_type = "AsyncFileKAIOSyncLatency"
+gauge_name = "process_p99_async_file_kaio_sync_latency"
+field_name = "P99"
+description = "P99 latency for AsyncFileKAIO sync operations"
+
+[[simple_gauge]]
+trace_type = "AsyncFileKAIOSyncLatency"
+gauge_name = "process_p999_async_file_kaio_sync_latency"
+field_name = "P99.9"
+description = "P999 latency for AsyncFileKAIO sync operations"
