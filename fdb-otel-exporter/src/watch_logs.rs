@@ -167,13 +167,41 @@ fn should_tail_file(file_name: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::fdb_gauge::FDBGauge;
+    use anyhow::Result;
     use opentelemetry_sdk::metrics::{ManualReader, SdkMeterProvider};
+    use serde_json::json;
+    use std::sync::Mutex;
     use tempfile::tempdir;
+    use tokio::fs::OpenOptions;
+    use tokio::io::AsyncWriteExt;
     use tokio::time::{timeout, Duration as TokioDuration};
 
     fn test_meter_provider() -> Arc<SdkMeterProvider> {
         let reader = ManualReader::builder().build();
         Arc::new(SdkMeterProvider::builder().with_reader(reader).build())
+    }
+
+    #[derive(Clone)]
+    struct RecordingGauge {
+        events: Arc<Mutex<Vec<TraceEvent>>>,
+    }
+
+    impl RecordingGauge {
+        fn new(events: Arc<Mutex<Vec<TraceEvent>>>) -> Self {
+            Self { events }
+        }
+    }
+
+    impl FDBGauge for RecordingGauge {
+        fn record(
+            &self,
+            trace_event: &TraceEvent,
+            _labels: &[opentelemetry::KeyValue],
+        ) -> Result<()> {
+            self.events.lock().unwrap().push(trace_event.clone());
+            Ok(())
+        }
     }
 
     #[test]
@@ -206,5 +234,73 @@ mod tests {
             tokio::fs::metadata(&log_dir).await.unwrap().is_dir(),
             "watch_logs should create log directory"
         );
+    }
+
+    #[tokio::test]
+    async fn run_log_directory_records_trace_events() -> Result<()> {
+        let temp_dir = tempdir()?;
+        let trace_path = temp_dir.path().join("trace.42.json");
+        let ignored_path = temp_dir.path().join("ignored.log");
+
+        tokio::fs::File::create(&trace_path).await?;
+        tokio::fs::File::create(&ignored_path).await?;
+
+        let events = Arc::new(Mutex::new(Vec::new()));
+        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
+        let log_metrics = LogMetrics::from_gauges(gauges);
+
+        let provider = test_meter_provider();
+        let meter = provider.meter("run_log_directory_records_trace_events");
+        let exporter_metrics = ExporterMetrics::new(&meter);
+
+        let poll_interval = TokioDuration::from_millis(20);
+        let dir = temp_dir.path().to_path_buf();
+
+        let handle = tokio::spawn(run_log_directory(
+            dir,
+            log_metrics,
+            exporter_metrics,
+            poll_interval,
+        ));
+
+        tokio::time::sleep(TokioDuration::from_millis(60)).await;
+
+        {
+            let mut file = OpenOptions::new()
+                .append(true)
+                .open(&trace_path)
+                .await
+                .context("failed to open trace file for append")?;
+
+            let event = json!({
+                "Machine": "machine-01",
+                "Roles": "storage",
+                "Type": "TestTrace"
+            });
+            file.write_all(serde_json::to_string(&event)?.as_bytes())
+                .await
+                .context("failed to write trace event")?;
+            file.write_all(b"\n").await?;
+            file.flush().await?;
+        }
+
+        for _ in 0..50 {
+            if events.lock().unwrap().len() >= 1 {
+                break;
+            }
+            tokio::time::sleep(TokioDuration::from_millis(10)).await;
+        }
+
+        handle.abort();
+        let _ = handle.await;
+
+        let recorded = events.lock().unwrap();
+        assert_eq!(
+            recorded.len(),
+            1,
+            "expected exactly one trace event to be recorded"
+        );
+
+        Ok(())
     }
 }

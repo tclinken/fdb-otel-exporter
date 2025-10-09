@@ -128,7 +128,7 @@ pub type TraceEvent = HashMap<String, Value>;
 
 #[cfg(test)]
 impl LogMetrics {
-    fn from_gauges(gauges: Vec<Arc<dyn FDBGauge>>) -> Self {
+    pub(crate) fn from_gauges(gauges: Vec<Arc<dyn FDBGauge>>) -> Self {
         Self { gauges }
     }
 }
