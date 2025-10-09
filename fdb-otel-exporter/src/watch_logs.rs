@@ -51,7 +51,7 @@ async fn run_log_directory(dir: PathBuf, metrics: LogMetrics) -> Result<()> {
                         continue;
                     };
 
-                    if !file_name.starts_with("trace.") || !file_name.ends_with(".json") {
+                    if !should_tail_file(file_name) {
                         continue;
                     }
 
@@ -129,5 +129,54 @@ async fn run_log_tailer(path: PathBuf, metrics: LogMetrics) -> Result<()> {
                 time::sleep(Duration::from_secs(1)).await;
             }
         }
+    }
+}
+
+fn should_tail_file(file_name: &str) -> bool {
+    file_name.starts_with("trace.") && file_name.ends_with(".json")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use opentelemetry_sdk::metrics::{ManualReader, SdkMeterProvider};
+    use tempfile::tempdir;
+    use tokio::time::timeout;
+
+    fn test_meter_provider() -> Arc<SdkMeterProvider> {
+        let reader = ManualReader::builder().build();
+        Arc::new(SdkMeterProvider::builder().with_reader(reader).build())
+    }
+
+    #[test]
+    fn should_tail_file_filters_trace_logs() {
+        assert!(should_tail_file("trace.1.json"));
+        assert!(should_tail_file("trace.some_process.json"));
+        assert!(!should_tail_file("trace.1.xml"));
+        assert!(!should_tail_file("random.log"));
+        assert!(!should_tail_file("tracejson"));
+    }
+
+    #[tokio::test]
+    async fn watch_logs_creates_missing_directory() {
+        let temp_dir = tempdir().expect("temp dir");
+        let log_dir = temp_dir.path().join("logs");
+        let provider = test_meter_provider();
+        assert!(
+            tokio::fs::metadata(&log_dir).await.is_err(),
+            "log dir should not exist before watch_logs"
+        );
+
+        watch_logs(&log_dir, provider)
+            .await
+            .expect("watch_logs should succeed");
+
+        // Allow spawned tasks to start.
+        let _ = timeout(Duration::from_millis(50), tokio::task::yield_now()).await;
+
+        assert!(
+            tokio::fs::metadata(&log_dir).await.unwrap().is_dir(),
+            "watch_logs should create log directory"
+        );
     }
 }
