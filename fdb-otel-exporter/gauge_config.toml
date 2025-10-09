@@ -418,3 +418,21 @@ trace_type = "AsyncFileKAIOSyncLatency"
 gauge_name = "process_p999_async_file_kaio_sync_latency"
 field_name = "P99.9"
 description = "P999 latency for AsyncFileKAIO sync operations"
+
+[[counter_rate_gauge]]
+trace_type = "ClusterControllerMetrics"
+gauge_name = "cc_open_db_reqs"
+field_name = "OpenDatabaseRequests"
+description = "Rate of open database requests, reported by cluster controller"
+
+[[counter_rate_gauge]]
+trace_type = "ClusterControllerMetrics"
+gauge_name = "cc_status_reqs"
+field_name = "StatusRequests"
+description = "Rate of status requests, reported by cluster controller"
+
+[[simple_gauge]]
+trace_type = "MasterRecoveryState"
+gauge_name = "cc_recovery_state"
+field_name = "StatusCode"
+description = "Recovery state, reported by cluster controller"
