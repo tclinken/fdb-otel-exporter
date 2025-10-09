@@ -1,6 +1,6 @@
 services:
   grafana:
-    image: grafana/grafana-oss:latest
+    image: grafana/grafana-oss:12.2.0-17142428006
     ports:
       - "3000:3000"
     environment:
@@ -10,7 +10,7 @@ services:
       - grafana-data:/var/lib/grafana
       - ./grafana-provisioning:/etc/grafana/provisioning
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.6.0
     ports:
       - "9090:9090"
     volumes:
