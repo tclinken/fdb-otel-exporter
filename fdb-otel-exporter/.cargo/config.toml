@@ -1,0 +1,18 @@
+[alias]
+# Runs unit and integration tests with instrumentation and renders an HTML coverage report.
+coverage = [
+    "llvm-cov",
+    "--tests",
+    "--workspace",
+    "--html",
+    "--output-dir",
+    "target/coverage",
+]
+
+# Emits a concise table so CI or local scripts can fail on low coverage without generating reports.
+coverage-summary = [
+    "llvm-cov",
+    "--tests",
+    "--workspace",
+    "--summary-only",
+]
