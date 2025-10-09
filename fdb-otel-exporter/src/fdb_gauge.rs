@@ -7,6 +7,7 @@ use std::{
     f64,
 };
 
+// Snapshot of a histogram bucket expressed in microseconds with counts and cumulative total.
 #[derive(Debug, Clone, Copy)]
 struct HistogramBucket {
     lower_bound_micros: u64,
@@ -15,10 +16,10 @@ struct HistogramBucket {
     cumulative_count: u64,
 }
 
-// Represents a precomputed histogram bucket and the cumulative events observed up to its upper bound.
-// Histogram lines emitted by FoundationDB report counts in `LessThan` buckets. The exporter converts
-// those buckets into microsecond ranges so percentile interpolation logic can operate on concrete
-// lower/upper bounds and the running cumulative count.
+// Interpolate a percentile value from histogram buckets assuming an exponential distribution.
+// The buckets are derived from FoundationDB `LessThan` lines, converted to microseconds, and paired
+// with running cumulative counts so this helper can locate the bucket that spans the percentile and
+// solve for the interpolated value.
 fn interpolate_exponential_percentile(
     buckets: &[HistogramBucket],
     total_count: u64,
@@ -305,11 +306,10 @@ pub struct HistogramPercentileFDBGauge {
 }
 
 impl HistogramPercentileFDBGauge {
-    // Record pre-aggregated histogram percentiles as gauges.
-    // FoundationDB log files contain histogram buckets (with upper-bound thresholds) for each
-    // `(Group, Op)` combination. This gauge collects buckets from the matching log event and
-    // interpolates the requested percentile assuming an exponential distribution of samples within
-    // the bucket that spans the target percentile.
+    // Record pre-aggregated histogram percentiles as gauges. FoundationDB log files contain
+    // histogram buckets (with upper-bound thresholds) for each `(Group, Op)` combination. This
+    // gauge collects buckets from the matching log event and interpolates the requested percentile
+    // under an exponential assumption.
     pub fn new(
         group: impl Into<String>,
         op: impl Into<String>,

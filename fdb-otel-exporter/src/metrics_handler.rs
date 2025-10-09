@@ -4,12 +4,14 @@ use axum::response::IntoResponse;
 use prometheus::{Encoder, Registry, TextEncoder};
 use std::sync::Arc;
 
+// Shared state passed to the `/metrics` endpoint so requests can scrape the Prometheus registry.
 #[derive(Clone)]
 pub struct AppState {
     registry: Arc<Registry>,
 }
 
 impl AppState {
+    // Store the Prometheus registry in an `Arc` for cheap cloning across requests.
     pub fn new(registry: Arc<Registry>) -> Self {
         Self {
             registry: registry.clone(),
@@ -17,6 +19,7 @@ impl AppState {
     }
 }
 
+// Render all collected metrics using the text exposition format expected by Prometheus.
 pub async fn metrics_handler(State(state): State<AppState>) -> impl IntoResponse {
     let metric_families = state.registry.gather();
     let encoder = TextEncoder::new();

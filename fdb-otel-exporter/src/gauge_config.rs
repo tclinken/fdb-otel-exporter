@@ -4,6 +4,7 @@ use serde::Deserialize;
 use std::{fs, path::Path};
 use toml::Value;
 
+// Helper enum used to map TOML sections to concrete gauge constructors.
 #[derive(Debug, Clone, Deserialize, Default)]
 enum GaugeType {
     #[default]
@@ -25,6 +26,7 @@ impl GaugeType {
     }
 }
 
+// Deserialize a list of percentile values and validate they fall within `[0, 1]`.
 fn deserialize_percentiles<'de, D>(deserializer: D) -> Result<Vec<f64>, D::Error>
 where
     D: Deserializer<'de>,
@@ -41,6 +43,7 @@ where
         .collect()
 }
 
+// Ensure a single percentile entry is finite and within the inclusive range `[0, 1]`.
 fn validate_percentile<E: de::Error>(value: f64) -> Result<f64, E> {
     if !value.is_finite() {
         return Err(de::Error::custom("percentile must be finite"));
@@ -55,11 +58,13 @@ fn validate_percentile<E: de::Error>(value: f64) -> Result<f64, E> {
     Ok(value)
 }
 
+// Produce a gauge name suffix such as `p95_5` from a percentile value.
 fn percentile_suffix(percentile: f64) -> String {
     let display = percentile_display(percentile).replace('.', "_");
     format!("p{display}")
 }
 
+// Format a percentile as a percentage string while trimming trailing zeros.
 fn percentile_display(percentile: f64) -> String {
     let mut value = format!("{:.6}", percentile * 100.0);
 
@@ -118,6 +123,7 @@ struct HistogramGaugeConfigEntry {
     description: String,
 }
 
+// Read `gauge_config.toml` from disk and return the normalized gauge definitions.
 pub fn read_gauge_config_file(toml_config: &Path) -> Result<Vec<GaugeDefinition>> {
     let contents = fs::read_to_string(toml_config)
         .with_context(|| format!("failed to read gauge config file {}", toml_config.display()))?;
@@ -136,6 +142,7 @@ pub fn read_gauge_config_file(toml_config: &Path) -> Result<Vec<GaugeDefinition>
     parse_typed_gauge_configs(&parsed_value, toml_config)
 }
 
+// Expand the parsed TOML value into strongly-typed gauge definitions.
 fn parse_typed_gauge_configs(value: &Value, toml_config: &Path) -> Result<Vec<GaugeDefinition>> {
     let table = value.as_table().with_context(|| {
         format!(

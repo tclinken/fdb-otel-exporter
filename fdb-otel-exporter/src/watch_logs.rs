@@ -11,6 +11,7 @@ use tokio::fs::{self, OpenOptions};
 use tokio::io::{AsyncBufReadExt, AsyncSeekExt, BufReader};
 use tokio::time;
 
+// Discover JSON trace logs under `log_dir_path` and push their events through the configured gauges.
 pub async fn watch_logs(
     log_dir_path: &PathBuf,
     meter_provider: Arc<SdkMeterProvider>,
@@ -33,6 +34,7 @@ pub async fn watch_logs(
     Ok(())
 }
 
+// Poll the log directory, spawning a tail task for each new `trace.*.json` file encountered.
 async fn run_log_directory(dir: PathBuf, metrics: LogMetrics) -> Result<()> {
     let mut tailed: HashSet<PathBuf> = HashSet::new();
 
@@ -73,6 +75,7 @@ async fn run_log_directory(dir: PathBuf, metrics: LogMetrics) -> Result<()> {
     }
 }
 
+// Tail a single trace file and forward each JSON line to the metrics recorder.
 async fn run_log_tailer(path: PathBuf, metrics: LogMetrics) -> Result<()> {
     loop {
         match OpenOptions::new().read(true).open(&path).await {

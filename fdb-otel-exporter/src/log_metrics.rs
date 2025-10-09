@@ -15,12 +15,14 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+// Holds the configured gauges derived from the on-disk gauge configuration.
 #[derive(Clone)]
 pub struct LogMetrics {
     gauges: Vec<Arc<dyn FDBGauge>>,
 }
 
 impl LogMetrics {
+    // Load gauge definitions from `gauge_config.toml` and instantiate their implementations.
     pub fn new(meter: &Meter) -> Result<Self> {
         let config_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("gauge_config.toml");
         let configs = read_gauge_config_file(&config_path)?;
@@ -98,6 +100,7 @@ impl LogMetrics {
         Ok(Self { gauges })
     }
 
+    // Record a single FoundationDB trace event across every configured gauge.
     pub fn record(&self, trace_event: &TraceEvent) -> Result<()> {
         let machine = trace_event
             .get("Machine")

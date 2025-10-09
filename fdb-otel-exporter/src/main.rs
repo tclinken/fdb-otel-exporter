@@ -27,6 +27,7 @@ const DEFAULT_TRACE_LOG_FILE: &str = "logs/tracing.log";
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Initialize logging, metrics infrastructure, and start watching FDB trace logs.
     init_tracing()?;
 
     let (registry, meter_provider) = init_metrics()?;
@@ -58,6 +59,7 @@ async fn main() -> Result<()> {
 }
 
 async fn shutdown_signal() {
+    // Wait for Ctrl+C or SIGTERM so axum can drain outstanding requests cleanly.
     let ctrl_c = async {
         signal::ctrl_c()
             .await
@@ -79,6 +81,7 @@ async fn shutdown_signal() {
 }
 
 fn init_tracing() -> Result<()> {
+    // Configure tracing to mirror logs into a rolling file whose location can be overridden via env.
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
 
     let log_file =
@@ -118,6 +121,7 @@ fn init_tracing() -> Result<()> {
 }
 
 fn init_metrics() -> Result<(Arc<Registry>, SdkMeterProvider)> {
+    // Build a Prometheus-backed meter provider so OpenTelemetry metrics feed the `/metrics` endpoint.
     let registry = Registry::new();
 
     let exporter = opentelemetry_prometheus::exporter()
