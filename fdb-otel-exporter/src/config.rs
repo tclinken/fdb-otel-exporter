@@ -147,4 +147,45 @@ mod tests {
             },
         );
     }
+
+    #[test]
+    fn parse_f64_env_rejects_non_numeric_values() {
+        with_env(&[(LOG_POLL_INTERVAL_ENV, Some("not-a-number"))], || {
+            let error = parse_f64_env(LOG_POLL_INTERVAL_ENV, 1.0)
+                .expect_err("invalid float strings should fail to parse");
+            assert!(
+                error
+                    .to_string()
+                    .contains("expected to be a floating point number"),
+                "unexpected error message: {error}"
+            );
+        });
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn parse_f64_env_rejects_non_utf8_values() {
+        use std::ffi::OsString;
+        use std::os::unix::ffi::OsStringExt;
+
+        let _guard = env_guard();
+
+        let previous = env::var_os(LOG_POLL_INTERVAL_ENV);
+        let invalid = OsString::from_vec(vec![0xff, 0xfe, 0xfd]);
+        env::set_var(LOG_POLL_INTERVAL_ENV, &invalid);
+
+        let error = parse_f64_env(LOG_POLL_INTERVAL_ENV, 1.0)
+            .expect_err("non-UTF8 env values should fail");
+        assert!(
+            error
+                .to_string()
+                .contains("must be valid UTF-8"),
+            "unexpected error message: {error}"
+        );
+
+        match previous {
+            Some(value) => env::set_var(LOG_POLL_INTERVAL_ENV, value),
+            None => env::remove_var(LOG_POLL_INTERVAL_ENV),
+        }
+    }
 }
