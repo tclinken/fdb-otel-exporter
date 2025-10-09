@@ -285,7 +285,7 @@ mod tests {
         }
 
         for _ in 0..50 {
-            if events.lock().unwrap().len() >= 1 {
+            if !events.lock().unwrap().is_empty() {
                 break;
             }
             tokio::time::sleep(TokioDuration::from_millis(10)).await;
