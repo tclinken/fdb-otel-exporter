@@ -6,6 +6,10 @@ The Grafana dashboard has over 100 charts to visualize various FDB metrics:
 
 ![Example Dashboard](./GrafanaImage.png)
 
+## Why not use `status json`?
+
+While relying solely on FDB logs prevents exposing some cluster-wide metrics that the cluster controller aggregates, the logs also contain many metrics not exposed through `status json`. For example, `Histogram` trace events give fine-grained details on latencies of FDB sub-operations, helpful for identifying bottlenecks. Furthermore, `status json` will give incomplete output if the cluster is in an unhealthy state, e.g. stuck in recovery. This means that useful metrics will be missing from `status json` precisely when it's most necessary to have visibility into the cluster's status. Not relying on `status json` also means that the `fdb-otel-exporter` crate has no dependency on the FDB client, though there is an implicit dependency on trace event schemas.
+
 ## Prerequisites
 
 - Install Docker
