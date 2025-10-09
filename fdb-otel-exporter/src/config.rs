@@ -13,7 +13,7 @@ pub const LOG_POLL_INTERVAL_ENV: &str = "LOG_POLL_INTERVAL_SECS";
 const DEFAULT_LOG_DIR: &str = "logs";
 const DEFAULT_TRACE_LOG_FILE: &str = "logs/tracing.log";
 const DEFAULT_LISTEN_ADDR: &str = "0.0.0.0:9200";
-const DEFAULT_POLL_INTERVAL_SECS: u64 = 2;
+const DEFAULT_POLL_INTERVAL_SECS: f64 = 2.0;
 
 #[derive(Debug, Clone)]
 pub struct AppConfig {
@@ -40,7 +40,7 @@ impl AppConfig {
             env::var(TRACE_LOG_FILE_ENV).unwrap_or_else(|_| DEFAULT_TRACE_LOG_FILE.to_string()),
         );
 
-        let log_poll_interval = Duration::from_secs(parse_u64_env(
+        let log_poll_interval = Duration::from_secs_f64(parse_f64_env(
             LOG_POLL_INTERVAL_ENV,
             DEFAULT_POLL_INTERVAL_SECS,
         )?);
@@ -54,10 +54,12 @@ impl AppConfig {
     }
 }
 
-fn parse_u64_env(key: &str, default: u64) -> Result<u64> {
+fn parse_f64_env(key: &str, default: f64) -> Result<f64> {
     match env::var(key) {
-        Ok(value) => value.parse::<u64>().with_context(|| {
-            format!("environment variable {key} expected to be an unsigned integer, got {value}")
+        Ok(value) => value.parse::<f64>().with_context(|| {
+            format!(
+                "environment variable {key} expected to be a floating point number, got {value}"
+            )
         }),
         Err(VarError::NotPresent) => Ok(default),
         Err(VarError::NotUnicode(_)) => {
@@ -119,7 +121,7 @@ mod tests {
                 assert_eq!(config.listen_addr, "127.0.0.1:1234".parse().unwrap());
                 assert_eq!(config.log_dir, PathBuf::from("/tmp/fdb"));
                 assert_eq!(config.trace_log_file, PathBuf::from("/tmp/tracing.log"));
-                assert_eq!(config.log_poll_interval, Duration::from_secs(5));
+                assert_eq!(config.log_poll_interval, Duration::from_secs_f64(5.0));
             },
         );
     }
@@ -140,7 +142,7 @@ mod tests {
                 assert_eq!(config.trace_log_file, PathBuf::from(DEFAULT_TRACE_LOG_FILE));
                 assert_eq!(
                     config.log_poll_interval,
-                    Duration::from_secs(DEFAULT_POLL_INTERVAL_SECS)
+                    Duration::from_secs_f64(DEFAULT_POLL_INTERVAL_SECS)
                 );
             },
         );
