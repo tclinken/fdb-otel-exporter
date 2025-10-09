@@ -22,7 +22,7 @@ docker compose up --build -d
 
 Open `localhost:3000` in your browser and login with the credentials provided in `GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`. Then navigate in Grafana to the FDB Metrics dashboard to view FDB process metrics.
 
-### Runtime Configuration
+## Runtime Configuration
 
 The exporter reads a handful of environment variables at startup:
 
