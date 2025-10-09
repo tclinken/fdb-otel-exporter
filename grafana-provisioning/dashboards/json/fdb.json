@@ -842,24 +842,10 @@
       "type": "timeseries"
     },
     {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 19
-      },
-      "id": 17,
-      "panels": [],
-      "title": "Commit Proxy",
-      "type": "row"
-    },
-    {
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Transaction commits per second on commit proxy",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -913,7 +899,7 @@
               }
             ]
           },
-          "unit": "ops"
+          "unit": "s"
         },
         "overrides": []
       },
@@ -921,9 +907,9 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 20
+        "y": 19
       },
-      "id": 9,
+      "id": 41,
       "options": {
         "legend": {
           "calcs": [],
@@ -940,14 +926,14 @@
       "pluginVersion": "12.2.0",
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "cp_txn_commit_in{job=\"fdb-otel-exporter\"}",
+          "editorMode": "builder",
+          "expr": "tl_queue_wait_latency_p50{job=\"fdb-otel-exporter\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Commit Proxy Commit Rate",
+      "title": "P50 TLog Queue Wait",
       "type": "timeseries"
     },
     {
@@ -955,7 +941,6 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Transaction conflict rate on commit proxy",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1009,7 +994,7 @@
               }
             ]
           },
-          "unit": "ops"
+          "unit": "s"
         },
         "overrides": []
       },
@@ -1017,9 +1002,9 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 20
+        "y": 19
       },
-      "id": 10,
+      "id": 42,
       "options": {
         "legend": {
           "calcs": [],
@@ -1036,14 +1021,14 @@
       "pluginVersion": "12.2.0",
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "cp_txn_conflicts{job=\"fdb-otel-exporter\"}",
+          "editorMode": "builder",
+          "expr": "tl_queue_wait_latency_p99{job=\"fdb-otel-exporter\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Commit Proxy Transaction Conflicts",
+      "title": "P99 TLog Queue Wait",
       "type": "timeseries"
     },
     {
@@ -1051,7 +1036,6 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "P99 server-side commit latency reported by commit proxy",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1113,9 +1097,9 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 20
+        "y": 19
       },
-      "id": 29,
+      "id": 43,
       "options": {
         "legend": {
           "calcs": [],
@@ -1132,15 +1116,317 @@
       "pluginVersion": "12.2.0",
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "cp_p99_commit_latency{job=\"fdb-otel-exporter\"}",
+          "editorMode": "builder",
+          "expr": "tl_queue_wait_latency_p99_9{job=\"fdb-otel-exporter\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "P99 Commit Latency",
+      "title": "P999 TLog Queue Wait",
       "type": "timeseries"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "id": 17,
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "Transaction commits per second on commit proxy",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "ops"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 28
+          },
+          "id": 9,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0",
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "cp_txn_commit_in{job=\"fdb-otel-exporter\"}",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Commit Proxy Commit Rate",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "Transaction conflict rate on commit proxy",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "ops"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 28
+          },
+          "id": 10,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0",
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "cp_txn_conflicts{job=\"fdb-otel-exporter\"}",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Commit Proxy Transaction Conflicts",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "P99 server-side commit latency reported by commit proxy",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 28
+          },
+          "id": 29,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0",
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "cp_p99_commit_latency{job=\"fdb-otel-exporter\"}",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "P99 Commit Latency",
+          "type": "timeseries"
+        }
+      ],
+      "title": "Commit Proxy",
+      "type": "row"
     },
     {
       "collapsed": true,
@@ -1219,7 +1505,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 61
+            "y": 117
           },
           "id": 11,
           "options": {
@@ -1315,7 +1601,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 61
+            "y": 117
           },
           "id": 12,
           "options": {
@@ -1411,7 +1697,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 61
+            "y": 117
           },
           "id": 27,
           "options": {
@@ -1521,7 +1807,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 70
+            "y": 126
           },
           "id": 6,
           "options": {
@@ -1617,7 +1903,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 70
+            "y": 126
           },
           "id": 5,
           "options": {
@@ -1713,7 +1999,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 70
+            "y": 126
           },
           "id": 8,
           "options": {
@@ -1809,7 +2095,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 78
+            "y": 134
           },
           "id": 3,
           "options": {
@@ -1905,7 +2191,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 78
+            "y": 134
           },
           "id": 7,
           "options": {
@@ -2001,7 +2287,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 78
+            "y": 134
           },
           "id": 2,
           "options": {
@@ -2097,7 +2383,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 86
+            "y": 142
           },
           "id": 28,
           "options": {
@@ -2194,7 +2480,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 86
+            "y": 142
           },
           "id": 1,
           "options": {
@@ -2291,7 +2577,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 86
+            "y": 142
           },
           "id": 4,
           "options": {
@@ -2401,7 +2687,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 95
+            "y": 151
           },
           "id": 13,
           "options": {
@@ -2497,7 +2783,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 95
+            "y": 151
           },
           "id": 23,
           "options": {
@@ -2607,7 +2893,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 104
+            "y": 160
           },
           "id": 32,
           "options": {
@@ -2703,7 +2989,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 104
+            "y": 160
           },
           "id": 31,
           "options": {
@@ -2799,7 +3085,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 104
+            "y": 160
           },
           "id": 30,
           "options": {
@@ -2909,7 +3195,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 105
+            "y": 161
           },
           "id": 36,
           "options": {
@@ -3005,7 +3291,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 105
+            "y": 161
           },
           "id": 34,
           "options": {
@@ -3101,7 +3387,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 105
+            "y": 161
           },
           "id": 35,
           "options": {
@@ -3152,5 +3438,5 @@
   "timezone": "",
   "title": "FDB Metrics",
   "uid": "fdb-metrics",
-  "version": 16
+  "version": 18
 }
