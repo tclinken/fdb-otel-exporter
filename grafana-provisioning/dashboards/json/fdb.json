@@ -66,7 +66,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -115,7 +114,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -162,7 +161,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -194,7 +192,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 136
+            "y": 24
           },
           "id": 113,
           "options": {
@@ -211,7 +209,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -258,7 +256,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -290,7 +287,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 136
+            "y": 24
           },
           "id": 114,
           "options": {
@@ -307,7 +304,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -354,7 +351,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -386,7 +382,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 136
+            "y": 24
           },
           "id": 115,
           "options": {
@@ -403,7 +399,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -450,7 +446,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -482,7 +477,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 208
+            "y": 32
           },
           "id": 116,
           "options": {
@@ -499,7 +494,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -546,7 +541,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -578,7 +572,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 208
+            "y": 32
           },
           "id": 117,
           "options": {
@@ -595,7 +589,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -642,7 +636,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -674,7 +667,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 208
+            "y": 32
           },
           "id": 118,
           "options": {
@@ -691,7 +684,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -738,7 +731,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -770,7 +762,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 216
+            "y": 40
           },
           "id": 119,
           "options": {
@@ -787,7 +779,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -834,7 +826,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -866,7 +857,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 216
+            "y": 40
           },
           "id": 120,
           "options": {
@@ -883,7 +874,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -930,7 +921,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -962,7 +952,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 216
+            "y": 40
           },
           "id": 121,
           "options": {
@@ -979,7 +969,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -1041,7 +1031,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -1072,7 +1061,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 2
+            "y": 49
           },
           "id": 123,
           "options": {
@@ -1088,7 +1077,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -1136,7 +1125,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -1167,7 +1155,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 2
+            "y": 49
           },
           "id": 124,
           "options": {
@@ -1183,7 +1171,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -1231,7 +1219,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -1262,7 +1249,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 2
+            "y": 49
           },
           "id": 125,
           "options": {
@@ -1278,7 +1265,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -1341,7 +1328,6 @@
                   "type": "log"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": false,
                 "stacking": {
                   "group": "A",
@@ -1382,7 +1368,7 @@
               "calcs": [],
               "displayMode": "list",
               "placement": "bottom",
-              "showLegend": false
+              "showLegend": true
             },
             "tooltip": {
               "hideZeros": false,
@@ -1390,12 +1376,13 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
               "expr": "rk_released_tps{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "interval": "",
+              "legendFormat": "Released TPS",
               "range": true,
               "refId": "Released TPS"
             },
@@ -1408,7 +1395,7 @@
               "expr": "rk_tps_limit{job=\"fdb-otel-exporter\"}",
               "hide": false,
               "instant": false,
-              "legendFormat": "__auto",
+              "legendFormat": "TPS Limit",
               "range": true,
               "refId": "TPS Limit"
             }
@@ -1465,7 +1452,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -1497,7 +1483,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 4
+            "y": 51
           },
           "id": 26,
           "options": {
@@ -1514,7 +1500,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -1562,7 +1548,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -1594,7 +1579,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 4
+            "y": 51
           },
           "id": 25,
           "options": {
@@ -1611,7 +1596,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -1659,7 +1644,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -1691,7 +1675,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 4
+            "y": 51
           },
           "id": 24,
           "options": {
@@ -1708,7 +1692,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -1755,7 +1739,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -1787,7 +1770,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 132
+            "y": 59
           },
           "id": 38,
           "options": {
@@ -1804,7 +1787,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -1851,7 +1834,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -1883,7 +1865,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 132
+            "y": 59
           },
           "id": 39,
           "options": {
@@ -1900,7 +1882,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -1947,7 +1929,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -1979,7 +1960,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 132
+            "y": 59
           },
           "id": 40,
           "options": {
@@ -1996,7 +1977,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -2043,7 +2024,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -2075,7 +2055,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 140
+            "y": 67
           },
           "id": 41,
           "options": {
@@ -2092,7 +2072,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -2139,7 +2119,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -2171,7 +2150,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 140
+            "y": 67
           },
           "id": 42,
           "options": {
@@ -2188,7 +2167,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -2235,7 +2214,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -2267,7 +2245,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 140
+            "y": 67
           },
           "id": 43,
           "options": {
@@ -2284,7 +2262,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -2331,7 +2309,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -2363,7 +2340,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 148
+            "y": 75
           },
           "id": 44,
           "options": {
@@ -2380,7 +2357,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -2427,7 +2404,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -2459,7 +2435,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 148
+            "y": 75
           },
           "id": 45,
           "options": {
@@ -2476,7 +2452,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -2523,7 +2499,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -2555,7 +2530,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 148
+            "y": 75
           },
           "id": 46,
           "options": {
@@ -2572,7 +2547,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -2634,7 +2609,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -2666,7 +2640,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 620
+            "y": 100
           },
           "id": 9,
           "options": {
@@ -2683,7 +2657,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -2731,7 +2705,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -2763,7 +2736,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 620
+            "y": 100
           },
           "id": 10,
           "options": {
@@ -2780,7 +2753,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -2828,7 +2801,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -2860,7 +2832,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 620
+            "y": 100
           },
           "id": 29,
           "options": {
@@ -2877,7 +2849,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -2924,7 +2896,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -2956,7 +2927,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 660
+            "y": 108
           },
           "id": 74,
           "options": {
@@ -2973,7 +2944,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -3020,7 +2991,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -3052,7 +3022,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 660
+            "y": 108
           },
           "id": 75,
           "options": {
@@ -3069,7 +3039,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -3116,7 +3086,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -3148,7 +3117,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 660
+            "y": 108
           },
           "id": 76,
           "options": {
@@ -3165,7 +3134,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -3212,7 +3181,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -3244,7 +3212,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 668
+            "y": 116
           },
           "id": 77,
           "options": {
@@ -3261,7 +3229,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -3308,7 +3276,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -3340,7 +3307,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 668
+            "y": 116
           },
           "id": 78,
           "options": {
@@ -3357,7 +3324,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -3404,7 +3371,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -3436,7 +3402,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 668
+            "y": 116
           },
           "id": 79,
           "options": {
@@ -3453,7 +3419,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -3500,7 +3466,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -3532,7 +3497,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 676
+            "y": 124
           },
           "id": 80,
           "options": {
@@ -3549,7 +3514,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -3596,7 +3561,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -3628,7 +3592,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 676
+            "y": 124
           },
           "id": 81,
           "options": {
@@ -3645,7 +3609,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -3692,7 +3656,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -3724,7 +3687,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 676
+            "y": 124
           },
           "id": 82,
           "options": {
@@ -3741,7 +3704,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -3788,7 +3751,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -3820,7 +3782,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 684
+            "y": 132
           },
           "id": 83,
           "options": {
@@ -3837,7 +3799,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -3884,7 +3846,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -3916,7 +3877,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 684
+            "y": 132
           },
           "id": 84,
           "options": {
@@ -3933,7 +3894,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -3980,7 +3941,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -4012,7 +3972,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 684
+            "y": 132
           },
           "id": 85,
           "options": {
@@ -4029,7 +3989,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -4076,7 +4036,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -4108,7 +4067,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 692
+            "y": 140
           },
           "id": 86,
           "options": {
@@ -4125,7 +4084,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -4172,7 +4131,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -4204,7 +4162,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 692
+            "y": 140
           },
           "id": 87,
           "options": {
@@ -4221,7 +4179,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -4268,7 +4226,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -4300,7 +4257,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 692
+            "y": 140
           },
           "id": 88,
           "options": {
@@ -4317,7 +4274,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -4364,7 +4321,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -4396,7 +4352,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 700
+            "y": 148
           },
           "id": 89,
           "options": {
@@ -4413,7 +4369,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -4460,7 +4416,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -4492,7 +4447,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 700
+            "y": 148
           },
           "id": 90,
           "options": {
@@ -4509,7 +4464,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -4556,7 +4511,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -4588,7 +4542,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 700
+            "y": 148
           },
           "id": 91,
           "options": {
@@ -4605,7 +4559,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -4652,7 +4606,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -4684,7 +4637,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 708
+            "y": 156
           },
           "id": 137,
           "options": {
@@ -4701,7 +4654,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -4748,7 +4701,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -4780,7 +4732,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 708
+            "y": 156
           },
           "id": 138,
           "options": {
@@ -4797,7 +4749,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -4844,7 +4796,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -4876,7 +4827,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 708
+            "y": 156
           },
           "id": 139,
           "options": {
@@ -4893,7 +4844,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -4940,7 +4891,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -4972,7 +4922,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 716
+            "y": 164
           },
           "id": 140,
           "options": {
@@ -4989,7 +4939,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -5036,7 +4986,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -5068,7 +5017,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 716
+            "y": 164
           },
           "id": 126,
           "options": {
@@ -5085,7 +5034,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -5132,7 +5081,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -5164,7 +5112,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 716
+            "y": 164
           },
           "id": 127,
           "options": {
@@ -5181,7 +5129,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -5243,7 +5191,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -5275,7 +5222,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 492
+            "y": 173
           },
           "id": 11,
           "options": {
@@ -5292,7 +5239,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -5340,7 +5287,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -5372,7 +5318,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 492
+            "y": 173
           },
           "id": 12,
           "options": {
@@ -5389,7 +5335,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "code",
@@ -5437,7 +5383,6 @@
                   "type": "linear"
                 },
                 "showPoints": "auto",
-                "showValues": false,
                 "spanNulls": true,
                 "stacking": {
                   "group": "A",
@@ -5469,7 +5414,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 492
+            "y": 173
           },
           "id": 27,
           "options": {
@@ -5486,7 +5431,7 @@
               "sort": "none"
             }
           },
-          "pluginVersion": "12.2.0",
+          "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
               "editorMode": "builder",
@@ -5565,7 +5510,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 500
+            "y": 181
           },
           "id": 101,
           "options": {
@@ -5661,7 +5606,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 500
+            "y": 181
           },
           "id": 102,
           "options": {
@@ -5757,7 +5702,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 500
+            "y": 181
           },
           "id": 103,
           "options": {
@@ -5853,7 +5798,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 508
+            "y": 189
           },
           "id": 104,
           "options": {
@@ -5949,7 +5894,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 508
+            "y": 189
           },
           "id": 105,
           "options": {
@@ -6045,7 +5990,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 508
+            "y": 189
           },
           "id": 106,
           "options": {
@@ -6156,7 +6101,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 7
+            "y": 542
           },
           "id": 6,
           "options": {
@@ -6253,7 +6198,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 7
+            "y": 542
           },
           "id": 5,
           "options": {
@@ -6350,7 +6295,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 7
+            "y": 542
           },
           "id": 8,
           "options": {
@@ -6447,7 +6392,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 15
+            "y": 550
           },
           "id": 3,
           "options": {
@@ -6544,7 +6489,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 15
+            "y": 550
           },
           "id": 7,
           "options": {
@@ -6641,7 +6586,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 15
+            "y": 550
           },
           "id": 2,
           "options": {
@@ -6738,7 +6683,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 23
+            "y": 558
           },
           "id": 28,
           "options": {
@@ -6836,7 +6781,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 23
+            "y": 558
           },
           "id": 1,
           "options": {
@@ -6934,7 +6879,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 23
+            "y": 558
           },
           "id": 4,
           "options": {
@@ -7031,7 +6976,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 31
+            "y": 566
           },
           "id": 47,
           "options": {
@@ -7128,7 +7073,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 31
+            "y": 566
           },
           "id": 48,
           "options": {
@@ -7225,7 +7170,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 31
+            "y": 566
           },
           "id": 49,
           "options": {
@@ -7322,7 +7267,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 39
+            "y": 574
           },
           "id": 50,
           "options": {
@@ -7419,7 +7364,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 39
+            "y": 574
           },
           "id": 51,
           "options": {
@@ -7516,7 +7461,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 39
+            "y": 574
           },
           "id": 52,
           "options": {
@@ -7613,7 +7558,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 47
+            "y": 582
           },
           "id": 53,
           "options": {
@@ -7710,7 +7655,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 47
+            "y": 582
           },
           "id": 54,
           "options": {
@@ -7807,7 +7752,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 47
+            "y": 582
           },
           "id": 55,
           "options": {
@@ -7904,7 +7849,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 55
+            "y": 590
           },
           "id": 56,
           "options": {
@@ -8001,7 +7946,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 55
+            "y": 590
           },
           "id": 57,
           "options": {
@@ -8098,7 +8043,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 55
+            "y": 590
           },
           "id": 58,
           "options": {
@@ -8195,7 +8140,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 63
+            "y": 598
           },
           "id": 59,
           "options": {
@@ -8292,7 +8237,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 63
+            "y": 598
           },
           "id": 60,
           "options": {
@@ -8389,7 +8334,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 63
+            "y": 598
           },
           "id": 61,
           "options": {
@@ -8486,7 +8431,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 71
+            "y": 606
           },
           "id": 62,
           "options": {
@@ -8583,7 +8528,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 71
+            "y": 606
           },
           "id": 63,
           "options": {
@@ -8680,7 +8625,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 71
+            "y": 606
           },
           "id": 64,
           "options": {
@@ -8777,7 +8722,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 79
+            "y": 614
           },
           "id": 65,
           "options": {
@@ -8874,7 +8819,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 79
+            "y": 614
           },
           "id": 66,
           "options": {
@@ -8971,7 +8916,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 79
+            "y": 614
           },
           "id": 67,
           "options": {
@@ -9068,7 +9013,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 87
+            "y": 622
           },
           "id": 71,
           "options": {
@@ -9165,7 +9110,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 87
+            "y": 622
           },
           "id": 72,
           "options": {
@@ -9262,7 +9207,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 87
+            "y": 622
           },
           "id": 73,
           "options": {
@@ -9358,7 +9303,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 95
+            "y": 630
           },
           "id": 107,
           "options": {
@@ -9454,7 +9399,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 95
+            "y": 630
           },
           "id": 108,
           "options": {
@@ -9550,7 +9495,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 95
+            "y": 630
           },
           "id": 109,
           "options": {
@@ -9646,7 +9591,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 103
+            "y": 638
           },
           "id": 128,
           "options": {
@@ -9742,7 +9687,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 103
+            "y": 638
           },
           "id": 129,
           "options": {
@@ -9838,7 +9783,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 103
+            "y": 638
           },
           "id": 130,
           "options": {
@@ -9934,7 +9879,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 111
+            "y": 646
           },
           "id": 131,
           "options": {
@@ -10030,7 +9975,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 111
+            "y": 646
           },
           "id": 132,
           "options": {
@@ -10126,7 +10071,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 111
+            "y": 646
           },
           "id": 133,
           "options": {
@@ -10222,7 +10167,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 119
+            "y": 654
           },
           "id": 134,
           "options": {
@@ -10318,7 +10263,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 119
+            "y": 654
           },
           "id": 135,
           "options": {
@@ -10414,7 +10359,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 119
+            "y": 654
           },
           "id": 136,
           "options": {
@@ -10525,7 +10470,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 1415
+            "y": 1950
           },
           "id": 13,
           "options": {
@@ -10622,7 +10567,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 1415
+            "y": 1950
           },
           "id": 23,
           "options": {
@@ -10733,7 +10678,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 1424
+            "y": 1959
           },
           "id": 32,
           "options": {
@@ -10830,7 +10775,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 1424
+            "y": 1959
           },
           "id": 31,
           "options": {
@@ -10927,7 +10872,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 1424
+            "y": 1959
           },
           "id": 30,
           "options": {
@@ -11038,7 +10983,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 625
+            "y": 1160
           },
           "id": 36,
           "options": {
@@ -11135,7 +11080,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 625
+            "y": 1160
           },
           "id": 34,
           "options": {
@@ -11232,7 +11177,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 625
+            "y": 1160
           },
           "id": 35,
           "options": {
@@ -11328,7 +11273,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 633
+            "y": 1168
           },
           "id": 95,
           "options": {
@@ -11424,7 +11369,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 633
+            "y": 1168
           },
           "id": 96,
           "options": {
@@ -11520,7 +11465,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 633
+            "y": 1168
           },
           "id": 97,
           "options": {
@@ -11616,7 +11561,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 641
+            "y": 1176
           },
           "id": 92,
           "options": {
@@ -11712,7 +11657,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 641
+            "y": 1176
           },
           "id": 93,
           "options": {
@@ -11808,7 +11753,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 641
+            "y": 1176
           },
           "id": 94,
           "options": {
@@ -11904,7 +11849,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 649
+            "y": 1184
           },
           "id": 98,
           "options": {
@@ -12000,7 +11945,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 649
+            "y": 1184
           },
           "id": 99,
           "options": {
@@ -12096,7 +12041,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 649
+            "y": 1184
           },
           "id": 100,
           "options": {
@@ -12192,7 +12137,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 657
+            "y": 1192
           },
           "id": 110,
           "options": {
@@ -12288,7 +12233,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 657
+            "y": 1192
           },
           "id": 111,
           "options": {
@@ -12384,7 +12329,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 657
+            "y": 1192
           },
           "id": 112,
           "options": {
@@ -12421,7 +12366,7 @@
   ],
   "preload": false,
   "refresh": "30s",
-  "schemaVersion": 42,
+  "schemaVersion": 41,
   "tags": [
     "otel"
   ],
@@ -12436,5 +12381,5 @@
   "timezone": "",
   "title": "FDB Metrics",
   "uid": "fdb-metrics",
-  "version": 38
+  "version": 39
 }
