@@ -156,9 +156,21 @@ description = "P99 server-side commit latency reported by commit proxy"
 
 [[simple_gauge]]
 trace_type = "ReadLatencyMetrics"
+gauge_name = "ss_p50_read_latency"
+field_name = "Median"
+description = "Median server-side read latency reported by storage server"
+
+[[simple_gauge]]
+trace_type = "ReadLatencyMetrics"
 gauge_name = "ss_p99_read_latency"
 field_name = "P99"
 description = "P99 server-side read latency reported by storage server"
+
+[[simple_gauge]]
+trace_type = "ReadLatencyMetrics"
+gauge_name = "ss_p999_read_latency"
+field_name = "P99.9"
+description = "P999 server-side read latency reported by storage server"
 
 [[counter_rate_gauge]]
 trace_type = "MasterMetrics"
@@ -526,3 +538,9 @@ trace_type = "ReadQueueWaitMetrics"
 gauge_name = "ss_p999_read_queue_wait"
 field_name = "P99.9"
 description = "P999 read queue wait latency"
+
+[[simple_gauge]]
+trace_type = "StorageMetrics"
+gauge_name = "ss_query_queue_max"
+field_name = "QueryQueueMax"
+description = "Maximum query queue depth on storage server"
