@@ -216,3 +216,60 @@ op = "TimeUntilDurable"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "tl_time_until_durable_latency"
 description = "tlog time until durable latency"
+
+[[histogram_percentile_gauge]]
+group = "StorageServer"
+op = "SSVersionLockLatency"
+percentiles = [0.5, 0.99, 0.999]
+gauge_name = "ss_version_lock_latency"
+description = "storage server version lock latency"
+
+[[histogram_percentile_gauge]]
+group = "StorageServer"
+op = "TLogMsgsPTreeUpdatesLatency"
+percentiles = [0.5, 0.99, 0.999]
+gauge_name = "ss_tlog_msgs_ptree_updates_latency"
+description = "storage server TLogMsgs PTree updates latency"
+
+[[histogram_percentile_gauge]]
+group = "StorageServer"
+op = "StorageUpdatesDurableLatency"
+percentiles = [0.5, 0.99, 0.999]
+gauge_name = "ss_storage_updates_durable_latency"
+description = "storage server updates durable latency"
+
+[[histogram_percentile_gauge]]
+group = "StorageServer"
+op = "StorageCommitLatency"
+percentiles = [0.5, 0.99, 0.999]
+gauge_name = "ss_storage_commit_latency"
+description = "storage server commit latency"
+
+[[histogram_percentile_gauge]]
+group = "StorageServer"
+op = "TLogCursorReadsLatency"
+percentiles = [0.5, 0.99, 0.999]
+gauge_name = "ss_tlog_cursor_reads_latency"
+description = "storage server tlog cursor reads latency"
+
+[[histogram_percentile_gauge]]
+group = "StorageServer"
+op = "SSDurableVersionUpdateLatency"
+percentiles = [0.5, 0.99, 0.999]
+gauge_name = "ss_durable_version_update_latency"
+description = "storage server durable version update latency"
+
+[[histogram_percentile_gauge]]
+group = "StorageServer"
+op = "FetchKeysPTreeUpdatesLatency"
+percentiles = [0.5, 0.99, 0.999]
+gauge_name = "ss_fetch_keys_ptree_updates_latency"
+description = "storage server fetch keys PTree updates latency"
+
+
+[[histogram_percentile_gauge]]
+group = "StorageServer"
+op = "EagerReadsLatency"
+percentiles = [0.5, 0.99, 0.999]
+gauge_name = "ss_eager_reads_latency"
+description = "storage server eager reads latency"
