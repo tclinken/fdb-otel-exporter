@@ -201,77 +201,77 @@ group = "tLog"
 op = "commit"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "tl_commit_latency"
-description = "tlog commit latency"
+description = "TLog commit latency"
 
 [[histogram_percentile_gauge]]
 group = "tLog"
 op = "QueueWait"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "tl_queue_wait_latency"
-description = "tlog queue wait latency"
+description = "TLog queue wait latency"
 
 [[histogram_percentile_gauge]]
 group = "tLog"
 op = "TimeUntilDurable"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "tl_time_until_durable_latency"
-description = "tlog time until durable latency"
+description = "TLog time until durable latency"
 
 [[histogram_percentile_gauge]]
 group = "StorageServer"
 op = "SSVersionLockLatency"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "ss_version_lock_latency"
-description = "storage server version lock latency"
+description = "Storage server version lock latency"
 
 [[histogram_percentile_gauge]]
 group = "StorageServer"
 op = "TLogMsgsPTreeUpdatesLatency"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "ss_tlog_msgs_ptree_updates_latency"
-description = "storage server TLogMsgs PTree updates latency"
+description = "Storage server TLogMsgs PTree updates latency"
 
 [[histogram_percentile_gauge]]
 group = "StorageServer"
 op = "StorageUpdatesDurableLatency"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "ss_storage_updates_durable_latency"
-description = "storage server updates durable latency"
+description = "Storage server updates durable latency"
 
 [[histogram_percentile_gauge]]
 group = "StorageServer"
 op = "StorageCommitLatency"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "ss_storage_commit_latency"
-description = "storage server commit latency"
+description = "Storage server commit latency"
 
 [[histogram_percentile_gauge]]
 group = "StorageServer"
 op = "TLogCursorReadsLatency"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "ss_tlog_cursor_reads_latency"
-description = "storage server tlog cursor reads latency"
+description = "Storage server TLog cursor reads latency"
 
 [[histogram_percentile_gauge]]
 group = "StorageServer"
 op = "SSDurableVersionUpdateLatency"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "ss_durable_version_update_latency"
-description = "storage server durable version update latency"
+description = "Storage server durable version update latency"
 
 [[histogram_percentile_gauge]]
 group = "StorageServer"
 op = "FetchKeysPTreeUpdatesLatency"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "ss_fetch_keys_ptree_updates_latency"
-description = "storage server fetch keys PTree updates latency"
+description = "Storage server fetch keys PTree updates latency"
 
 [[histogram_percentile_gauge]]
 group = "StorageServer"
 op = "FetchKeysBytesPerCommit"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "ss_fetch_keys_bytes_per_commit"
-description = "storage server fetch keys bytes per commit"
+description = "Storage server fetch keys bytes per commit"
 
 
 [[histogram_percentile_gauge]]
@@ -279,91 +279,91 @@ group = "StorageServer"
 op = "EagerReadsLatency"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "ss_eager_reads_latency"
-description = "storage server eager reads latency"
+description = "Storage server eager reads latency"
 
 [[histogram_percentile_gauge]]
 group = "CommitProxy"
 op = "ProcessingMutation"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "cp_processing_mutation_latency"
-description = "commit proxy processing mutation latency"
+description = "Commit proxy processing mutation latency"
 
 [[histogram_percentile_gauge]]
 group = "CommitProxy"
 op = "PostResolutionQueuing"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "cp_post_resolution_queuing_latency"
-description = "commit proxy post-resolution queuing latency"
+description = "Commit proxy post-resolution queuing latency"
 
 [[histogram_percentile_gauge]]
 group = "CommitProxy"
 op = "GetCommitVersion"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "cp_get_commit_version_latency"
-description = "commit proxy get commit version latency"
+description = "Commit proxy get commit version latency"
 
 [[histogram_percentile_gauge]]
 group = "CommitProxy"
 op = "ReplyCommit"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "cp_reply_commit_latency"
-description = "commit proxy reply commit latency"
+description = "Commit proxy reply commit latency"
 
 [[histogram_percentile_gauge]]
 group = "CommitProxy"
 op = "Resolution"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "cp_resolution_latency"
-description = "commit proxy resolution latency"
+description = "Commit proxy resolution latency"
 
 [[histogram_percentile_gauge]]
 group = "CommitProxy"
 op = "TlogLogging"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "cp_tlog_logging_latency"
-description = "commit proxy TLog logging latency"
+description = "Commit proxy TLog logging latency"
 
 [[histogram_percentile_gauge]]
 group = "GrvProxy"
 op = "GrvConfirmEpochLive"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "gp_confirm_epoch_live_latency"
-description = "grv proxy ConfirmEpochLive latency"
+description = "GRV proxy ConfirmEpochLive latency"
 
 [[histogram_percentile_gauge]]
 group = "GrvProxy"
 op = "GrvGetCommittedVersionRpc"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "gp_get_committed_version_rpc_latency"
-description = "grv proxy GetCommittedVersionRpc latency"
+description = "GRV proxy GetCommittedVersionRpc latency"
 
 [[histogram_percentile_gauge]]
 group = "Resolver"
 op = "ComputeTime"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "rv_compute_time_latency"
-description = "resolver compute time latency"
+description = "Resolver compute time latency"
 
 [[histogram_percentile_gauge]]
 group = "Resolver"
 op = "Latency"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "rv_latency"
-description = "resolver overall latency"
+description = "Resolver overall latency"
 
 [[histogram_percentile_gauge]]
 group = "Resolver"
 op = "QueueWait"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "rv_queue_wait_latency"
-description = "resolver queue wait latency"
+description = "Resolver queue wait latency"
 
 [[histogram_percentile_gauge]]
 group = "Resolver"
 op = "QueueDepth"
 percentiles = [0.5, 0.99, 0.999]
 gauge_name = "rv_queue_depth"
-description = "resolver queue depth"
+description = "Resolver queue depth"
 
 [[simple_gauge]]
 trace_type = "AsyncFileKAIOReadLatency"
