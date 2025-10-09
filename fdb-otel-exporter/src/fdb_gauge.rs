@@ -445,6 +445,76 @@ mod tests {
     }
 
     #[test]
+    fn interpolates_percentile_in_middle_bucket() {
+        let buckets = vec![
+            bucket(1_000, 50, 50),
+            bucket(2_000, 30, 80),
+            bucket(4_000, 20, 100),
+        ];
+        let total_count = 100u64;
+        let percentile = 0.6;
+
+        let value = interpolate_exponential_percentile(&buckets, total_count, percentile)
+            .expect("percentile value");
+
+        let middle_bucket = buckets[1];
+        let bucket_upper_seconds = middle_bucket.upper_bound_micros as f64 / 1_000_000.0;
+        let bucket_lower_seconds = middle_bucket.lower_bound_micros as f64 / 1_000_000.0;
+        let bucket_cdf = middle_bucket.cumulative_count as f64 / total_count as f64;
+        let prev_cdf = buckets[0].cumulative_count as f64 / total_count as f64;
+        let bucket_mass = middle_bucket.count as f64 / total_count as f64;
+
+        let lambda = -((1.0 - bucket_cdf).ln()) / bucket_upper_seconds;
+        let exp_lower = (-lambda * bucket_lower_seconds).exp();
+        let exp_upper = (-lambda * bucket_upper_seconds).exp();
+        let relative = ((percentile - prev_cdf) / bucket_mass).clamp(0.0, 1.0 - f64::EPSILON);
+        let target = exp_lower - relative * (exp_lower - exp_upper);
+        let expected = -target.ln() / lambda;
+
+        assert!(
+            (value - expected).abs() < 1e-12,
+            "value {value} != {expected}"
+        );
+    }
+
+    #[test]
+    fn interpolates_percentile_in_last_bucket() {
+        let buckets = vec![
+            bucket(1_000, 50, 50),
+            bucket(2_000, 30, 80),
+            bucket(4_000, 20, 100),
+        ];
+        let total_count = 100u64;
+        let percentile = 0.95;
+
+        let value = interpolate_exponential_percentile(&buckets, total_count, percentile)
+            .expect("percentile value");
+
+        let last_bucket = buckets[2];
+        let bucket_upper_seconds = last_bucket.upper_bound_micros as f64 / 1_000_000.0;
+        let bucket_lower_seconds = last_bucket.lower_bound_micros as f64 / 1_000_000.0;
+        let bucket_cdf = last_bucket.cumulative_count as f64 / total_count as f64;
+        let prev_cdf = buckets[1].cumulative_count as f64 / total_count as f64;
+        let bucket_mass = last_bucket.count as f64 / total_count as f64;
+
+        let lambda = if bucket_cdf >= 1.0 && bucket_lower_seconds > 0.0 && prev_cdf < 1.0 {
+            -((1.0 - prev_cdf).ln()) / bucket_lower_seconds
+        } else {
+            -((1.0 - bucket_cdf).ln()) / bucket_upper_seconds
+        };
+        let exp_lower = (-lambda * bucket_lower_seconds).exp();
+        let exp_upper = (-lambda * bucket_upper_seconds).exp();
+        let relative = ((percentile - prev_cdf) / bucket_mass).clamp(0.0, 1.0 - f64::EPSILON);
+        let target = exp_lower - relative * (exp_lower - exp_upper);
+        let expected = -target.ln() / lambda;
+
+        assert!(
+            (value - expected).abs() < 1e-12,
+            "value {value} != {expected}"
+        );
+    }
+
+    #[test]
     fn clamps_to_bucket_lower_for_zero_percentile() {
         let buckets = vec![bucket(1_000, 50, 50), bucket(2_000, 50, 100)];
         let value =
