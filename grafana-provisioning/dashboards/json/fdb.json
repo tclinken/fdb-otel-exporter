@@ -192,7 +192,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 360
+            "y": 480
           },
           "id": 113,
           "options": {
@@ -287,7 +287,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 360
+            "y": 480
           },
           "id": 114,
           "options": {
@@ -382,7 +382,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 360
+            "y": 480
           },
           "id": 115,
           "options": {
@@ -477,7 +477,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 368
+            "y": 488
           },
           "id": 116,
           "options": {
@@ -572,7 +572,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 368
+            "y": 488
           },
           "id": 117,
           "options": {
@@ -667,7 +667,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 368
+            "y": 488
           },
           "id": 118,
           "options": {
@@ -762,7 +762,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 376
+            "y": 496
           },
           "id": 119,
           "options": {
@@ -857,7 +857,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 376
+            "y": 496
           },
           "id": 120,
           "options": {
@@ -952,7 +952,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 376
+            "y": 496
           },
           "id": 121,
           "options": {
@@ -1061,7 +1061,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 712
+            "y": 832
           },
           "id": 123,
           "options": {
@@ -1155,7 +1155,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 712
+            "y": 832
           },
           "id": 124,
           "options": {
@@ -1249,7 +1249,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 712
+            "y": 832
           },
           "id": 125,
           "options": {
@@ -1483,7 +1483,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 714
+            "y": 834
           },
           "id": 26,
           "options": {
@@ -1579,7 +1579,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 714
+            "y": 834
           },
           "id": 25,
           "options": {
@@ -1675,7 +1675,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 714
+            "y": 834
           },
           "id": 24,
           "options": {
@@ -1770,7 +1770,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 722
+            "y": 842
           },
           "id": 38,
           "options": {
@@ -1865,7 +1865,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 722
+            "y": 842
           },
           "id": 39,
           "options": {
@@ -1960,7 +1960,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 722
+            "y": 842
           },
           "id": 40,
           "options": {
@@ -2055,7 +2055,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 730
+            "y": 850
           },
           "id": 41,
           "options": {
@@ -2150,7 +2150,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 730
+            "y": 850
           },
           "id": 42,
           "options": {
@@ -2245,7 +2245,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 730
+            "y": 850
           },
           "id": 43,
           "options": {
@@ -2340,7 +2340,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 738
+            "y": 858
           },
           "id": 44,
           "options": {
@@ -2435,7 +2435,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 738
+            "y": 858
           },
           "id": 45,
           "options": {
@@ -2530,7 +2530,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 738
+            "y": 858
           },
           "id": 46,
           "options": {
@@ -2927,7 +2927,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 213
+            "y": 333
           },
           "id": 74,
           "options": {
@@ -3022,7 +3022,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 213
+            "y": 333
           },
           "id": 75,
           "options": {
@@ -3117,7 +3117,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 213
+            "y": 333
           },
           "id": 76,
           "options": {
@@ -3212,7 +3212,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 221
+            "y": 341
           },
           "id": 77,
           "options": {
@@ -3307,7 +3307,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 221
+            "y": 341
           },
           "id": 78,
           "options": {
@@ -3402,7 +3402,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 221
+            "y": 341
           },
           "id": 79,
           "options": {
@@ -3497,7 +3497,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 229
+            "y": 349
           },
           "id": 80,
           "options": {
@@ -3592,7 +3592,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 229
+            "y": 349
           },
           "id": 81,
           "options": {
@@ -3687,7 +3687,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 229
+            "y": 349
           },
           "id": 82,
           "options": {
@@ -3782,7 +3782,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 237
+            "y": 357
           },
           "id": 83,
           "options": {
@@ -3877,7 +3877,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 237
+            "y": 357
           },
           "id": 84,
           "options": {
@@ -3972,7 +3972,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 237
+            "y": 357
           },
           "id": 85,
           "options": {
@@ -4067,7 +4067,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 245
+            "y": 365
           },
           "id": 86,
           "options": {
@@ -4162,7 +4162,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 245
+            "y": 365
           },
           "id": 87,
           "options": {
@@ -4257,7 +4257,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 245
+            "y": 365
           },
           "id": 88,
           "options": {
@@ -4352,7 +4352,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 253
+            "y": 373
           },
           "id": 89,
           "options": {
@@ -4447,7 +4447,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 253
+            "y": 373
           },
           "id": 90,
           "options": {
@@ -4542,7 +4542,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 253
+            "y": 373
           },
           "id": 91,
           "options": {
@@ -4637,7 +4637,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 261
+            "y": 381
           },
           "id": 137,
           "options": {
@@ -4732,7 +4732,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 261
+            "y": 381
           },
           "id": 138,
           "options": {
@@ -4827,7 +4827,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 261
+            "y": 381
           },
           "id": 139,
           "options": {
@@ -4922,7 +4922,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 269
+            "y": 389
           },
           "id": 140,
           "options": {
@@ -5017,7 +5017,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 269
+            "y": 389
           },
           "id": 126,
           "options": {
@@ -5112,7 +5112,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 269
+            "y": 389
           },
           "id": 127,
           "options": {
@@ -5509,7 +5509,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 190
+            "y": 310
           },
           "id": 101,
           "options": {
@@ -5604,7 +5604,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 190
+            "y": 310
           },
           "id": 102,
           "options": {
@@ -5699,7 +5699,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 190
+            "y": 310
           },
           "id": 103,
           "options": {
@@ -5794,7 +5794,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 198
+            "y": 318
           },
           "id": 104,
           "options": {
@@ -5889,7 +5889,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 198
+            "y": 318
           },
           "id": 105,
           "options": {
@@ -5984,7 +5984,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 198
+            "y": 318
           },
           "id": 106,
           "options": {
@@ -6028,6 +6028,294 @@
       },
       "id": 15,
       "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "P50 server-side read latency reported by storage server",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 7
+          },
+          "id": 143,
+          "options": {
+            "connectNulls": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0-17142428006",
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "ss_p50_read_latency{job=\"fdb-otel-exporter\"}",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "P50 Read Latency",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "P99 server-side read latency reported by storage server",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 7
+          },
+          "id": 28,
+          "options": {
+            "connectNulls": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0-17142428006",
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "ss_p99_read_latency{job=\"fdb-otel-exporter\"}",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "P99 Read Latency",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "P999 server-side read latency reported by storage server",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 7
+          },
+          "id": 142,
+          "options": {
+            "connectNulls": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0-17142428006",
+          "targets": [
+            {
+              "editorMode": "code",
+              "expr": "ss_p999_read_latency{job=\"fdb-otel-exporter\"}",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "P999 Read Latency",
+          "type": "timeseries"
+        },
         {
           "datasource": {
             "type": "prometheus",
@@ -6094,7 +6382,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 7
+            "y": 15
           },
           "id": 6,
           "options": {
@@ -6190,7 +6478,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 7
+            "y": 15
           },
           "id": 5,
           "options": {
@@ -6286,7 +6574,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 7
+            "y": 15
           },
           "id": 8,
           "options": {
@@ -6382,7 +6670,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 15
+            "y": 23
           },
           "id": 3,
           "options": {
@@ -6478,7 +6766,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 15
+            "y": 23
           },
           "id": 7,
           "options": {
@@ -6574,7 +6862,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 15
+            "y": 23
           },
           "id": 2,
           "options": {
@@ -6609,7 +6897,6 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "description": "P99 server-side read latency reported by storage server",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -6661,8 +6948,7 @@
                     "value": 80
                   }
                 ]
-              },
-              "unit": "s"
+              }
             },
             "overrides": []
           },
@@ -6670,11 +6956,10 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 23
+            "y": 31
           },
-          "id": 28,
+          "id": 141,
           "options": {
-            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -6690,14 +6975,14 @@
           "pluginVersion": "12.2.0-17142428006",
           "targets": [
             {
-              "editorMode": "code",
-              "expr": "ss_p99_read_latency{job=\"fdb-otel-exporter\"}",
+              "editorMode": "builder",
+              "expr": "ss_query_queue_max{job=\"fdb-otel-exporter\"}",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
             }
           ],
-          "title": "P99 Read Latency",
+          "title": "Storage Server Query Queue Max",
           "type": "timeseries"
         },
         {
@@ -6767,7 +7052,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 23
+            "y": 31
           },
           "id": 1,
           "options": {
@@ -6864,7 +7149,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 23
+            "y": 31
           },
           "id": 4,
           "options": {
@@ -6960,7 +7245,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 31
+            "y": 39
           },
           "id": 47,
           "options": {
@@ -7056,7 +7341,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 31
+            "y": 39
           },
           "id": 48,
           "options": {
@@ -7152,7 +7437,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 31
+            "y": 39
           },
           "id": 49,
           "options": {
@@ -7248,7 +7533,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 39
+            "y": 47
           },
           "id": 50,
           "options": {
@@ -7344,7 +7629,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 39
+            "y": 47
           },
           "id": 51,
           "options": {
@@ -7440,7 +7725,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 39
+            "y": 47
           },
           "id": 52,
           "options": {
@@ -7536,7 +7821,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 47
+            "y": 55
           },
           "id": 53,
           "options": {
@@ -7632,7 +7917,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 47
+            "y": 55
           },
           "id": 54,
           "options": {
@@ -7728,7 +8013,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 47
+            "y": 55
           },
           "id": 55,
           "options": {
@@ -7824,7 +8109,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 55
+            "y": 63
           },
           "id": 56,
           "options": {
@@ -7920,7 +8205,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 55
+            "y": 63
           },
           "id": 57,
           "options": {
@@ -8016,7 +8301,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 55
+            "y": 63
           },
           "id": 58,
           "options": {
@@ -8112,7 +8397,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 63
+            "y": 71
           },
           "id": 59,
           "options": {
@@ -8208,7 +8493,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 63
+            "y": 71
           },
           "id": 60,
           "options": {
@@ -8304,7 +8589,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 63
+            "y": 71
           },
           "id": 61,
           "options": {
@@ -8400,7 +8685,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 71
+            "y": 79
           },
           "id": 62,
           "options": {
@@ -8496,7 +8781,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 71
+            "y": 79
           },
           "id": 63,
           "options": {
@@ -8592,7 +8877,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 71
+            "y": 79
           },
           "id": 64,
           "options": {
@@ -8688,7 +8973,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 79
+            "y": 87
           },
           "id": 65,
           "options": {
@@ -8784,7 +9069,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 79
+            "y": 87
           },
           "id": 66,
           "options": {
@@ -8880,7 +9165,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 79
+            "y": 87
           },
           "id": 67,
           "options": {
@@ -8976,7 +9261,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 87
+            "y": 95
           },
           "id": 71,
           "options": {
@@ -9072,7 +9357,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 87
+            "y": 95
           },
           "id": 72,
           "options": {
@@ -9168,7 +9453,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 87
+            "y": 95
           },
           "id": 73,
           "options": {
@@ -9263,7 +9548,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 95
+            "y": 103
           },
           "id": 107,
           "options": {
@@ -9358,7 +9643,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 95
+            "y": 103
           },
           "id": 108,
           "options": {
@@ -9453,7 +9738,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 95
+            "y": 103
           },
           "id": 109,
           "options": {
@@ -9548,7 +9833,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 103
+            "y": 111
           },
           "id": 128,
           "options": {
@@ -9643,7 +9928,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 103
+            "y": 111
           },
           "id": 129,
           "options": {
@@ -9738,7 +10023,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 103
+            "y": 111
           },
           "id": 130,
           "options": {
@@ -9833,7 +10118,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 111
+            "y": 119
           },
           "id": 131,
           "options": {
@@ -9928,7 +10213,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 111
+            "y": 119
           },
           "id": 132,
           "options": {
@@ -10023,7 +10308,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 111
+            "y": 119
           },
           "id": 133,
           "options": {
@@ -10118,7 +10403,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 119
+            "y": 127
           },
           "id": 134,
           "options": {
@@ -10213,7 +10498,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 119
+            "y": 127
           },
           "id": 135,
           "options": {
@@ -10308,7 +10593,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 119
+            "y": 127
           },
           "id": 136,
           "options": {
@@ -10418,7 +10703,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 8
+            "y": 128
           },
           "id": 13,
           "options": {
@@ -10514,7 +10799,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 8
+            "y": 128
           },
           "id": 23,
           "options": {
@@ -10624,7 +10909,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 9
+            "y": 129
           },
           "id": 32,
           "options": {
@@ -10720,7 +11005,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 9
+            "y": 129
           },
           "id": 31,
           "options": {
@@ -10816,7 +11101,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 9
+            "y": 129
           },
           "id": 30,
           "options": {
@@ -10926,7 +11211,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 10
+            "y": 130
           },
           "id": 36,
           "options": {
@@ -11022,7 +11307,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 10
+            "y": 130
           },
           "id": 34,
           "options": {
@@ -11118,7 +11403,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 10
+            "y": 130
           },
           "id": 35,
           "options": {
@@ -11213,7 +11498,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 18
+            "y": 138
           },
           "id": 95,
           "options": {
@@ -11308,7 +11593,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 18
+            "y": 138
           },
           "id": 96,
           "options": {
@@ -11403,7 +11688,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 18
+            "y": 138
           },
           "id": 97,
           "options": {
@@ -11498,7 +11783,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 26
+            "y": 146
           },
           "id": 92,
           "options": {
@@ -11593,7 +11878,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 26
+            "y": 146
           },
           "id": 93,
           "options": {
@@ -11688,7 +11973,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 26
+            "y": 146
           },
           "id": 94,
           "options": {
@@ -11783,7 +12068,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 34
+            "y": 154
           },
           "id": 98,
           "options": {
@@ -11878,7 +12163,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 34
+            "y": 154
           },
           "id": 99,
           "options": {
@@ -11973,7 +12258,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 34
+            "y": 154
           },
           "id": 100,
           "options": {
@@ -12068,7 +12353,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 42
+            "y": 162
           },
           "id": 110,
           "options": {
@@ -12163,7 +12448,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 42
+            "y": 162
           },
           "id": 111,
           "options": {
@@ -12258,7 +12543,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 42
+            "y": 162
           },
           "id": 112,
           "options": {
@@ -12310,5 +12595,5 @@
   "timezone": "",
   "title": "FDB Metrics",
   "uid": "fdb-metrics",
-  "version": 40
+  "version": 41
 }
