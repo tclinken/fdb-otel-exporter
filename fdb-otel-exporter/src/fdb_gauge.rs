@@ -442,12 +442,8 @@ impl FDBGauge for HistogramPercentileFDBGauge {
             };
         }
 
-        if let Some(interpolated_value) = interpolate_exponential_percentile(
-            &buckets,
-            total_count,
-            self.percentile,
-            unit_divisor,
-        )
+        if let Some(interpolated_value) =
+            interpolate_exponential_percentile(&buckets, total_count, self.percentile, unit_divisor)
         {
             self.gauge.record(interpolated_value, labels);
         }
@@ -500,8 +496,9 @@ mod tests {
         let percentile = 0.6;
         let unit_divisor = 1_000_000.0;
 
-        let value = interpolate_exponential_percentile(&buckets, total_count, percentile, unit_divisor)
-            .expect("percentile value");
+        let value =
+            interpolate_exponential_percentile(&buckets, total_count, percentile, unit_divisor)
+                .expect("percentile value");
 
         let middle_bucket = buckets[1];
         let bucket_upper_seconds = middle_bucket.upper_bound as f64 / unit_divisor;
@@ -534,8 +531,9 @@ mod tests {
         let percentile = 0.95;
         let unit_divisor = 1_000_000.0;
 
-        let value = interpolate_exponential_percentile(&buckets, total_count, percentile, unit_divisor)
-            .expect("percentile value");
+        let value =
+            interpolate_exponential_percentile(&buckets, total_count, percentile, unit_divisor)
+                .expect("percentile value");
 
         let last_bucket = buckets[2];
         let bucket_upper_seconds = last_bucket.upper_bound as f64 / unit_divisor;
@@ -564,18 +562,16 @@ mod tests {
     #[test]
     fn clamps_to_bucket_lower_for_zero_percentile() {
         let buckets = vec![bucket(1_000, 50, 50), bucket(2_000, 50, 100)];
-        let value =
-            interpolate_exponential_percentile(&buckets, 100, 0.0, 1_000_000.0)
-                .expect("percentile value");
+        let value = interpolate_exponential_percentile(&buckets, 100, 0.0, 1_000_000.0)
+            .expect("percentile value");
         assert!((value - 0.0005).abs() < 1e-12);
     }
 
     #[test]
     fn returns_bucket_upper_for_full_percentile() {
         let buckets = vec![bucket(1_000, 50, 50), bucket(2_000, 50, 100)];
-        let value =
-            interpolate_exponential_percentile(&buckets, 100, 1.0, 1_000_000.0)
-                .expect("percentile value");
+        let value = interpolate_exponential_percentile(&buckets, 100, 1.0, 1_000_000.0)
+            .expect("percentile value");
         assert!((value - 0.002).abs() < 1e-12);
     }
 
@@ -588,9 +584,8 @@ mod tests {
     fn interpolates_histogram_without_scaling_for_unit_one() {
         for &upper in &[128u64, 32u64] {
             let buckets = vec![bucket(upper, 50, 50), bucket(upper * 2, 50, 100)];
-            let value =
-                interpolate_exponential_percentile(&buckets, 100, 0.25, 1.0)
-                    .expect("percentile value");
+            let value = interpolate_exponential_percentile(&buckets, 100, 0.25, 1.0)
+                .expect("percentile value");
 
             let bucket_upper = upper as f64;
             let lambda = -((1.0 - 0.5f64).ln()) / bucket_upper;

@@ -1,42 +1,46 @@
+mod config;
+mod exporter_metrics;
 mod fdb_gauge;
 mod gauge_config;
 mod log_metrics;
 mod metrics_handler;
 mod watch_logs;
-use metrics_handler::{metrics_handler, AppState};
-use watch_logs::watch_logs;
 
 use std::{
-    env, fs,
+    fs,
     path::{Path, PathBuf},
     sync::Arc,
 };
 
 use anyhow::{anyhow, Context, Result};
 use axum::{http::StatusCode, routing::get, Router};
+use config::AppConfig;
 use opentelemetry::KeyValue;
 use opentelemetry_sdk::{metrics::SdkMeterProvider, Resource};
 use prometheus::Registry;
 use tokio::{net::TcpListener, signal};
 use tracing_subscriber::{fmt, EnvFilter};
 
-const LOG_DIR_ENV: &str = "LOG_DIR";
-const DEFAULT_LOG_DIR: &str = "logs";
-const TRACE_LOG_FILE_ENV: &str = "TRACE_LOG_FILE";
-const DEFAULT_TRACE_LOG_FILE: &str = "logs/tracing.log";
+use metrics_handler::{metrics_handler, AppState};
+use watch_logs::watch_logs;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     // Initialize logging, metrics infrastructure, and start watching FDB trace logs.
-    init_tracing()?;
+    let config = AppConfig::from_env().context("failed to load exporter configuration")?;
+    init_tracing(&config)?;
 
     let (registry, meter_provider) = init_metrics()?;
     let meter_provider = Arc::new(meter_provider);
 
-    let log_dir = env::var(LOG_DIR_ENV).unwrap_or_else(|_| DEFAULT_LOG_DIR.to_string());
-    tracing::info!(log_dir, "watching JSON logs directory");
-    let log_dir_path = PathBuf::from(&log_dir);
-    if let Err(err) = watch_logs(&log_dir_path, Arc::clone(&meter_provider)).await {
+    tracing::info!(log_dir = %config.log_dir.display(), "watching JSON logs directory");
+    if let Err(err) = watch_logs(
+        &config.log_dir,
+        Arc::clone(&meter_provider),
+        config.log_poll_interval,
+    )
+    .await
+    {
         tracing::error!(?err, "watch_logs failed");
         return Err(err);
     }
@@ -48,7 +52,7 @@ async fn main() -> Result<()> {
         .route("/health", get(|| async { StatusCode::OK }))
         .with_state(app_state);
 
-    let listener = TcpListener::bind("0.0.0.0:9200").await?;
+    let listener = TcpListener::bind(config.listen_addr).await?;
     tracing::info!("listening on {}", listener.local_addr()?);
 
     axum::serve(listener, app)
@@ -80,13 +84,11 @@ async fn shutdown_signal() {
     tracing::info!("shutdown signal received");
 }
 
-fn init_tracing() -> Result<()> {
+fn init_tracing(config: &AppConfig) -> Result<()> {
     // Configure tracing to mirror logs into a rolling file whose location can be overridden via env.
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
 
-    let log_file =
-        env::var(TRACE_LOG_FILE_ENV).unwrap_or_else(|_| DEFAULT_TRACE_LOG_FILE.to_string());
-    let log_path = PathBuf::from(&log_file);
+    let log_path = config.trace_log_file.clone();
 
     let (directory, file_name) = match log_path.file_name().and_then(|name| name.to_str()) {
         Some(name) if !name.is_empty() => {

@@ -22,7 +22,16 @@ docker compose up --build -d
 
 Open `localhost:3000` in your browser and login with the credentials provided in `GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`. Then navigate in Grafana to the FDB Metrics dashboard to view FDB process metrics.
 
-## Configuration
+### Runtime Configuration
+
+The exporter reads a handful of environment variables at startup:
+
+- `LOG_DIR` (default `logs/`): directory to tail for `trace.*.json` files and to emit generated samples.
+- `LISTEN_ADDR` (default `0.0.0.0:9200`): socket address for the HTTP server that exposes `/metrics` and `/health`.
+- `TRACE_LOG_FILE` (default `logs/tracing.log`): path where structured logs from the exporter itself are written.
+- `LOG_POLL_INTERVAL_SECS` (default `2`): frequency (in seconds) to rescan the log directory for new trace files.
+
+## Gauge Configuration
 
 Reported metrics are configured in the `gauge_config.toml` file. There are currently 5 types of gauges that can be reported from JSON trace files:
 

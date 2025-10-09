@@ -1,10 +1,13 @@
-use crate::log_metrics::{LogMetrics, TraceEvent};
+use crate::{
+    exporter_metrics::ExporterMetrics,
+    log_metrics::{LogMetrics, TraceEvent},
+};
 use anyhow::{Context, Result};
 use opentelemetry::metrics::MeterProvider;
 use opentelemetry_sdk::metrics::SdkMeterProvider;
 use std::collections::HashSet;
 use std::io::SeekFrom;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::fs::{self, OpenOptions};
@@ -13,21 +16,26 @@ use tokio::time;
 
 // Discover JSON trace logs under `log_dir_path` and push their events through the configured gauges.
 pub async fn watch_logs(
-    log_dir_path: &PathBuf,
+    log_dir_path: &Path,
     meter_provider: Arc<SdkMeterProvider>,
+    poll_interval: Duration,
 ) -> Result<()> {
     let meter = meter_provider.meter("fdb-otel-exporter");
+    let exporter_metrics = ExporterMetrics::new(&meter);
     let log_metrics =
         LogMetrics::new(&meter).with_context(|| "failed to load gauge configuration")?;
 
-    fs::create_dir_all(&log_dir_path)
+    fs::create_dir_all(log_dir_path)
         .await
         .with_context(|| format!("failed to create log directory {}", log_dir_path.display()))?;
 
-    let watcher_dir = log_dir_path.clone();
+    let watcher_dir = log_dir_path.to_path_buf();
     let dir_metrics = log_metrics.clone();
+    let directory_metrics = exporter_metrics.clone();
     tokio::spawn(async move {
-        if let Err(error) = run_log_directory(watcher_dir, dir_metrics).await {
+        if let Err(error) =
+            run_log_directory(watcher_dir, dir_metrics, directory_metrics, poll_interval).await
+        {
             tracing::error!(?error, "log directory watcher terminated");
         }
     });
@@ -35,7 +43,12 @@ pub async fn watch_logs(
 }
 
 // Poll the log directory, spawning a tail task for each new `trace.*.json` file encountered.
-async fn run_log_directory(dir: PathBuf, metrics: LogMetrics) -> Result<()> {
+async fn run_log_directory(
+    dir: PathBuf,
+    metrics: LogMetrics,
+    exporter_metrics: ExporterMetrics,
+    poll_interval: Duration,
+) -> Result<()> {
     let mut tailed: HashSet<PathBuf> = HashSet::new();
 
     loop {
@@ -58,8 +71,12 @@ async fn run_log_directory(dir: PathBuf, metrics: LogMetrics) -> Result<()> {
                     if tailed.insert(path.clone()) {
                         tracing::info!(file = %path.display(), "starting log tailer");
                         let task_metrics = metrics.clone();
+                        let task_exporter_metrics = exporter_metrics.clone();
                         tokio::spawn(async move {
-                            if let Err(error) = run_log_tailer(path.clone(), task_metrics).await {
+                            if let Err(error) =
+                                run_log_tailer(path.clone(), task_metrics, task_exporter_metrics)
+                                    .await
+                            {
                                 tracing::error!(?error, file = %path.display(), "log tailer exited");
                             }
                         });
@@ -71,12 +88,16 @@ async fn run_log_directory(dir: PathBuf, metrics: LogMetrics) -> Result<()> {
             }
         }
 
-        time::sleep(Duration::from_secs(2)).await;
+        time::sleep(poll_interval).await;
     }
 }
 
 // Tail a single trace file and forward each JSON line to the metrics recorder.
-async fn run_log_tailer(path: PathBuf, metrics: LogMetrics) -> Result<()> {
+async fn run_log_tailer(
+    path: PathBuf,
+    metrics: LogMetrics,
+    exporter_metrics: ExporterMetrics,
+) -> Result<()> {
     loop {
         match OpenOptions::new().read(true).open(&path).await {
             Ok(mut file) => {
@@ -106,12 +127,19 @@ async fn run_log_tailer(path: PathBuf, metrics: LogMetrics) -> Result<()> {
                             }
 
                             match serde_json::from_str::<TraceEvent>(trimmed) {
-                                Ok(record) => {
-                                    if let Err(error) = metrics.record(&record) {
-                                        tracing::warn!(?error, raw_line = %trimmed, "failed to record log line");
+                                Ok(record) => match metrics.record(&record) {
+                                    Ok(()) => exporter_metrics.record_processed(),
+                                    Err(error) => {
+                                        exporter_metrics.record_record_error();
+                                        tracing::warn!(
+                                            ?error,
+                                            raw_line = %trimmed,
+                                            "failed to record log line"
+                                        );
                                     }
-                                }
+                                },
                                 Err(error) => {
+                                    exporter_metrics.record_parse_error();
                                     tracing::warn!(?error, raw_line = %trimmed, "failed to parse log line");
                                 }
                             }
@@ -141,7 +169,7 @@ mod tests {
     use super::*;
     use opentelemetry_sdk::metrics::{ManualReader, SdkMeterProvider};
     use tempfile::tempdir;
-    use tokio::time::timeout;
+    use tokio::time::{timeout, Duration as TokioDuration};
 
     fn test_meter_provider() -> Arc<SdkMeterProvider> {
         let reader = ManualReader::builder().build();
@@ -167,12 +195,12 @@ mod tests {
             "log dir should not exist before watch_logs"
         );
 
-        watch_logs(&log_dir, provider)
+        watch_logs(&log_dir, provider, TokioDuration::from_millis(50))
             .await
             .expect("watch_logs should succeed");
 
         // Allow spawned tasks to start.
-        let _ = timeout(Duration::from_millis(50), tokio::task::yield_now()).await;
+        let _ = timeout(TokioDuration::from_millis(50), tokio::task::yield_now()).await;
 
         assert!(
             tokio::fs::metadata(&log_dir).await.unwrap().is_dir(),

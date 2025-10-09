@@ -9,7 +9,7 @@
 - `cargo fmt` (run inside `fdb-otel-exporter/`) formats Rust sources; execute before every commit.
 - `cargo check` validates compilation without producing binaries.
 - `cargo test` runs the unit and integration suites, including files under `fdb-otel-exporter/tests/`.
-- `docker compose up --build -d` rebuilds the service image, applies env changes (e.g., `LOG_DIR`, `GENERATE_SAMPLE_LOGS=1`), and starts the observability stack.
+- `docker compose up --build -d` rebuilds the service image, applies env changes (e.g., `LOG_DIR`), and starts the observability stack.
 
 ## Coding Style & Naming Conventions
 - Target Rust 2021 with 4-space indentation; use `snake_case` for functions/variables and `CamelCase` for types.
@@ -28,4 +28,4 @@
 
 ## Observability & Configuration Tips
 - Default metrics endpoint is `http://localhost:9200/metrics`; adjust Prometheus scrape intervals via `prometheus.yml`.
-- Set `LOG_DIR` to point at archived traces; enable `GENERATE_SAMPLE_LOGS=1` locally to seed sample `StorageMetrics` events.
+- Set `LOG_DIR` to point at archived traces for local testing.
