@@ -15,6 +15,10 @@ struct HistogramBucket {
     cumulative_count: u64,
 }
 
+// Represents a precomputed histogram bucket and the cumulative events observed up to its upper bound.
+// Histogram lines emitted by FoundationDB report counts in `LessThan` buckets. The exporter converts
+// those buckets into microsecond ranges so percentile interpolation logic can operate on concrete
+// lower/upper bounds and the running cumulative count.
 fn interpolate_exponential_percentile(
     buckets: &[HistogramBucket],
     total_count: u64,
@@ -301,6 +305,11 @@ pub struct HistogramPercentileFDBGauge {
 }
 
 impl HistogramPercentileFDBGauge {
+    // Record pre-aggregated histogram percentiles as gauges.
+    // FoundationDB log files contain histogram buckets (with upper-bound thresholds) for each
+    // `(Group, Op)` combination. This gauge collects buckets from the matching log event and
+    // interpolates the requested percentile assuming an exponential distribution of samples within
+    // the bucket that spans the target percentile.
     pub fn new(
         group: impl Into<String>,
         op: impl Into<String>,
