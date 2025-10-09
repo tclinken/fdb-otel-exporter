@@ -619,7 +619,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 11
+            "y": 123
           },
           "id": 38,
           "options": {
@@ -714,7 +714,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 11
+            "y": 123
           },
           "id": 39,
           "options": {
@@ -809,7 +809,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 11
+            "y": 123
           },
           "id": 40,
           "options": {
@@ -904,7 +904,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 19
+            "y": 131
           },
           "id": 41,
           "options": {
@@ -999,7 +999,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 19
+            "y": 131
           },
           "id": 42,
           "options": {
@@ -1094,7 +1094,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 19
+            "y": 131
           },
           "id": 43,
           "options": {
@@ -1189,7 +1189,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 27
+            "y": 139
           },
           "id": 44,
           "options": {
@@ -1284,7 +1284,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 27
+            "y": 139
           },
           "id": 45,
           "options": {
@@ -1379,7 +1379,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 27
+            "y": 139
           },
           "id": 46,
           "options": {
@@ -1489,7 +1489,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 444
+            "y": 4
           },
           "id": 9,
           "options": {
@@ -1585,7 +1585,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 444
+            "y": 4
           },
           "id": 10,
           "options": {
@@ -1681,7 +1681,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 444
+            "y": 4
           },
           "id": 29,
           "options": {
@@ -1776,7 +1776,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 452
+            "y": 12
           },
           "id": 74,
           "options": {
@@ -1802,7 +1802,7 @@
               "refId": "A"
             }
           ],
-          "title": "P50 Commit Proxy Processing Mutation",
+          "title": "P50 Commit Proxy ProcessingMutation Latency",
           "type": "timeseries"
         },
         {
@@ -1871,7 +1871,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 452
+            "y": 12
           },
           "id": 75,
           "options": {
@@ -1897,7 +1897,7 @@
               "refId": "A"
             }
           ],
-          "title": "P99 Commit Proxy Processing Mutation",
+          "title": "P99 Commit Proxy ProcessingMutation Latency",
           "type": "timeseries"
         },
         {
@@ -1966,7 +1966,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 452
+            "y": 12
           },
           "id": 76,
           "options": {
@@ -1992,7 +1992,7 @@
               "refId": "A"
             }
           ],
-          "title": "P999 Commit Proxy Processing Mutation",
+          "title": "P999 Commit Proxy ProcessingMutation Latency",
           "type": "timeseries"
         },
         {
@@ -2061,7 +2061,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 460
+            "y": 20
           },
           "id": 77,
           "options": {
@@ -2087,7 +2087,7 @@
               "refId": "A"
             }
           ],
-          "title": "P50 Commit Proxy Post-Resolution Queuing",
+          "title": "P50 Commit Proxy Post-Resolution Queuing Latency",
           "type": "timeseries"
         },
         {
@@ -2156,7 +2156,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 460
+            "y": 20
           },
           "id": 78,
           "options": {
@@ -2182,7 +2182,7 @@
               "refId": "A"
             }
           ],
-          "title": "P99 Commit Proxy Post-Resolution Queuing",
+          "title": "P99 Commit Proxy Post-Resolution Queuing Latency",
           "type": "timeseries"
         },
         {
@@ -2251,7 +2251,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 460
+            "y": 20
           },
           "id": 79,
           "options": {
@@ -2277,7 +2277,7 @@
               "refId": "A"
             }
           ],
-          "title": "P999 Commit Proxy Post-Resolution Queuing",
+          "title": "P999 Commit Proxy Post-Resolution Queuing Latency",
           "type": "timeseries"
         },
         {
@@ -2346,7 +2346,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 468
+            "y": 28
           },
           "id": 80,
           "options": {
@@ -2372,7 +2372,7 @@
               "refId": "A"
             }
           ],
-          "title": "P50 Commit Proxy Get Commit Version",
+          "title": "P50 Commit Proxy GetCommitVersion Latency",
           "type": "timeseries"
         },
         {
@@ -2441,7 +2441,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 468
+            "y": 28
           },
           "id": 81,
           "options": {
@@ -2467,7 +2467,7 @@
               "refId": "A"
             }
           ],
-          "title": "P99 Commit Proxy Get Commit Version",
+          "title": "P99 Commit Proxy GetCommitVersion Latency",
           "type": "timeseries"
         },
         {
@@ -2536,7 +2536,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 468
+            "y": 28
           },
           "id": 82,
           "options": {
@@ -2562,7 +2562,7 @@
               "refId": "A"
             }
           ],
-          "title": "P999 Commit Proxy Get Commit Version",
+          "title": "P999 Commit Proxy GetCommitVersion Latency",
           "type": "timeseries"
         },
         {
@@ -2631,7 +2631,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 476
+            "y": 36
           },
           "id": 83,
           "options": {
@@ -2657,7 +2657,7 @@
               "refId": "A"
             }
           ],
-          "title": "P50 Commit Proxy Reply Commit",
+          "title": "P50 Commit Proxy ReplyCommit Latency",
           "type": "timeseries"
         },
         {
@@ -2726,7 +2726,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 476
+            "y": 36
           },
           "id": 84,
           "options": {
@@ -2752,7 +2752,7 @@
               "refId": "A"
             }
           ],
-          "title": "P99 Commit Proxy Reply Commit",
+          "title": "P99 Commit Proxy ReplyCommit Latency",
           "type": "timeseries"
         },
         {
@@ -2821,7 +2821,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 476
+            "y": 36
           },
           "id": 85,
           "options": {
@@ -2847,7 +2847,7 @@
               "refId": "A"
             }
           ],
-          "title": "P999 Commit Proxy Reply Commit",
+          "title": "P999 Commit Proxy ReplyCommit Latency",
           "type": "timeseries"
         },
         {
@@ -2916,7 +2916,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 484
+            "y": 44
           },
           "id": 86,
           "options": {
@@ -2942,7 +2942,7 @@
               "refId": "A"
             }
           ],
-          "title": "P50 Commit Proxy Resolution",
+          "title": "P50 Commit Proxy Resolution Latency",
           "type": "timeseries"
         },
         {
@@ -3011,7 +3011,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 484
+            "y": 44
           },
           "id": 87,
           "options": {
@@ -3037,7 +3037,7 @@
               "refId": "A"
             }
           ],
-          "title": "P99 Commit Proxy Resolution",
+          "title": "P99 Commit Proxy Resolution Latency",
           "type": "timeseries"
         },
         {
@@ -3106,7 +3106,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 484
+            "y": 44
           },
           "id": 88,
           "options": {
@@ -3132,7 +3132,7 @@
               "refId": "A"
             }
           ],
-          "title": "P999 Commit Proxy Resolution",
+          "title": "P999 Commit Proxy Resolution Latency",
           "type": "timeseries"
         },
         {
@@ -3201,7 +3201,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 492
+            "y": 52
           },
           "id": 89,
           "options": {
@@ -3227,7 +3227,7 @@
               "refId": "A"
             }
           ],
-          "title": "P50 Commit Proxy Tlog Logging",
+          "title": "P50 Commit Proxy Tlog Logging Latency",
           "type": "timeseries"
         },
         {
@@ -3296,7 +3296,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 492
+            "y": 52
           },
           "id": 90,
           "options": {
@@ -3322,7 +3322,7 @@
               "refId": "A"
             }
           ],
-          "title": "P99 Commit Proxy Tlog Logging",
+          "title": "P99 Commit Proxy Tlog Logging Latency",
           "type": "timeseries"
         },
         {
@@ -3391,7 +3391,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 492
+            "y": 52
           },
           "id": 91,
           "options": {
@@ -3417,7 +3417,7 @@
               "refId": "A"
             }
           ],
-          "title": "P999 Commit Proxy Tlog Logging",
+          "title": "P999 Commit Proxy Tlog Logging Latency",
           "type": "timeseries"
         }
       ],
@@ -3501,7 +3501,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 533
+            "y": 645
           },
           "id": 11,
           "options": {
@@ -3597,7 +3597,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 533
+            "y": 645
           },
           "id": 12,
           "options": {
@@ -3693,7 +3693,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 533
+            "y": 645
           },
           "id": 27,
           "options": {
@@ -3803,7 +3803,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 214
+            "y": 326
           },
           "id": 6,
           "options": {
@@ -3899,7 +3899,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 214
+            "y": 326
           },
           "id": 5,
           "options": {
@@ -3995,7 +3995,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 214
+            "y": 326
           },
           "id": 8,
           "options": {
@@ -4091,7 +4091,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 222
+            "y": 334
           },
           "id": 3,
           "options": {
@@ -4187,7 +4187,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 222
+            "y": 334
           },
           "id": 7,
           "options": {
@@ -4283,7 +4283,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 222
+            "y": 334
           },
           "id": 2,
           "options": {
@@ -4379,7 +4379,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 230
+            "y": 342
           },
           "id": 28,
           "options": {
@@ -4476,7 +4476,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 230
+            "y": 342
           },
           "id": 1,
           "options": {
@@ -4573,7 +4573,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 230
+            "y": 342
           },
           "id": 4,
           "options": {
@@ -4669,7 +4669,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 238
+            "y": 350
           },
           "id": 47,
           "options": {
@@ -4765,7 +4765,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 238
+            "y": 350
           },
           "id": 48,
           "options": {
@@ -4861,7 +4861,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 238
+            "y": 350
           },
           "id": 49,
           "options": {
@@ -4957,7 +4957,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 246
+            "y": 358
           },
           "id": 50,
           "options": {
@@ -5053,7 +5053,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 246
+            "y": 358
           },
           "id": 51,
           "options": {
@@ -5149,7 +5149,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 246
+            "y": 358
           },
           "id": 52,
           "options": {
@@ -5245,7 +5245,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 254
+            "y": 366
           },
           "id": 53,
           "options": {
@@ -5341,7 +5341,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 254
+            "y": 366
           },
           "id": 54,
           "options": {
@@ -5437,7 +5437,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 254
+            "y": 366
           },
           "id": 55,
           "options": {
@@ -5533,7 +5533,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 262
+            "y": 374
           },
           "id": 56,
           "options": {
@@ -5629,7 +5629,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 262
+            "y": 374
           },
           "id": 57,
           "options": {
@@ -5725,7 +5725,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 262
+            "y": 374
           },
           "id": 58,
           "options": {
@@ -5821,7 +5821,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 270
+            "y": 382
           },
           "id": 59,
           "options": {
@@ -5917,7 +5917,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 270
+            "y": 382
           },
           "id": 60,
           "options": {
@@ -6013,7 +6013,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 270
+            "y": 382
           },
           "id": 61,
           "options": {
@@ -6109,7 +6109,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 278
+            "y": 390
           },
           "id": 62,
           "options": {
@@ -6205,7 +6205,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 278
+            "y": 390
           },
           "id": 63,
           "options": {
@@ -6301,7 +6301,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 278
+            "y": 390
           },
           "id": 64,
           "options": {
@@ -6397,7 +6397,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 286
+            "y": 398
           },
           "id": 65,
           "options": {
@@ -6493,7 +6493,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 286
+            "y": 398
           },
           "id": 66,
           "options": {
@@ -6589,7 +6589,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 286
+            "y": 398
           },
           "id": 67,
           "options": {
@@ -6685,7 +6685,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 294
+            "y": 406
           },
           "id": 71,
           "options": {
@@ -6781,7 +6781,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 294
+            "y": 406
           },
           "id": 72,
           "options": {
@@ -6877,7 +6877,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 294
+            "y": 406
           },
           "id": 73,
           "options": {
@@ -6987,7 +6987,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 567
+            "y": 679
           },
           "id": 13,
           "options": {
@@ -7083,7 +7083,7 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 567
+            "y": 679
           },
           "id": 23,
           "options": {
@@ -7193,7 +7193,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 576
+            "y": 688
           },
           "id": 32,
           "options": {
@@ -7289,7 +7289,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 576
+            "y": 688
           },
           "id": 31,
           "options": {
@@ -7385,7 +7385,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 576
+            "y": 688
           },
           "id": 30,
           "options": {
@@ -7495,7 +7495,7 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 577
+            "y": 689
           },
           "id": 36,
           "options": {
@@ -7591,7 +7591,7 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 577
+            "y": 689
           },
           "id": 34,
           "options": {
@@ -7687,7 +7687,7 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 577
+            "y": 689
           },
           "id": 35,
           "options": {
@@ -7738,5 +7738,5 @@
   "timezone": "",
   "title": "FDB Metrics",
   "uid": "fdb-metrics",
-  "version": 24
+  "version": 26
 }
