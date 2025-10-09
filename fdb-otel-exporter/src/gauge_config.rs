@@ -37,7 +37,7 @@ where
 
     percentiles
         .into_iter()
-        .map(|value| validate_percentile::<D::Error>(value))
+        .map(validate_percentile::<D::Error>)
         .collect()
 }
 
@@ -48,8 +48,7 @@ fn validate_percentile<E: de::Error>(value: f64) -> Result<f64, E> {
 
     if !(0.0..=1.0).contains(&value) {
         return Err(de::Error::custom(format!(
-            "percentile {} must be between 0.0 and 1.0",
-            value
+            "percentile {value} must be between 0.0 and 1.0"
         )));
     }
 
@@ -58,7 +57,7 @@ fn validate_percentile<E: de::Error>(value: f64) -> Result<f64, E> {
 
 fn percentile_suffix(percentile: f64) -> String {
     let display = percentile_display(percentile).replace('.', "_");
-    format!("p{}", display)
+    format!("p{display}")
 }
 
 fn percentile_display(percentile: f64) -> String {

@@ -2,7 +2,111 @@ use anyhow::{Context, Result};
 use opentelemetry::metrics::{Gauge, Meter};
 use opentelemetry::KeyValue;
 use serde_json::Value;
-use std::collections::{BTreeMap, HashMap};
+use std::{
+    collections::{BTreeMap, HashMap},
+    f64,
+};
+
+#[derive(Debug, Clone, Copy)]
+struct HistogramBucket {
+    lower_bound_micros: u64,
+    upper_bound_micros: u64,
+    count: u64,
+    cumulative_count: u64,
+}
+
+fn interpolate_exponential_percentile(
+    buckets: &[HistogramBucket],
+    total_count: u64,
+    percentile: f64,
+) -> Option<f64> {
+    if buckets.is_empty() || total_count == 0 {
+        return None;
+    }
+
+    let percentile = percentile.clamp(0.0, 1.0);
+    let total_count_f64 = total_count as f64;
+
+    if percentile >= 1.0 {
+        return buckets
+            .last()
+            .map(|bucket| bucket.upper_bound_micros as f64 / 1_000_000.0);
+    }
+
+    let target_rank = percentile * total_count_f64;
+    let mut bucket_index = buckets.len().saturating_sub(1);
+
+    for (index, bucket) in buckets.iter().enumerate() {
+        if bucket.count == 0 {
+            continue;
+        }
+        if (bucket.cumulative_count as f64) >= target_rank {
+            bucket_index = index;
+            break;
+        }
+    }
+
+    let bucket = buckets[bucket_index];
+
+    let bucket_lower_seconds = bucket.lower_bound_micros as f64 / 1_000_000.0;
+    let bucket_upper_seconds = bucket.upper_bound_micros as f64 / 1_000_000.0;
+
+    if bucket_upper_seconds <= 0.0 {
+        return Some(bucket_upper_seconds);
+    }
+
+    let bucket_cdf = (bucket.cumulative_count as f64) / total_count_f64;
+    let lower_cumulative_count = bucket.cumulative_count.saturating_sub(bucket.count);
+    let prev_cdf = (lower_cumulative_count as f64) / total_count_f64;
+    let bucket_mass = (bucket.count as f64) / total_count_f64;
+
+    if bucket_mass <= 0.0 {
+        return Some(bucket_upper_seconds);
+    }
+
+    if percentile <= prev_cdf {
+        return Some(bucket_lower_seconds);
+    }
+
+    let lambda = if bucket_cdf >= 1.0 {
+        if bucket_lower_seconds > 0.0 && prev_cdf < 1.0 {
+            -((1.0 - prev_cdf).ln()) / bucket_lower_seconds
+        } else {
+            f64::INFINITY
+        }
+    } else {
+        -((1.0 - bucket_cdf).ln()) / bucket_upper_seconds
+    };
+
+    if !lambda.is_finite() || lambda <= 0.0 {
+        return Some(bucket_upper_seconds);
+    }
+
+    let relative_percentile =
+        ((percentile - prev_cdf) / bucket_mass).clamp(0.0, 1.0 - f64::EPSILON);
+
+    let exp_neg_lambda_lower = (-lambda * bucket_lower_seconds).exp();
+    let exp_neg_lambda_upper = (-lambda * bucket_upper_seconds).exp();
+
+    let denom = exp_neg_lambda_lower - exp_neg_lambda_upper;
+    if denom <= 0.0 {
+        return Some(bucket_upper_seconds);
+    }
+
+    let target = exp_neg_lambda_lower - relative_percentile * denom;
+
+    if target <= 0.0 {
+        return Some(bucket_upper_seconds);
+    }
+
+    let value = -target.ln() / lambda;
+
+    if !value.is_finite() {
+        return Some(bucket_upper_seconds);
+    }
+
+    Some(value.clamp(bucket_lower_seconds, bucket_upper_seconds))
+}
 
 pub trait FDBGauge: Send + Sync {
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()>;
@@ -22,7 +126,7 @@ fn get_trace_field<'a>(
     trace_event
         .get(field_name)
         .and_then(|value| value.as_str())
-        .with_context(|| format!("Missing {} field", field_name))
+        .with_context(|| format!("Missing {field_name} field"))
 }
 
 impl FDBGaugeImpl {
@@ -179,7 +283,7 @@ impl FDBGauge for ElapsedRateFDBGauge {
         let trace_type = get_trace_field(trace_event, "Type")?;
 
         if trace_type == self.gauge_impl.trace_type {
-            let value = get_trace_field(trace_event, &self.gauge_impl.field_name.as_str())?
+            let value = get_trace_field(trace_event, self.gauge_impl.field_name.as_str())?
                 .parse::<f64>()?;
             let elapsed = get_trace_field(trace_event, "Elapsed")?.parse::<f64>()?;
             self.gauge_impl.gauge.record(value / elapsed, labels);
@@ -235,6 +339,10 @@ impl FDBGauge for HistogramPercentileFDBGauge {
         }
 
         let total_count = get_trace_field(trace_event, "TotalCount")?.parse::<u64>()?;
+        if total_count == 0 {
+            return Ok(());
+        }
+
         let mut hist: BTreeMap<u64, u64> = BTreeMap::new();
 
         for (k, v) in trace_event {
@@ -249,18 +357,111 @@ impl FDBGauge for HistogramPercentileFDBGauge {
             }
         }
 
-        let cutoff = self.percentile * (total_count as f64);
-        let mut seen = 0;
+        if hist.is_empty() {
+            return Ok(());
+        }
 
-        // TODO: Perform interpolation here:
-        for (micros, count) in hist {
-            seen += count;
-            if (seen as f64) >= cutoff {
-                self.gauge.record((micros as f64) / 1000000.0, labels);
-                break;
+        let mut buckets: Vec<HistogramBucket> = Vec::new();
+        let mut cumulative = 0u64;
+        let hist_entries: Vec<(u64, u64)> = hist
+            .iter()
+            .map(|(upper_bound_micros, count)| (*upper_bound_micros, *count))
+            .collect();
+
+        let Some((mut expected_upper_micros, _)) = hist_entries.first().copied() else {
+            return Ok(());
+        };
+
+        for (upper_bound_micros, count) in hist_entries {
+            while expected_upper_micros < upper_bound_micros {
+                let lower_bound_micros = expected_upper_micros / 2;
+                buckets.push(HistogramBucket {
+                    lower_bound_micros,
+                    upper_bound_micros: expected_upper_micros,
+                    count: 0,
+                    cumulative_count: cumulative,
+                });
+                expected_upper_micros = expected_upper_micros.saturating_mul(2);
+                if expected_upper_micros == 0 {
+                    break;
+                }
             }
+
+            cumulative += count;
+
+            buckets.push(HistogramBucket {
+                lower_bound_micros: upper_bound_micros / 2,
+                upper_bound_micros,
+                count,
+                cumulative_count: cumulative,
+            });
+
+            expected_upper_micros = match upper_bound_micros.checked_mul(2) {
+                Some(value) => value,
+                None => upper_bound_micros,
+            };
+        }
+
+        if let Some(interpolated_value_seconds) =
+            interpolate_exponential_percentile(&buckets, total_count, self.percentile)
+        {
+            self.gauge.record(interpolated_value_seconds, labels);
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn bucket(upper_bound_micros: u64, count: u64, cumulative: u64) -> HistogramBucket {
+        HistogramBucket {
+            lower_bound_micros: upper_bound_micros / 2,
+            upper_bound_micros,
+            count,
+            cumulative_count: cumulative,
+        }
+    }
+
+    #[test]
+    fn interpolates_percentile_within_bucket() {
+        let buckets = vec![bucket(1_000, 50, 50), bucket(2_000, 50, 100)];
+        let value =
+            interpolate_exponential_percentile(&buckets, 100, 0.25).expect("percentile value");
+        let expected = {
+            let bucket_upper_seconds = 1_000f64 / 1_000_000.0;
+            let lambda = -((1.0 - 0.5f64).ln()) / bucket_upper_seconds;
+            let exp_lower = (-lambda * (bucket_upper_seconds / 2.0)).exp();
+            let exp_upper = (-lambda * bucket_upper_seconds).exp();
+            let target = exp_lower - 0.5 * (exp_lower - exp_upper);
+            -target.ln() / lambda
+        };
+        assert!(
+            (value - expected).abs() < 1e-12,
+            "value {value} != {expected}"
+        );
+    }
+
+    #[test]
+    fn clamps_to_bucket_lower_for_zero_percentile() {
+        let buckets = vec![bucket(1_000, 50, 50), bucket(2_000, 50, 100)];
+        let value =
+            interpolate_exponential_percentile(&buckets, 100, 0.0).expect("percentile value");
+        assert!((value - 0.0005).abs() < 1e-12);
+    }
+
+    #[test]
+    fn returns_bucket_upper_for_full_percentile() {
+        let buckets = vec![bucket(1_000, 50, 50), bucket(2_000, 50, 100)];
+        let value =
+            interpolate_exponential_percentile(&buckets, 100, 1.0).expect("percentile value");
+        assert!((value - 0.002).abs() < 1e-12);
+    }
+
+    #[test]
+    fn none_for_empty_input() {
+        assert!(interpolate_exponential_percentile(&[], 0, 0.5).is_none());
     }
 }
