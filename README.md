@@ -21,25 +21,38 @@ Open `localhost:3000` in your browser and login with `admin:admin` credentials. 
 
 ## Configuration
 
-Reported metrics are configured in the `gauge_config.toml` file. There are currently 4 types of gauges that can be reported from JSON trace files:
+Reported metrics are configured in the `gauge_config.toml` file. There are currently 5 types of gauges that can be reported from JSON trace files:
 
 - `Simple`: Reports the numeric value of the field
 - `CounterTotal`: Reports the total value from a counter (the third space-delimited value of the field)
 - `CounterRate`: Reports the rate from a counter (the first space-delimited value of the field)
 - `ElapsedRate`: Reports the numeric value of the field divided by the `Elapsed` field in the same trace event
+- `HistogramPercentile`: Interpolates (assuming an exponential distribution) percentiles from histogram buckets aggregated by FDB
 
-For each gauge, the `trace_type`, `field_name`, `gauge_name`, `gauge_type`, and `description` must be configured. For example, the following gauge configuration:
+For each gauge, the `trace_type`, `field_name`, `gauge_name`, and `description` must be configured. For example, the following gauge configuration:
 
 ```
-[[gauge]]
+[[counter_total_gauge]]
 trace_type = "StorageMetrics"
 gauge_name = "ss_bytes_input"
 field_name = "BytesInput"
-gauge_type = "CounterTotal"
 description = "Total input bytes on storage server"
 ```
 
 will report a gauge from trace events of the form:
 ```
-{ "Type": "StorageMetrics", "Time": "<trace_time>", "BytesInput": "<rate> <roughness> <total>", "Machine": "<process_address>" }
+{ "Type": "StorageMetrics", "Time": "<trace_time>", "BytesInput": "<rate> <roughness> <total>", "Machine": "<process_address>", ... }
 ```
+
+For histogram percentile gauges, the schema is different, and a list of percentiles are provided. For example:
+
+```
+[[histogram_percentile_gauge]]
+group = "CommitProxy"
+op = "TlogLogging"
+percentiles = [0.5, 0.99, 0.999]
+gauge_name = "cp_tlog_logging_latency"
+description = "commit proxy TLog logging latency"
+```
+
+will report interpolated P50, P99, and P999 latency estimates from FDB trace events with `Type="Hisogram"`, `Group="CommitProxy"`, and `Op="TlogLogging"`.
