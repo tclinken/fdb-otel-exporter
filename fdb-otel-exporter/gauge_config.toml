@@ -266,6 +266,13 @@ percentiles = [0.5, 0.99, 0.999]
 gauge_name = "ss_fetch_keys_ptree_updates_latency"
 description = "storage server fetch keys PTree updates latency"
 
+[[histogram_percentile_gauge]]
+group = "StorageServer"
+op = "FetchKeysBytesPerCommit"
+percentiles = [0.5, 0.99, 0.999]
+gauge_name = "ss_fetch_keys_bytes_per_commit"
+description = "storage server fetch keys bytes per commit"
+
 
 [[histogram_percentile_gauge]]
 group = "StorageServer"
