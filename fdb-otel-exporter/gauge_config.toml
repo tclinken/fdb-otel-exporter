@@ -454,3 +454,21 @@ trace_type = "CommitBatchingWindowSize"
 gauge_name = "cp_p999_commit_batching_window"
 field_name = "P99.9"
 description = "P999 commit batching window size"
+
+[[simple_gauge]]
+trace_type = "CommitBatchingEmptyMessageRatio"
+gauge_name = "cp_p50_commit_batching_empty_message_ratio"
+field_name = "Median"
+description = "Median commit batching window empty message ratio"
+
+[[simple_gauge]]
+trace_type = "CommitBatchingEmptyMessageRatio"
+gauge_name = "cp_p99_commit_batching_empty_message_ratio"
+field_name = "P99"
+description = "P99 commit batching window empty message ratio"
+
+[[simple_gauge]]
+trace_type = "CommitBatchingEmptyMessageRatio"
+gauge_name = "cp_p999_commit_batching_empty_message_ratio"
+field_name = "P99.9"
+description = "P999 commit batching window empty message ratio"
