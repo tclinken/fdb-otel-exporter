@@ -108,7 +108,15 @@ impl LogMetrics {
             .map(str::to_owned)
             .with_context(|| "Missing or invalid Machine field")?;
 
-        let storage_labels = [KeyValue::new("machine", machine.clone())];
+        let roles = trace_event
+            .get("Roles")
+            .and_then(|value| value.as_str())
+            .map(str::to_owned);
+
+        let mut storage_labels = vec![KeyValue::new("machine", machine)];
+        if let Some(roles) = roles {
+            storage_labels.push(KeyValue::new("Roles", roles));
+        }
         for gauge in self.gauges.iter() {
             gauge.record(trace_event, &storage_labels)?;
         }
