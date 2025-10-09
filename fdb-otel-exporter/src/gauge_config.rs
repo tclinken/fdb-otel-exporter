@@ -312,7 +312,10 @@ mod tests {
         let error = parse_typed_gauge_configs(&value, std::path::Path::new("inline.toml"))
             .expect_err("non-table root should error");
         assert!(
-            error_chain_contains(&error, "expected gauge config file inline.toml to be a TOML table"),
+            error_chain_contains(
+                &error,
+                "expected gauge config file inline.toml to be a TOML table"
+            ),
             "missing table context: {error}"
         );
     }
@@ -333,7 +336,10 @@ mod tests {
         let error = read_gauge_config_file(file.path())
             .expect_err("non-array histogram section should error");
         assert!(
-            error_chain_contains(&error, "expected histogram_percentile_gauge section to be an array"),
+            error_chain_contains(
+                &error,
+                "expected histogram_percentile_gauge section to be an array"
+            ),
             "missing histogram array context: {error}"
         );
     }
@@ -369,8 +375,7 @@ mod tests {
             "#,
         );
 
-        let error = read_gauge_config_file(file.path())
-            .expect_err("missing field should error");
+        let error = read_gauge_config_file(file.path()).expect_err("missing field should error");
         assert!(
             error_chain_contains(&error, "failed to parse simple_gauge entry 0"),
             "missing entry parse context: {error}"
@@ -390,8 +395,8 @@ mod tests {
             "#,
         );
 
-        let error = read_gauge_config_file(file.path())
-            .expect_err("empty percentile list should error");
+        let error =
+            read_gauge_config_file(file.path()).expect_err("empty percentile list should error");
         assert!(
             error_chain_contains(&error, "percentiles list cannot be empty"),
             "missing empty percentile message: {error}"
@@ -418,8 +423,8 @@ mod tests {
             "#,
         );
 
-        let gauges = read_gauge_config_file(file.path())
-            .expect("single percentile histogram should parse");
+        let gauges =
+            read_gauge_config_file(file.path()).expect("single percentile histogram should parse");
         assert_eq!(gauges.len(), 1, "expected single histogram gauge");
 
         match &gauges[0] {

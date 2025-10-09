@@ -174,12 +174,10 @@ mod tests {
         let invalid = OsString::from_vec(vec![0xff, 0xfe, 0xfd]);
         env::set_var(LOG_POLL_INTERVAL_ENV, &invalid);
 
-        let error = parse_f64_env(LOG_POLL_INTERVAL_ENV, 1.0)
-            .expect_err("non-UTF8 env values should fail");
+        let error =
+            parse_f64_env(LOG_POLL_INTERVAL_ENV, 1.0).expect_err("non-UTF8 env values should fail");
         assert!(
-            error
-                .to_string()
-                .contains("must be valid UTF-8"),
+            error.to_string().contains("must be valid UTF-8"),
             "unexpected error message: {error}"
         );
 
