@@ -117,3 +117,93 @@ impl LogMetrics {
 }
 
 pub type TraceEvent = HashMap<String, Value>;
+
+#[cfg(test)]
+impl LogMetrics {
+    fn from_gauges(gauges: Vec<Arc<dyn FDBGauge>>) -> Self {
+        Self { gauges }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use opentelemetry::metrics::MeterProvider;
+    use opentelemetry::KeyValue;
+    use opentelemetry_sdk::metrics::{ManualReader, SdkMeterProvider};
+    use std::sync::{Arc, Mutex};
+
+    #[derive(Clone)]
+    struct TestGauge {
+        calls: Arc<Mutex<Vec<Vec<KeyValue>>>>,
+    }
+
+    impl TestGauge {
+        fn new(calls: Arc<Mutex<Vec<Vec<KeyValue>>>>) -> Self {
+            Self { calls }
+        }
+    }
+
+    impl FDBGauge for TestGauge {
+        fn record(&self, _trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
+            self.calls.lock().unwrap().push(labels.to_vec());
+            Ok(())
+        }
+    }
+
+    fn test_meter() -> Meter {
+        let reader = ManualReader::builder().build();
+        let provider = SdkMeterProvider::builder().with_reader(reader).build();
+        provider.meter("test")
+    }
+
+    #[test]
+    fn new_loads_gauge_config() {
+        let meter = test_meter();
+        LogMetrics::new(&meter).expect("should load gauges from config");
+    }
+
+    #[test]
+    fn record_requires_machine_field() {
+        let calls = Arc::new(Mutex::new(Vec::new()));
+        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(TestGauge::new(Arc::clone(&calls)))];
+        let log_metrics = LogMetrics::from_gauges(gauges);
+
+        let mut event = HashMap::new();
+        event.insert("Type".to_string(), Value::String("StorageMetrics".into()));
+
+        let err = log_metrics.record(&event).expect_err("machine required");
+        assert!(
+            err.to_string().contains("Machine"),
+            "unexpected error message: {err}"
+        );
+        assert!(
+            calls.lock().unwrap().is_empty(),
+            "gauge should not be called"
+        );
+    }
+
+    #[test]
+    fn record_invokes_gauges_with_machine_label() {
+        let calls = Arc::new(Mutex::new(Vec::new()));
+        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(TestGauge::new(Arc::clone(&calls)))];
+        let log_metrics = LogMetrics::from_gauges(gauges);
+
+        let mut event = HashMap::new();
+        event.insert("Machine".to_string(), Value::String("10.0.0.1".into()));
+        event.insert("Type".to_string(), Value::String("StorageMetrics".into()));
+        event.insert("BytesInput".to_string(), Value::String("0 0 0".into()));
+
+        log_metrics.record(&event).expect("record should succeed");
+
+        let recorded = calls.lock().unwrap();
+        assert_eq!(recorded.len(), 1);
+        let labels = &recorded[0];
+        assert!(
+            labels
+                .iter()
+                .any(|kv| kv.key.as_str() == "machine" && kv.value.to_string() == "10.0.0.1"),
+            "expected machine label, got {labels:?}"
+        );
+    }
+}
