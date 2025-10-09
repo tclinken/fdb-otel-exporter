@@ -455,6 +455,8 @@ impl FDBGauge for HistogramPercentileFDBGauge {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use opentelemetry::metrics::{Meter, MeterProvider};
+    use opentelemetry_sdk::metrics::{ManualReader, SdkMeterProvider};
 
     fn bucket(upper_bound: u64, count: u64, cumulative: u64) -> HistogramBucket {
         HistogramBucket {
@@ -463,6 +465,131 @@ mod tests {
             count,
             cumulative_count: cumulative,
         }
+    }
+
+    fn test_meter() -> Meter {
+        let reader = ManualReader::builder().build();
+        let provider = SdkMeterProvider::builder().with_reader(reader).build();
+        provider.meter("test")
+    }
+
+    fn base_event_with_type(trace_type: &str) -> HashMap<String, Value> {
+        let mut event = HashMap::new();
+        event.insert("Type".to_string(), Value::String(trace_type.to_string()));
+        event
+    }
+
+    #[test]
+    fn simple_gauge_records_matching_events() {
+        let meter = test_meter();
+        let gauge = SimpleFDBGauge::new(
+            "StorageMetrics",
+            "Version",
+            "ss_version_test",
+            "Test version gauge",
+            &meter,
+        );
+
+        let mut event = base_event_with_type("StorageMetrics");
+        event.insert("Version".into(), Value::String("123".into()));
+
+        gauge.record(&event, &[]).expect("record should succeed");
+    }
+
+    #[test]
+    fn simple_gauge_errors_when_field_missing() {
+        let meter = test_meter();
+        let gauge = SimpleFDBGauge::new(
+            "StorageMetrics",
+            "Version",
+            "ss_version_test",
+            "Test version gauge",
+            &meter,
+        );
+
+        let event = base_event_with_type("StorageMetrics");
+        let err = gauge
+            .record(&event, &[])
+            .expect_err("missing field should error");
+        assert!(
+            err.to_string().contains("Version"),
+            "unexpected error message: {err}"
+        );
+    }
+
+    #[test]
+    fn total_counter_gauge_parses_third_component() {
+        let meter = test_meter();
+        let gauge = TotalCounterFDBGauge::new(
+            "StorageMetrics",
+            "BytesDurable",
+            "ss_bytes_durable_test",
+            "Total bytes durable",
+            &meter,
+        );
+
+        let mut event = base_event_with_type("StorageMetrics");
+        event.insert("BytesDurable".into(), Value::String("1 2 3".into()));
+
+        gauge.record(&event, &[]).expect("record should succeed");
+    }
+
+    #[test]
+    fn rate_counter_gauge_parses_first_component() {
+        let meter = test_meter();
+        let gauge = RateCounterFDBGauge::new(
+            "ProxyMetrics",
+            "TxnCommitIn",
+            "cp_txn_commit_in_test",
+            "Txn commit rate",
+            &meter,
+        );
+
+        let mut event = base_event_with_type("ProxyMetrics");
+        event.insert("TxnCommitIn".into(), Value::String("42 100 200".into()));
+
+        gauge.record(&event, &[]).expect("record should succeed");
+    }
+
+    #[test]
+    fn elapsed_rate_gauge_divides_by_elapsed() {
+        let meter = test_meter();
+        let gauge = ElapsedRateFDBGauge::new(
+            "ProcessMetrics",
+            "CPUSeconds",
+            "process_cpu_util_test",
+            "CPU utilization",
+            &meter,
+        );
+
+        let mut event = base_event_with_type("ProcessMetrics");
+        event.insert("CPUSeconds".into(), Value::String("10.0".into()));
+        event.insert("Elapsed".into(), Value::String("2.0".into()));
+
+        gauge.record(&event, &[]).expect("record should succeed");
+    }
+
+    #[test]
+    fn histogram_percentile_records_matching_histogram() {
+        let meter = test_meter();
+        let gauge = HistogramPercentileFDBGauge::new(
+            "StorageServer",
+            "Read",
+            0.5,
+            "ss_read_latency_p50_test",
+            "Read latency",
+            &meter,
+        );
+
+        let mut event = base_event_with_type("Histogram");
+        event.insert("Group".into(), Value::String("StorageServer".into()));
+        event.insert("Op".into(), Value::String("Read".into()));
+        event.insert("Unit".into(), Value::String("milliseconds".into()));
+        event.insert("TotalCount".into(), Value::String("10".into()));
+        event.insert("LessThan1.0".into(), Value::String("4".into()));
+        event.insert("LessThan2.0".into(), Value::String("6".into()));
+
+        gauge.record(&event, &[]).expect("record should succeed");
     }
 
     #[test]

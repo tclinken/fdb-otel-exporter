@@ -267,3 +267,166 @@ fn parse_typed_gauge_configs(value: &Value, toml_config: &Path) -> Result<Vec<Ga
         )
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::NamedTempFile;
+
+    fn write_config(contents: &str) -> NamedTempFile {
+        let file = NamedTempFile::new().expect("create temp config");
+        std::fs::write(file.path(), contents.trim_start()).expect("write config");
+        file
+    }
+
+    #[test]
+    fn parses_standard_gauges() {
+        let file = write_config(
+            r#"
+            [[simple_gauge]]
+            trace_type = "StorageMetrics"
+            gauge_name = "ss_version"
+            field_name = "Version"
+            description = "Storage server version"
+
+            [[counter_total_gauge]]
+            trace_type = "StorageMetrics"
+            gauge_name = "ss_bytes_durable"
+            field_name = "BytesDurable"
+            description = "Durable bytes"
+
+            [[elapsed_rate_gauge]]
+            trace_type = "ProxyMetrics"
+            gauge_name = "cp_cpu_util"
+            field_name = "CPUSeconds"
+            description = "Commit proxy CPU utilization"
+            "#,
+        );
+
+        let gauges =
+            read_gauge_config_file(file.path()).expect("standard gauges should parse successfully");
+        assert_eq!(gauges.len(), 3, "unexpected number of gauges");
+
+        let simple = gauges
+            .iter()
+            .find_map(|g| match g {
+                GaugeDefinition::Simple(def) => Some(def),
+                _ => None,
+            })
+            .expect("expected simple gauge definition");
+        assert_eq!(simple.trace_type, "StorageMetrics");
+        assert_eq!(simple.gauge_name, "ss_version");
+        assert_eq!(simple.field_name, "Version");
+        assert_eq!(simple.description, "Storage server version");
+
+        let counter_total = gauges
+            .iter()
+            .find_map(|g| match g {
+                GaugeDefinition::CounterTotal(def) => Some(def),
+                _ => None,
+            })
+            .expect("expected counter total gauge definition");
+        assert_eq!(counter_total.trace_type, "StorageMetrics");
+        assert_eq!(counter_total.gauge_name, "ss_bytes_durable");
+        assert_eq!(counter_total.field_name, "BytesDurable");
+
+        let elapsed_rate = gauges
+            .iter()
+            .find_map(|g| match g {
+                GaugeDefinition::ElapsedRate(def) => Some(def),
+                _ => None,
+            })
+            .expect("expected elapsed rate gauge definition");
+        assert_eq!(elapsed_rate.trace_type, "ProxyMetrics");
+        assert_eq!(elapsed_rate.field_name, "CPUSeconds");
+    }
+
+    #[test]
+    fn expands_histogram_percentiles_with_suffixes() {
+        let file = write_config(
+            r#"
+            [[histogram_percentile_gauge]]
+            group = "StorageServer"
+            op = "Read"
+            percentiles = [0.5, 0.99]
+            gauge_name = "ss_read_latency_seconds"
+            description = "Read latency"
+            "#,
+        );
+
+        let gauges = read_gauge_config_file(file.path())
+            .expect("histogram gauges should parse successfully");
+
+        assert_eq!(gauges.len(), 2, "expected gauges for two percentiles");
+
+        match &gauges[0] {
+            GaugeDefinition::HistogramPercentile(def) => {
+                assert_eq!(def.group, "StorageServer");
+                assert_eq!(def.op, "Read");
+                assert_eq!(def.percentile, 0.5);
+                assert_eq!(def.gauge_name, "ss_read_latency_seconds_p50");
+                assert_eq!(def.description, "Read latency (p50)");
+            }
+            other => panic!("expected histogram gauge, got {other:?}"),
+        }
+
+        match &gauges[1] {
+            GaugeDefinition::HistogramPercentile(def) => {
+                assert_eq!(def.percentile, 0.99);
+                assert_eq!(def.gauge_name, "ss_read_latency_seconds_p99");
+            }
+            other => panic!("expected histogram gauge, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn errors_when_no_recognized_sections() {
+        let file = write_config(
+            r#"
+            [unrelated]
+            value = 1
+            "#,
+        );
+
+        let error =
+            read_gauge_config_file(file.path()).expect_err("should error without known sections");
+        assert!(
+            error
+                .to_string()
+                .contains("did not contain any recognized sections"),
+            "unexpected error message: {error}"
+        );
+    }
+
+    #[test]
+    fn rejects_invalid_percentiles() {
+        let file = write_config(
+            r#"
+            [[histogram_percentile_gauge]]
+            group = "StorageServer"
+            op = "Read"
+            percentiles = [1.5]
+            gauge_name = "ss_read_latency_seconds"
+            description = "Read latency"
+            "#,
+        );
+
+        let error =
+            read_gauge_config_file(file.path()).expect_err("should reject invalid percentile");
+        let mut found = false;
+        for cause in error.chain() {
+            if cause.to_string().contains("between 0.0 and 1.0") {
+                found = true;
+                break;
+            }
+        }
+        assert!(found, "unexpected error chain: {error:?}");
+    }
+
+    #[test]
+    fn percentile_suffix_formats_values() {
+        assert_eq!(percentile_suffix(0.5), "p50");
+        assert_eq!(percentile_suffix(0.995), "p99_5");
+        assert_eq!(percentile_suffix(0.000_123), "p0_0123");
+    }
+}
