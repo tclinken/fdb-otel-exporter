@@ -271,12 +271,165 @@ fn parse_typed_gauge_configs(value: &Value, toml_config: &Path) -> Result<Vec<Ga
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde::de::value::Error as DeValueError;
     use tempfile::NamedTempFile;
 
     fn write_config(contents: &str) -> NamedTempFile {
         let file = NamedTempFile::new().expect("create temp config");
         std::fs::write(file.path(), contents.trim_start()).expect("write config");
         file
+    }
+
+    fn error_chain_contains(error: &anyhow::Error, needle: &str) -> bool {
+        error
+            .chain()
+            .any(|cause| cause.to_string().contains(needle))
+    }
+
+    #[test]
+    fn returns_empty_gauges_for_blank_file() {
+        let file = write_config("");
+        let gauges =
+            read_gauge_config_file(file.path()).expect("blank config should return empty gauges");
+        assert!(gauges.is_empty(), "expected empty gauge list");
+    }
+
+    #[test]
+    fn surfaces_toml_parse_error_context() {
+        let file = write_config("invalid = [");
+
+        let error = read_gauge_config_file(file.path())
+            .expect_err("invalid TOML should surface parse error");
+        assert!(
+            error_chain_contains(&error, "failed to parse gauge config file"),
+            "missing parse context: {error}"
+        );
+    }
+
+    #[test]
+    fn errors_when_top_level_is_not_table() {
+        let value = Value::Integer(42);
+        let error = parse_typed_gauge_configs(&value, std::path::Path::new("inline.toml"))
+            .expect_err("non-table root should error");
+        assert!(
+            error_chain_contains(&error, "expected gauge config file inline.toml to be a TOML table"),
+            "missing table context: {error}"
+        );
+    }
+
+    #[test]
+    fn errors_when_histogram_section_is_not_array() {
+        let file = write_config(
+            r#"
+            [histogram_percentile_gauge]
+            group = "StorageServer"
+            op = "Read"
+            percentiles = [0.5]
+            gauge_name = "ss_read_latency_seconds"
+            description = "Read latency"
+            "#,
+        );
+
+        let error = read_gauge_config_file(file.path())
+            .expect_err("non-array histogram section should error");
+        assert!(
+            error_chain_contains(&error, "expected histogram_percentile_gauge section to be an array"),
+            "missing histogram array context: {error}"
+        );
+    }
+
+    #[test]
+    fn errors_when_standard_section_is_not_array() {
+        let file = write_config(
+            r#"
+            [simple_gauge]
+            trace_type = "StorageMetrics"
+            gauge_name = "ss_version"
+            field_name = "Version"
+            description = "Storage server version"
+            "#,
+        );
+
+        let error = read_gauge_config_file(file.path())
+            .expect_err("non-array standard section should error");
+        assert!(
+            error_chain_contains(&error, "expected simple_gauge section to be an array"),
+            "missing standard array context: {error}"
+        );
+    }
+
+    #[test]
+    fn errors_when_standard_entry_is_missing_fields() {
+        let file = write_config(
+            r#"
+            [[simple_gauge]]
+            trace_type = "StorageMetrics"
+            gauge_name = "ss_version"
+            description = "Storage server version"
+            "#,
+        );
+
+        let error = read_gauge_config_file(file.path())
+            .expect_err("missing field should error");
+        assert!(
+            error_chain_contains(&error, "failed to parse simple_gauge entry 0"),
+            "missing entry parse context: {error}"
+        );
+    }
+
+    #[test]
+    fn rejects_empty_percentile_list() {
+        let file = write_config(
+            r#"
+            [[histogram_percentile_gauge]]
+            group = "StorageServer"
+            op = "Read"
+            percentiles = []
+            gauge_name = "ss_read_latency_seconds"
+            description = "Read latency"
+            "#,
+        );
+
+        let error = read_gauge_config_file(file.path())
+            .expect_err("empty percentile list should error");
+        assert!(
+            error_chain_contains(&error, "percentiles list cannot be empty"),
+            "missing empty percentile message: {error}"
+        );
+    }
+
+    #[test]
+    fn validate_percentile_rejects_non_finite_values() {
+        let error =
+            validate_percentile::<DeValueError>(f64::NAN).expect_err("NaN percentile should error");
+        assert_eq!(error.to_string(), "percentile must be finite");
+    }
+
+    #[test]
+    fn expands_single_histogram_percentile_without_suffix() {
+        let file = write_config(
+            r#"
+            [[histogram_percentile_gauge]]
+            group = "StorageServer"
+            op = "Read"
+            percentiles = [0.9]
+            gauge_name = "ss_read_latency_seconds"
+            description = "Read latency"
+            "#,
+        );
+
+        let gauges = read_gauge_config_file(file.path())
+            .expect("single percentile histogram should parse");
+        assert_eq!(gauges.len(), 1, "expected single histogram gauge");
+
+        match &gauges[0] {
+            GaugeDefinition::HistogramPercentile(def) => {
+                assert_eq!(def.gauge_name, "ss_read_latency_seconds");
+                assert_eq!(def.description, "Read latency");
+                assert_eq!(def.percentile, 0.9);
+            }
+            other => panic!("expected histogram gauge, got {other:?}"),
+        }
     }
 
     #[test]
