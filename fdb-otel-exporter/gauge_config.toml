@@ -472,3 +472,57 @@ trace_type = "CommitBatchingEmptyMessageRatio"
 gauge_name = "cp_p999_commit_batching_empty_message_ratio"
 field_name = "P99.9"
 description = "P999 commit batching window empty message ratio"
+
+[[simple_gauge]]
+trace_type = "UpdateLatencyMetrics"
+gauge_name = "ss_p50_update_latency"
+field_name = "Median"
+description = "Median update latency on storage server"
+
+[[simple_gauge]]
+trace_type = "UpdateLatencyMetrics"
+gauge_name = "ss_p99_update_latency"
+field_name = "P99"
+description = "P99 update latency on storage server"
+
+[[simple_gauge]]
+trace_type = "UpdateLatencyMetrics"
+gauge_name = "ss_p999_update_latency"
+field_name = "P99.9"
+description = "P999 update latency on storage server"
+
+[[simple_gauge]]
+trace_type = "ReadVersionWaitMetrics"
+gauge_name = "ss_p50_read_version_wait"
+field_name = "Median"
+description = "Median read version wait latency"
+
+[[simple_gauge]]
+trace_type = "ReadVersionWaitMetrics"
+gauge_name = "ss_p99_read_version_wait"
+field_name = "P99"
+description = "P99 read version wait latency"
+
+[[simple_gauge]]
+trace_type = "ReadVersionWaitMetrics"
+gauge_name = "ss_p999_read_version_wait"
+field_name = "P99.9"
+description = "P999 read version wait latency"
+
+[[simple_gauge]]
+trace_type = "ReadQueueWaitMetrics"
+gauge_name = "ss_p50_read_queue_wait"
+field_name = "Median"
+description = "Median read queue wait latency"
+
+[[simple_gauge]]
+trace_type = "ReadQueueWaitMetrics"
+gauge_name = "ss_p99_read_queue_wait"
+field_name = "P99"
+description = "P99 read queue wait latency"
+
+[[simple_gauge]]
+trace_type = "ReadQueueWaitMetrics"
+gauge_name = "ss_p999_read_queue_wait"
+field_name = "P99.9"
+description = "P999 read queue wait latency"
