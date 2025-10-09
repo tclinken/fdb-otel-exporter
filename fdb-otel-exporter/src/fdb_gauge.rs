@@ -11,6 +11,7 @@ use std::{
 enum HistogramUnit {
     Milliseconds,
     Bytes,
+    Count,
 }
 
 impl HistogramUnit {
@@ -18,18 +19,19 @@ impl HistogramUnit {
         match self {
             Self::Milliseconds => 1_000_000.0,
             Self::Bytes => 1.0,
+            Self::Count => 1.0,
         }
     }
 
     fn convert_bucket_upper(&self, bucket_value: f64) -> u64 {
         match self {
             Self::Milliseconds => (bucket_value * 1000.0) as u64,
-            Self::Bytes => bucket_value as u64,
+            Self::Bytes | Self::Count => bucket_value as u64,
         }
     }
 }
 
-// Snapshot of a histogram bucket expressed in the trace's base units (microseconds or bytes),
+// Snapshot of a histogram bucket expressed in the trace's base units (microseconds, bytes, or counts),
 // along with per-bucket counts and cumulative totals.
 #[derive(Debug, Clone, Copy)]
 struct HistogramBucket {
@@ -41,9 +43,9 @@ struct HistogramBucket {
 
 // Interpolate a percentile value from histogram buckets assuming an exponential distribution.
 // The buckets are derived from FoundationDB `LessThan` lines, converted to their base units
-// (microseconds for latency histograms or bytes for size histograms), and paired with running
-// cumulative counts so this helper can locate the bucket that spans the percentile and solve for
-// the interpolated value.
+// (microseconds for latency histograms, bytes for size histograms, or counts for raw counters),
+// and paired with running cumulative counts so this helper can locate the bucket that spans the
+// percentile and solve for the interpolated value.
 fn interpolate_exponential_percentile(
     buckets: &[HistogramBucket],
     total_count: u64,
@@ -371,6 +373,7 @@ impl FDBGauge for HistogramPercentileFDBGauge {
         let unit = match unit_str {
             "milliseconds" => HistogramUnit::Milliseconds,
             "bytes" => HistogramUnit::Bytes,
+            "count" => HistogramUnit::Count,
             _ => return Ok(()),
         };
         let unit_divisor = unit.divisor();
@@ -582,20 +585,24 @@ mod tests {
     }
 
     #[test]
-    fn interpolates_bytes_histogram_without_scaling() {
-        let buckets = vec![bucket(128, 50, 50), bucket(256, 50, 100)];
-        let value =
-            interpolate_exponential_percentile(&buckets, 100, 0.25, 1.0).expect("percentile value");
+    fn interpolates_histogram_without_scaling_for_unit_one() {
+        for &upper in &[128u64, 32u64] {
+            let buckets = vec![bucket(upper, 50, 50), bucket(upper * 2, 50, 100)];
+            let value =
+                interpolate_exponential_percentile(&buckets, 100, 0.25, 1.0)
+                    .expect("percentile value");
 
-        let expected = {
-            let bucket_upper = 128f64;
+            let bucket_upper = upper as f64;
             let lambda = -((1.0 - 0.5f64).ln()) / bucket_upper;
             let exp_lower = (-lambda * (bucket_upper / 2.0)).exp();
             let exp_upper = (-lambda * bucket_upper).exp();
             let target = exp_lower - 0.5 * (exp_lower - exp_upper);
-            -target.ln() / lambda
-        };
+            let expected = -target.ln() / lambda;
 
-        assert!((value - expected).abs() < 1e-12, "value {value} != {expected}");
+            assert!(
+                (value - expected).abs() < 1e-12,
+                "upper {upper} value {value} != {expected}"
+            );
+        }
     }
 }
