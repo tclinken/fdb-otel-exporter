@@ -102,6 +102,7 @@
           },
           "id": 22,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -213,6 +214,7 @@
           },
           "id": 20,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -336,6 +338,7 @@
           },
           "id": 26,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -432,6 +435,7 @@
           },
           "id": 25,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -528,6 +532,7 @@
           },
           "id": 24,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -619,10 +624,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 123
+            "y": 243
           },
           "id": 38,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -714,10 +720,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 123
+            "y": 243
           },
           "id": 39,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -809,10 +816,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 123
+            "y": 243
           },
           "id": 40,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -904,10 +912,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 131
+            "y": 251
           },
           "id": 41,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -999,10 +1008,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 131
+            "y": 251
           },
           "id": 42,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -1094,10 +1104,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 131
+            "y": 251
           },
           "id": 43,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -1189,10 +1200,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 139
+            "y": 259
           },
           "id": 44,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -1284,10 +1296,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 139
+            "y": 259
           },
           "id": 45,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -1379,10 +1392,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 139
+            "y": 259
           },
           "id": 46,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -1493,6 +1507,7 @@
           },
           "id": 9,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -1589,6 +1604,7 @@
           },
           "id": 10,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -1685,6 +1701,7 @@
           },
           "id": 29,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -1776,10 +1793,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 12
+            "y": 44
           },
           "id": 74,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -1871,10 +1889,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 12
+            "y": 44
           },
           "id": 75,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -1966,10 +1985,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 12
+            "y": 44
           },
           "id": 76,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -2061,10 +2081,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 20
+            "y": 52
           },
           "id": 77,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -2156,10 +2177,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 20
+            "y": 52
           },
           "id": 78,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -2251,10 +2273,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 20
+            "y": 52
           },
           "id": 79,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -2346,10 +2369,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 28
+            "y": 60
           },
           "id": 80,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -2441,10 +2465,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 28
+            "y": 60
           },
           "id": 81,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -2536,10 +2561,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 28
+            "y": 60
           },
           "id": 82,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -2631,10 +2657,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 36
+            "y": 68
           },
           "id": 83,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -2726,10 +2753,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 36
+            "y": 68
           },
           "id": 84,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -2821,10 +2849,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 36
+            "y": 68
           },
           "id": 85,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -2916,10 +2945,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 44
+            "y": 76
           },
           "id": 86,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -3011,10 +3041,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 44
+            "y": 76
           },
           "id": 87,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -3106,10 +3137,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 44
+            "y": 76
           },
           "id": 88,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -3201,10 +3233,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 52
+            "y": 84
           },
           "id": 89,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -3296,10 +3329,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 52
+            "y": 84
           },
           "id": 90,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -3391,10 +3425,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 52
+            "y": 84
           },
           "id": 91,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -3501,10 +3536,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 645
+            "y": 765
           },
           "id": 11,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -3597,10 +3633,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 645
+            "y": 765
           },
           "id": 12,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -3693,10 +3730,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 645
+            "y": 765
           },
           "id": 27,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -3803,10 +3841,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 326
+            "y": 446
           },
           "id": 6,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -3899,10 +3938,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 326
+            "y": 446
           },
           "id": 5,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -3995,10 +4035,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 326
+            "y": 446
           },
           "id": 8,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -4091,10 +4132,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 334
+            "y": 454
           },
           "id": 3,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -4187,10 +4229,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 334
+            "y": 454
           },
           "id": 7,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -4283,10 +4326,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 334
+            "y": 454
           },
           "id": 2,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -4379,10 +4423,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 342
+            "y": 462
           },
           "id": 28,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -4476,10 +4521,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 342
+            "y": 462
           },
           "id": 1,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -4573,10 +4619,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 342
+            "y": 462
           },
           "id": 4,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -4669,10 +4716,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 350
+            "y": 470
           },
           "id": 47,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -4765,10 +4813,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 350
+            "y": 470
           },
           "id": 48,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -4861,10 +4910,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 350
+            "y": 470
           },
           "id": 49,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -4957,10 +5007,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 358
+            "y": 478
           },
           "id": 50,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -5053,10 +5104,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 358
+            "y": 478
           },
           "id": 51,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -5149,10 +5201,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 358
+            "y": 478
           },
           "id": 52,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -5245,10 +5298,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 366
+            "y": 486
           },
           "id": 53,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -5341,10 +5395,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 366
+            "y": 486
           },
           "id": 54,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -5437,10 +5492,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 366
+            "y": 486
           },
           "id": 55,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -5533,10 +5589,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 374
+            "y": 494
           },
           "id": 56,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -5629,10 +5686,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 374
+            "y": 494
           },
           "id": 57,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -5725,10 +5783,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 374
+            "y": 494
           },
           "id": 58,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -5821,10 +5880,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 382
+            "y": 502
           },
           "id": 59,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -5917,10 +5977,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 382
+            "y": 502
           },
           "id": 60,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -6013,10 +6074,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 382
+            "y": 502
           },
           "id": 61,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -6109,10 +6171,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 390
+            "y": 510
           },
           "id": 62,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -6205,10 +6268,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 390
+            "y": 510
           },
           "id": 63,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -6301,10 +6365,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 390
+            "y": 510
           },
           "id": 64,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -6397,10 +6462,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 398
+            "y": 518
           },
           "id": 65,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -6493,10 +6559,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 398
+            "y": 518
           },
           "id": 66,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -6589,10 +6656,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 398
+            "y": 518
           },
           "id": 67,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -6685,10 +6753,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 406
+            "y": 526
           },
           "id": 71,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -6781,10 +6850,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 406
+            "y": 526
           },
           "id": 72,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -6877,10 +6947,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 406
+            "y": 526
           },
           "id": 73,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -6987,10 +7058,11 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 679
+            "y": 799
           },
           "id": 13,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -7083,10 +7155,11 @@
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 679
+            "y": 799
           },
           "id": 23,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -7193,10 +7266,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 688
+            "y": 808
           },
           "id": 32,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -7289,10 +7363,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 688
+            "y": 808
           },
           "id": 31,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -7385,10 +7460,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 688
+            "y": 808
           },
           "id": 30,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -7495,10 +7571,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 689
+            "y": 9
           },
           "id": 36,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -7591,10 +7668,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 689
+            "y": 9
           },
           "id": 34,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -7687,10 +7765,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 689
+            "y": 9
           },
           "id": 35,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -7751,7 +7830,7 @@
                 },
                 "showPoints": "auto",
                 "showValues": false,
-                "spanNulls": false,
+                "spanNulls": true,
                 "stacking": {
                   "group": "A",
                   "mode": "none"
@@ -7782,295 +7861,11 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 697
-          },
-          "id": 92,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.2.0",
-          "targets": [
-            {
-              "editorMode": "builder",
-              "expr": "rv_compute_time_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "P50 Resolver Compute Time",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "barWidthFactor": 0.6,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "showValues": false,
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": 0
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "s"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 8,
-            "y": 697
-          },
-          "id": 93,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.2.0",
-          "targets": [
-            {
-              "editorMode": "builder",
-              "expr": "rv_compute_time_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "P99 Resolver Compute Time",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "barWidthFactor": 0.6,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "showValues": false,
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": 0
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "s"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 16,
-            "y": 697
-          },
-          "id": 94,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": false
-            },
-            "tooltip": {
-              "hideZeros": false,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "12.2.0",
-          "targets": [
-            {
-              "editorMode": "builder",
-              "expr": "rv_compute_time_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "P999 Resolver Compute Time",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "barWidthFactor": 0.6,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "showValues": false,
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": 0
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "s"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 0,
-            "y": 705
+            "y": 17
           },
           "id": 95,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -8131,7 +7926,7 @@
                 },
                 "showPoints": "auto",
                 "showValues": false,
-                "spanNulls": false,
+                "spanNulls": true,
                 "stacking": {
                   "group": "A",
                   "mode": "none"
@@ -8162,10 +7957,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 705
+            "y": 17
           },
           "id": 96,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -8226,7 +8022,7 @@
                 },
                 "showPoints": "auto",
                 "showValues": false,
-                "spanNulls": false,
+                "spanNulls": true,
                 "stacking": {
                   "group": "A",
                   "mode": "none"
@@ -8257,10 +8053,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 705
+            "y": 17
           },
           "id": 97,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -8321,7 +8118,7 @@
                 },
                 "showPoints": "auto",
                 "showValues": false,
-                "spanNulls": false,
+                "spanNulls": true,
                 "stacking": {
                   "group": "A",
                   "mode": "none"
@@ -8352,10 +8149,299 @@
             "h": 8,
             "w": 8,
             "x": 0,
-            "y": 713
+            "y": 25
+          },
+          "id": 92,
+          "options": {
+            "connectNulls": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0",
+          "targets": [
+            {
+              "editorMode": "builder",
+              "expr": "rv_compute_time_latency_p50{job=\"fdb-otel-exporter\"}",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "P50 Resolver Compute Time",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 25
+          },
+          "id": 93,
+          "options": {
+            "connectNulls": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0",
+          "targets": [
+            {
+              "editorMode": "builder",
+              "expr": "rv_compute_time_latency_p99{job=\"fdb-otel-exporter\"}",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "P99 Resolver Compute Time",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 25
+          },
+          "id": 94,
+          "options": {
+            "connectNulls": true,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0",
+          "targets": [
+            {
+              "editorMode": "builder",
+              "expr": "rv_compute_time_latency_p99_9{job=\"fdb-otel-exporter\"}",
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "P999 Resolver Compute Time",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "showValues": false,
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 33
           },
           "id": 98,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -8416,7 +8502,7 @@
                 },
                 "showPoints": "auto",
                 "showValues": false,
-                "spanNulls": false,
+                "spanNulls": true,
                 "stacking": {
                   "group": "A",
                   "mode": "none"
@@ -8447,10 +8533,11 @@
             "h": 8,
             "w": 8,
             "x": 8,
-            "y": 713
+            "y": 33
           },
           "id": 99,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -8511,7 +8598,7 @@
                 },
                 "showPoints": "auto",
                 "showValues": false,
-                "spanNulls": false,
+                "spanNulls": true,
                 "stacking": {
                   "group": "A",
                   "mode": "none"
@@ -8542,10 +8629,11 @@
             "h": 8,
             "w": 8,
             "x": 16,
-            "y": 713
+            "y": 33
           },
           "id": 100,
           "options": {
+            "connectNulls": true,
             "legend": {
               "calcs": [],
               "displayMode": "list",
@@ -8593,5 +8681,5 @@
   "timezone": "",
   "title": "FDB Metrics",
   "uid": "fdb-metrics",
-  "version": 26
+  "version": 29
 }
