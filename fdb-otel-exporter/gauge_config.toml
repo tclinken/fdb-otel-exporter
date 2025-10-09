@@ -436,3 +436,21 @@ trace_type = "MasterRecoveryState"
 gauge_name = "cc_recovery_state"
 field_name = "StatusCode"
 description = "Recovery state, reported by cluster controller"
+
+[[simple_gauge]]
+trace_type = "CommitBatchingWindowSize"
+gauge_name = "cp_p50_commit_batching_window"
+field_name = "Median"
+description = "Median commit batching window size"
+
+[[simple_gauge]]
+trace_type = "CommitBatchingWindowSize"
+gauge_name = "cp_p99_commit_batching_window"
+field_name = "P99"
+description = "P99 commit batching window size"
+
+[[simple_gauge]]
+trace_type = "CommitBatchingWindowSize"
+gauge_name = "cp_p999_commit_batching_window"
+field_name = "P99.9"
+description = "P999 commit batching window size"
