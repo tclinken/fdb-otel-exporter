@@ -186,7 +186,7 @@ impl FDBGaugeImpl {
 #[derive(Clone)]
 pub struct SimpleFDBGauge {
     gauge_impl: FDBGaugeImpl,
-    samples: Arc<Mutex<HashMap<LabelKey, VecDeque<TimedSample>>>>,
+    rolling_window: RollingWindow,
 }
 
 impl SimpleFDBGauge {
@@ -199,7 +199,7 @@ impl SimpleFDBGauge {
     ) -> Self {
         Self {
             gauge_impl: FDBGaugeImpl::new(trace_type, field_name, gauge_name, description, meter),
-            samples: Arc::new(Mutex::new(HashMap::new())),
+            rolling_window: RollingWindow::new(ROLLING_WINDOW_SECONDS),
         }
     }
 }
@@ -216,31 +216,7 @@ impl FDBGauge for SimpleFDBGauge {
             let sample = value.parse::<f64>()?;
             let time = get_trace_field(trace_event, "Time")?.parse::<f64>()?;
 
-            let key = LabelKey::from_labels(labels);
-            let averaged = {
-                let mut samples = self
-                    .samples
-                    .lock()
-                    .expect("simple gauge sample cache poisoned");
-                let window = samples.entry(key).or_insert_with(VecDeque::new);
-                window.push_back(TimedSample {
-                    time,
-                    value: sample,
-                });
-                while let Some(front) = window.front() {
-                    if time - front.time > ROLLING_WINDOW_SECONDS {
-                        window.pop_front();
-                    } else {
-                        break;
-                    }
-                }
-                let count = window.len() as f64;
-                if count == 0.0 {
-                    sample
-                } else {
-                    window.iter().map(|s| s.value).sum::<f64>() / count
-                }
-            };
+            let averaged = self.rolling_window.observe(labels, time, sample);
 
             self.gauge_impl.gauge.record(averaged, labels);
         }
@@ -309,11 +285,49 @@ struct TimedSample {
 }
 
 #[derive(Clone)]
+struct RollingWindow {
+    window_seconds: f64,
+    samples: Arc<Mutex<HashMap<LabelKey, VecDeque<TimedSample>>>>,
+}
+
+impl RollingWindow {
+    fn new(window_seconds: f64) -> Self {
+        Self {
+            window_seconds,
+            samples: Arc::new(Mutex::new(HashMap::new())),
+        }
+    }
+
+    fn observe(&self, labels: &[KeyValue], time: f64, value: f64) -> f64 {
+        let key = LabelKey::from_labels(labels);
+        let mut samples = self
+            .samples
+            .lock()
+            .expect("rolling window sample cache poisoned");
+        let window = samples.entry(key).or_insert_with(VecDeque::new);
+        window.push_back(TimedSample { time, value });
+        while let Some(front) = window.front() {
+            if time - front.time > self.window_seconds {
+                window.pop_front();
+            } else {
+                break;
+            }
+        }
+        let count = window.len() as f64;
+        if count == 0.0 {
+            value
+        } else {
+            window.iter().map(|s| s.value).sum::<f64>() / count
+        }
+    }
+}
+
+#[derive(Clone)]
 // Maintains a 15 second rolling mean of raw samples keyed by label set so Prometheus scrapes see a
 // stable value even when scrape periods exceed log emission frequency.
 pub struct RateCounterFDBGauge {
     gauge_impl: FDBGaugeImpl,
-    samples: Arc<Mutex<HashMap<LabelKey, VecDeque<TimedSample>>>>,
+    rolling_window: RollingWindow,
 }
 
 impl RateCounterFDBGauge {
@@ -326,7 +340,7 @@ impl RateCounterFDBGauge {
     ) -> Self {
         Self {
             gauge_impl: FDBGaugeImpl::new(trace_type, field_name, gauge_name, description, meter),
-            samples: Arc::new(Mutex::new(HashMap::new())),
+            rolling_window: RollingWindow::new(ROLLING_WINDOW_SECONDS),
         }
     }
 }
@@ -344,31 +358,7 @@ impl FDBGauge for RateCounterFDBGauge {
                 .parse::<f64>()?;
             let time = get_trace_field(trace_event, "Time")?.parse::<f64>()?;
 
-            let key = LabelKey::from_labels(labels);
-            let averaged = {
-                let mut samples = self
-                    .samples
-                    .lock()
-                    .expect("rate counter sample cache poisoned");
-                let window = samples.entry(key).or_insert_with(VecDeque::new);
-                window.push_back(TimedSample {
-                    time,
-                    value: sample,
-                });
-                while let Some(front) = window.front() {
-                    if time - front.time > ROLLING_WINDOW_SECONDS {
-                        window.pop_front();
-                    } else {
-                        break;
-                    }
-                }
-                let count = window.len() as f64;
-                if count == 0.0 {
-                    sample
-                } else {
-                    window.iter().map(|s| s.value).sum::<f64>() / count
-                }
-            };
+            let averaged = self.rolling_window.observe(labels, time, sample);
 
             self.gauge_impl.gauge.record(averaged, labels);
         }
@@ -379,7 +369,7 @@ impl FDBGauge for RateCounterFDBGauge {
 #[derive(Clone)]
 pub struct ElapsedRateFDBGauge {
     gauge_impl: FDBGaugeImpl,
-    samples: Arc<Mutex<HashMap<LabelKey, VecDeque<TimedSample>>>>,
+    rolling_window: RollingWindow,
 }
 
 impl ElapsedRateFDBGauge {
@@ -392,7 +382,7 @@ impl ElapsedRateFDBGauge {
     ) -> Self {
         Self {
             gauge_impl: FDBGaugeImpl::new(trace_type, field_name, gauge_name, description, meter),
-            samples: Arc::new(Mutex::new(HashMap::new())),
+            rolling_window: RollingWindow::new(ROLLING_WINDOW_SECONDS),
         }
     }
 }
@@ -408,31 +398,7 @@ impl FDBGauge for ElapsedRateFDBGauge {
             let time = get_trace_field(trace_event, "Time")?.parse::<f64>()?;
             let sample = value / elapsed;
 
-            let key = LabelKey::from_labels(labels);
-            let averaged = {
-                let mut samples = self
-                    .samples
-                    .lock()
-                    .expect("elapsed rate sample cache poisoned");
-                let window = samples.entry(key).or_insert_with(VecDeque::new);
-                window.push_back(TimedSample {
-                    time,
-                    value: sample,
-                });
-                while let Some(front) = window.front() {
-                    if time - front.time > ROLLING_WINDOW_SECONDS {
-                        window.pop_front();
-                    } else {
-                        break;
-                    }
-                }
-                let count = window.len() as f64;
-                if count == 0.0 {
-                    sample
-                } else {
-                    window.iter().map(|s| s.value).sum::<f64>() / count
-                }
-            };
+            let averaged = self.rolling_window.observe(labels, time, sample);
 
             self.gauge_impl.gauge.record(averaged, labels);
         }
