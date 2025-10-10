@@ -118,7 +118,7 @@
             {
               "editorMode": "code",
               "expr": "gp_txn_start_in{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -594,7 +594,7 @@
             {
               "editorMode": "code",
               "expr": "dd_total_kv_size{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -704,7 +704,7 @@
             {
               "editorMode": "code",
               "expr": "process_cpu_util{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -798,7 +798,7 @@
             {
               "editorMode": "builder",
               "expr": "process_rss{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -892,7 +892,7 @@
             {
               "editorMode": "code",
               "expr": "process_conns{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -987,7 +987,7 @@
             {
               "editorMode": "code",
               "expr": "process_p50_async_file_kaio_read_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -1082,7 +1082,7 @@
             {
               "editorMode": "code",
               "expr": "process_p99_async_file_kaio_read_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -1177,7 +1177,7 @@
             {
               "editorMode": "code",
               "expr": "process_p999_async_file_kaio_read_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -1272,7 +1272,7 @@
             {
               "editorMode": "code",
               "expr": "process_p50_async_file_kaio_write_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -1367,7 +1367,7 @@
             {
               "editorMode": "code",
               "expr": "process_p99_async_file_kaio_write_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -1462,7 +1462,7 @@
             {
               "editorMode": "code",
               "expr": "process_p999_async_file_kaio_write_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -1557,7 +1557,7 @@
             {
               "editorMode": "code",
               "expr": "process_p50_async_file_kaio_sync_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -1652,7 +1652,7 @@
             {
               "editorMode": "code",
               "expr": "process_p99_async_file_kaio_sync_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -1747,7 +1747,7 @@
             {
               "editorMode": "code",
               "expr": "process_p999_async_file_kaio_sync_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -1855,7 +1855,7 @@
             {
               "editorMode": "builder",
               "expr": "cc_open_db_reqs{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -1949,7 +1949,7 @@
             {
               "editorMode": "code",
               "expr": "cc_status_reqs{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -2043,7 +2043,7 @@
             {
               "editorMode": "builder",
               "expr": "cc_recovery_state{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -2155,7 +2155,7 @@
               "editorMode": "code",
               "expr": "rk_released_tps{job=\"fdb-otel-exporter\"}",
               "interval": "",
-              "legendFormat": "Released TPS",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "Released TPS"
             },
@@ -2168,7 +2168,7 @@
               "expr": "rk_tps_limit{job=\"fdb-otel-exporter\"}",
               "hide": false,
               "instant": false,
-              "legendFormat": "TPS Limit",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "TPS Limit"
             }
@@ -2278,7 +2278,7 @@
             {
               "editorMode": "builder",
               "expr": "tl_non_empty_peek_rate{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -2374,7 +2374,7 @@
             {
               "editorMode": "code",
               "expr": "tl_empty_peek_rate{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -2470,7 +2470,7 @@
             {
               "editorMode": "code",
               "expr": "tl_bytes_input{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -2565,7 +2565,7 @@
             {
               "editorMode": "builder",
               "expr": "tl_commit_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -2660,7 +2660,7 @@
             {
               "editorMode": "builder",
               "expr": "tl_commit_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -2755,7 +2755,7 @@
             {
               "editorMode": "builder",
               "expr": "tl_commit_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -2850,7 +2850,7 @@
             {
               "editorMode": "builder",
               "expr": "tl_queue_wait_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -2945,7 +2945,7 @@
             {
               "editorMode": "builder",
               "expr": "tl_queue_wait_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -3040,7 +3040,7 @@
             {
               "editorMode": "builder",
               "expr": "tl_queue_wait_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -3135,7 +3135,7 @@
             {
               "editorMode": "builder",
               "expr": "tl_time_until_durable_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -3230,7 +3230,7 @@
             {
               "editorMode": "builder",
               "expr": "tl_time_until_durable_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -3325,7 +3325,7 @@
             {
               "editorMode": "builder",
               "expr": "tl_time_until_durable_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -3435,7 +3435,7 @@
             {
               "editorMode": "code",
               "expr": "cp_txn_commit_in{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -3531,7 +3531,7 @@
             {
               "editorMode": "code",
               "expr": "cp_txn_conflicts{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -3627,7 +3627,7 @@
             {
               "editorMode": "code",
               "expr": "cp_p50_commit_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -3723,7 +3723,7 @@
             {
               "editorMode": "code",
               "expr": "cp_p99_commit_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -3819,7 +3819,7 @@
             {
               "editorMode": "code",
               "expr": "cp_p999_commit_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -3914,7 +3914,7 @@
             {
               "editorMode": "code",
               "expr": "cp_processing_mutation_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -4009,7 +4009,7 @@
             {
               "editorMode": "code",
               "expr": "cp_processing_mutation_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -4104,7 +4104,7 @@
             {
               "editorMode": "code",
               "expr": "cp_processing_mutation_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -4199,7 +4199,7 @@
             {
               "editorMode": "code",
               "expr": "cp_post_resolution_queuing_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -4294,7 +4294,7 @@
             {
               "editorMode": "code",
               "expr": "cp_post_resolution_queuing_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -4389,7 +4389,7 @@
             {
               "editorMode": "code",
               "expr": "cp_post_resolution_queuing_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -4484,7 +4484,7 @@
             {
               "editorMode": "code",
               "expr": "cp_get_commit_version_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -4579,7 +4579,7 @@
             {
               "editorMode": "code",
               "expr": "cp_get_commit_version_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -4674,7 +4674,7 @@
             {
               "editorMode": "code",
               "expr": "cp_get_commit_version_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -4769,7 +4769,7 @@
             {
               "editorMode": "code",
               "expr": "cp_reply_commit_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -4864,7 +4864,7 @@
             {
               "editorMode": "code",
               "expr": "cp_reply_commit_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -4959,7 +4959,7 @@
             {
               "editorMode": "code",
               "expr": "cp_reply_commit_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -5054,7 +5054,7 @@
             {
               "editorMode": "code",
               "expr": "cp_resolution_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -5149,7 +5149,7 @@
             {
               "editorMode": "code",
               "expr": "cp_resolution_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -5244,7 +5244,7 @@
             {
               "editorMode": "code",
               "expr": "cp_resolution_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -5339,7 +5339,7 @@
             {
               "editorMode": "code",
               "expr": "cp_tlog_logging_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -5434,7 +5434,7 @@
             {
               "editorMode": "code",
               "expr": "cp_tlog_logging_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -5529,7 +5529,7 @@
             {
               "editorMode": "code",
               "expr": "cp_tlog_logging_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -5624,7 +5624,7 @@
             {
               "editorMode": "code",
               "expr": "cp_p50_commit_batching_window{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -5719,7 +5719,7 @@
             {
               "editorMode": "code",
               "expr": "cp_p99_commit_batching_window{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -5814,7 +5814,7 @@
             {
               "editorMode": "code",
               "expr": "cp_p999_commit_batching_window{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -5911,7 +5911,7 @@
             {
               "editorMode": "code",
               "expr": "cp_p50_commit_batching_empty_message_ratio{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -6008,7 +6008,7 @@
             {
               "editorMode": "code",
               "expr": "cp_p99_commit_batching_empty_message_ratio{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -6105,7 +6105,7 @@
             {
               "editorMode": "code",
               "expr": "cp_p999_commit_batching_empty_message_ratio{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -6201,7 +6201,7 @@
             {
               "editorMode": "code",
               "expr": "cp_mutations{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -6297,7 +6297,7 @@
             {
               "editorMode": "code",
               "expr": "cp_mutation_bytes{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -6393,7 +6393,7 @@
             {
               "editorMode": "code",
               "expr": "cp_max_compute{job=\"fdb-otel-exporter\"} / 1000000000.0",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -6503,7 +6503,7 @@
             {
               "editorMode": "code",
               "expr": "gp_txn_start_in{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -6599,7 +6599,7 @@
             {
               "editorMode": "code",
               "expr": "gp_grv_req_in{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -6695,7 +6695,7 @@
             {
               "editorMode": "code",
               "expr": "gp_p50_grv_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -6791,7 +6791,7 @@
             {
               "editorMode": "builder",
               "expr": "gp_p99_grv_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -6887,7 +6887,7 @@
             {
               "editorMode": "code",
               "expr": "gp_p999_grv_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -6982,7 +6982,7 @@
             {
               "editorMode": "code",
               "expr": "gp_confirm_epoch_live_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -7077,7 +7077,7 @@
             {
               "editorMode": "code",
               "expr": "gp_confirm_epoch_live_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -7172,7 +7172,7 @@
             {
               "editorMode": "code",
               "expr": "gp_confirm_epoch_live_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -7267,7 +7267,7 @@
             {
               "editorMode": "code",
               "expr": "gp_get_committed_version_rpc_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -7362,7 +7362,7 @@
             {
               "editorMode": "code",
               "expr": "gp_get_committed_version_rpc_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -7457,7 +7457,7 @@
             {
               "editorMode": "code",
               "expr": "gp_get_committed_version_rpc_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -7567,7 +7567,7 @@
             {
               "editorMode": "code",
               "expr": "ss_p50_read_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -7663,7 +7663,7 @@
             {
               "editorMode": "code",
               "expr": "ss_p99_read_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -7759,7 +7759,7 @@
             {
               "editorMode": "code",
               "expr": "ss_p999_read_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -7855,7 +7855,7 @@
             {
               "editorMode": "code",
               "expr": "ss_get_range_queries{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -7951,7 +7951,7 @@
             {
               "editorMode": "code",
               "expr": "ss_mutation_bytes{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -8047,7 +8047,7 @@
             {
               "editorMode": "code",
               "expr": "ss_get_key_queries{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -8143,7 +8143,7 @@
             {
               "editorMode": "code",
               "expr": "ss_bytes_queried{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -8239,7 +8239,7 @@
             {
               "editorMode": "code",
               "expr": "ss_get_value_queries{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -8335,7 +8335,7 @@
             {
               "editorMode": "code",
               "expr": "(ss_bytes_input{job=\"fdb-otel-exporter\"} - ss_bytes_durable{job=\"fdb-otel-exporter\"})",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -8428,7 +8428,7 @@
             {
               "editorMode": "builder",
               "expr": "ss_query_queue_max{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -8526,7 +8526,7 @@
               "editorMode": "code",
               "expr": "(ss_version{job=\"fdb-otel-exporter\"} - ss_durable_version{job=\"fdb-otel-exporter\"})",
               "interval": "",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -8622,7 +8622,7 @@
             {
               "editorMode": "code",
               "expr": "ss_mutations{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -8718,7 +8718,7 @@
             {
               "editorMode": "code",
               "expr": "ss_version_lock_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -8814,7 +8814,7 @@
             {
               "editorMode": "code",
               "expr": "ss_version_lock_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -8910,7 +8910,7 @@
             {
               "editorMode": "code",
               "expr": "ss_version_lock_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -9006,7 +9006,7 @@
             {
               "editorMode": "code",
               "expr": "ss_tlog_msgs_ptree_updates_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -9102,7 +9102,7 @@
             {
               "editorMode": "code",
               "expr": "ss_tlog_msgs_ptree_updates_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -9198,7 +9198,7 @@
             {
               "editorMode": "code",
               "expr": "ss_tlog_msgs_ptree_updates_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -9294,7 +9294,7 @@
             {
               "editorMode": "code",
               "expr": "ss_storage_updates_durable_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -9390,7 +9390,7 @@
             {
               "editorMode": "code",
               "expr": "ss_storage_updates_durable_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -9486,7 +9486,7 @@
             {
               "editorMode": "code",
               "expr": "ss_storage_updates_durable_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -9582,7 +9582,7 @@
             {
               "editorMode": "code",
               "expr": "ss_storage_commit_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -9678,7 +9678,7 @@
             {
               "editorMode": "code",
               "expr": "ss_storage_commit_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -9774,7 +9774,7 @@
             {
               "editorMode": "code",
               "expr": "ss_storage_commit_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -9870,7 +9870,7 @@
             {
               "editorMode": "code",
               "expr": "ss_tlog_cursor_reads_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -9966,7 +9966,7 @@
             {
               "editorMode": "code",
               "expr": "ss_tlog_cursor_reads_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -10062,7 +10062,7 @@
             {
               "editorMode": "code",
               "expr": "ss_tlog_cursor_reads_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -10158,7 +10158,7 @@
             {
               "editorMode": "code",
               "expr": "ss_durable_version_update_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -10254,7 +10254,7 @@
             {
               "editorMode": "code",
               "expr": "ss_durable_version_update_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -10350,7 +10350,7 @@
             {
               "editorMode": "code",
               "expr": "ss_durable_version_update_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -10446,7 +10446,7 @@
             {
               "editorMode": "code",
               "expr": "ss_fetch_keys_ptree_updates_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -10542,7 +10542,7 @@
             {
               "editorMode": "code",
               "expr": "ss_fetch_keys_ptree_updates_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -10638,7 +10638,7 @@
             {
               "editorMode": "code",
               "expr": "ss_fetch_keys_ptree_updates_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -10734,7 +10734,7 @@
             {
               "editorMode": "code",
               "expr": "ss_eager_reads_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -10830,7 +10830,7 @@
             {
               "editorMode": "code",
               "expr": "ss_eager_reads_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -10926,7 +10926,7 @@
             {
               "editorMode": "code",
               "expr": "ss_eager_reads_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -11021,7 +11021,7 @@
             {
               "editorMode": "code",
               "expr": "ss_fetch_keys_bytes_per_commit_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -11116,7 +11116,7 @@
             {
               "editorMode": "code",
               "expr": "ss_fetch_keys_bytes_per_commit_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -11211,7 +11211,7 @@
             {
               "editorMode": "code",
               "expr": "ss_fetch_keys_bytes_per_commit_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -11306,7 +11306,7 @@
             {
               "editorMode": "code",
               "expr": "ss_p50_update_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -11401,7 +11401,7 @@
             {
               "editorMode": "code",
               "expr": "ss_p99_update_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -11496,7 +11496,7 @@
             {
               "editorMode": "code",
               "expr": "ss_p999_update_latency{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -11591,7 +11591,7 @@
             {
               "editorMode": "code",
               "expr": "ss_p50_read_version_wait{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -11686,7 +11686,7 @@
             {
               "editorMode": "code",
               "expr": "ss_p99_read_version_wait{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -11781,7 +11781,7 @@
             {
               "editorMode": "code",
               "expr": "ss_p999_read_version_wait{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -11876,7 +11876,7 @@
             {
               "editorMode": "code",
               "expr": "ss_p50_read_queue_wait{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -11971,7 +11971,7 @@
             {
               "editorMode": "code",
               "expr": "ss_p99_read_queue_wait{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -12066,7 +12066,7 @@
             {
               "editorMode": "code",
               "expr": "ss_p999_read_queue_wait{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -12176,7 +12176,7 @@
             {
               "editorMode": "code",
               "expr": "dd_average_shard_size{job=\"fdb-otel-exporter\"} * (dd_shards_in_queue{job=\"fdb-otel-exporter\"} + dd_shards_in_flight{job=\"fdb-otel-exporter\"})",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -12286,7 +12286,7 @@
             {
               "editorMode": "builder",
               "expr": "ms_report_live_committed_version_reqs{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -12382,7 +12382,7 @@
             {
               "editorMode": "builder",
               "expr": "ms_live_committed_version_reqs{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -12478,7 +12478,7 @@
             {
               "editorMode": "builder",
               "expr": "ms_commit_version_reqs{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -12588,7 +12588,7 @@
             {
               "editorMode": "builder",
               "expr": "rv_bytes_resolved{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -12684,7 +12684,7 @@
             {
               "editorMode": "builder",
               "expr": "rv_txns_resolved{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -12780,7 +12780,7 @@
             {
               "editorMode": "builder",
               "expr": "rv_batches_resolved{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -12875,7 +12875,7 @@
             {
               "editorMode": "builder",
               "expr": "rv_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -12970,7 +12970,7 @@
             {
               "editorMode": "builder",
               "expr": "rv_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -13065,7 +13065,7 @@
             {
               "editorMode": "builder",
               "expr": "rv_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -13160,7 +13160,7 @@
             {
               "editorMode": "builder",
               "expr": "rv_compute_time_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -13255,7 +13255,7 @@
             {
               "editorMode": "builder",
               "expr": "rv_compute_time_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -13350,7 +13350,7 @@
             {
               "editorMode": "builder",
               "expr": "rv_compute_time_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -13445,7 +13445,7 @@
             {
               "editorMode": "builder",
               "expr": "rv_queue_wait_latency_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -13540,7 +13540,7 @@
             {
               "editorMode": "builder",
               "expr": "rv_queue_wait_latency_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -13635,7 +13635,7 @@
             {
               "editorMode": "builder",
               "expr": "rv_queue_wait_latency_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -13730,7 +13730,7 @@
             {
               "editorMode": "code",
               "expr": "rv_queue_depth_p50{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -13825,7 +13825,7 @@
             {
               "editorMode": "code",
               "expr": "rv_queue_depth_p99{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
@@ -13920,7 +13920,7 @@
             {
               "editorMode": "code",
               "expr": "rv_queue_depth_p99_9{job=\"fdb-otel-exporter\"}",
-              "legendFormat": "__auto",
+              "legendFormat": "{{machine}} - {{Roles}}",
               "range": true,
               "refId": "A"
             }
