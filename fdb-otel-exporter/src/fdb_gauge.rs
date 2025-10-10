@@ -3,8 +3,9 @@ use opentelemetry::metrics::{Gauge, Meter};
 use opentelemetry::KeyValue;
 use serde_json::Value;
 use std::{
-    collections::{BTreeMap, HashMap},
+    collections::{BTreeMap, HashMap, VecDeque},
     f64,
+    sync::{Arc, Mutex},
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -254,11 +255,37 @@ impl FDBGauge for TotalCounterFDBGauge {
     }
 }
 
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+struct LabelKey(Vec<(String, String)>);
+
+impl LabelKey {
+    fn from_labels(labels: &[KeyValue]) -> Self {
+        let mut entries: Vec<(String, String)> = labels
+            .iter()
+            .map(|kv| (kv.key.as_str().to_string(), kv.value.to_string()))
+            .collect();
+        entries.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)));
+        Self(entries)
+    }
+}
+
+#[derive(Clone, Copy)]
+struct TimedSample {
+    time: f64,
+    value: f64,
+}
+
+#[derive(Clone)]
+// Maintains a 15 second rolling mean of raw samples keyed by label set so Prometheus scrapes see a
+// stable value even when scrape periods exceed log emission frequency.
 pub struct RateCounterFDBGauge {
     gauge_impl: FDBGaugeImpl,
+    samples: Arc<Mutex<HashMap<LabelKey, VecDeque<TimedSample>>>>,
 }
 
 impl RateCounterFDBGauge {
+    const ROLLING_WINDOW_SECONDS: f64 = 15.0;
+
     pub fn new(
         trace_type: impl Into<String>,
         field_name: impl Into<String>,
@@ -268,6 +295,7 @@ impl RateCounterFDBGauge {
     ) -> Self {
         Self {
             gauge_impl: FDBGaugeImpl::new(trace_type, field_name, gauge_name, description, meter),
+            samples: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 }
@@ -278,14 +306,40 @@ impl FDBGauge for RateCounterFDBGauge {
 
         if trace_type == self.gauge_impl.trace_type {
             let value = get_trace_field(trace_event, self.gauge_impl.field_name.as_str())?;
-            self.gauge_impl.gauge.record(
-                value
-                    .split(' ')
-                    .next()
-                    .with_context(|| format!("Malformed {} counter", self.gauge_impl.field_name))?
-                    .parse::<f64>()?,
-                labels,
-            );
+            let sample = value
+                .split(' ')
+                .next()
+                .with_context(|| format!("Malformed {} counter", self.gauge_impl.field_name))?
+                .parse::<f64>()?;
+            let time = get_trace_field(trace_event, "Time")?.parse::<f64>()?;
+
+            let key = LabelKey::from_labels(labels);
+            let averaged = {
+                let mut samples = self
+                    .samples
+                    .lock()
+                    .expect("rate counter sample cache poisoned");
+                let window = samples.entry(key).or_insert_with(VecDeque::new);
+                window.push_back(TimedSample {
+                    time,
+                    value: sample,
+                });
+                while let Some(front) = window.front() {
+                    if time - front.time > Self::ROLLING_WINDOW_SECONDS {
+                        window.pop_front();
+                    } else {
+                        break;
+                    }
+                }
+                let count = window.len() as f64;
+                if count == 0.0 {
+                    sample
+                } else {
+                    window.iter().map(|s| s.value).sum::<f64>() / count
+                }
+            };
+
+            self.gauge_impl.gauge.record(averaged, labels);
         }
         Ok(())
     }
@@ -456,7 +510,10 @@ impl FDBGauge for HistogramPercentileFDBGauge {
 mod tests {
     use super::*;
     use opentelemetry::metrics::{Meter, MeterProvider};
+    use opentelemetry::KeyValue;
+    use opentelemetry_prometheus::exporter as prometheus_exporter;
     use opentelemetry_sdk::metrics::{ManualReader, SdkMeterProvider};
+    use prometheus::Registry;
 
     fn bucket(upper_bound: u64, count: u64, cumulative: u64) -> HistogramBucket {
         HistogramBucket {
@@ -471,6 +528,17 @@ mod tests {
         let reader = ManualReader::builder().build();
         let provider = SdkMeterProvider::builder().with_reader(reader).build();
         provider.meter("test")
+    }
+
+    fn prometheus_meter() -> (SdkMeterProvider, Meter, Registry) {
+        let registry = Registry::new();
+        let reader = prometheus_exporter()
+            .with_registry(registry.clone())
+            .build()
+            .expect("prometheus exporter");
+        let provider = SdkMeterProvider::builder().with_reader(reader).build();
+        let meter = provider.meter("test");
+        (provider, meter, registry)
     }
 
     fn base_event_with_type(trace_type: &str) -> HashMap<String, Value> {
@@ -565,8 +633,80 @@ mod tests {
 
         let mut event = base_event_with_type("ProxyMetrics");
         event.insert("TxnCommitIn".into(), Value::String("42 100 200".into()));
+        event.insert("Time".into(), Value::String("1.0".into()));
 
         gauge.record(&event, &[]).expect("record should succeed");
+    }
+
+    #[test]
+    fn rate_counter_gauge_averages_last_three_samples() {
+        let (provider, meter, registry) = prometheus_meter();
+        let _provider = provider;
+        let gauge = RateCounterFDBGauge::new(
+            "ProxyMetrics",
+            "TxnCommitIn",
+            "cp_txn_commit_in_test",
+            "Txn commit rate",
+            &meter,
+        );
+
+        let mut event = base_event_with_type("ProxyMetrics");
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        event.insert("TxnCommitIn".into(), Value::String("10 0 0".into()));
+        event.insert("Time".into(), Value::String("100.0".into()));
+        gauge
+            .record(&event, &labels)
+            .expect("initial record should succeed");
+
+        event.insert("TxnCommitIn".into(), Value::String("20 0 0".into()));
+        event.insert("Time".into(), Value::String("105.0".into()));
+        gauge
+            .record(&event, &labels)
+            .expect("second record should succeed");
+
+        event.insert("TxnCommitIn".into(), Value::String("30 0 0".into()));
+        event.insert("Time".into(), Value::String("110.0".into()));
+        gauge
+            .record(&event, &labels)
+            .expect("third record should succeed");
+
+        let value_after_three = gauge_value(&registry, "cp_txn_commit_in_test", "machine", "test");
+        assert!(
+            (value_after_three - 20.0).abs() < f64::EPSILON,
+            "expected average of first three samples to be 20.0, got {value_after_three}"
+        );
+
+        event.insert("TxnCommitIn".into(), Value::String("40 0 0".into()));
+        event.insert("Time".into(), Value::String("120.0".into()));
+        gauge
+            .record(&event, &labels)
+            .expect("fourth record should succeed");
+
+        let value_after_four = gauge_value(&registry, "cp_txn_commit_in_test", "machine", "test");
+        assert!(
+            (value_after_four - 30.0).abs() < f64::EPSILON,
+            "expected average of most recent three samples to be 30.0, got {value_after_four}"
+        );
+    }
+
+    fn gauge_value(registry: &Registry, name: &str, label_name: &str, label_value: &str) -> f64 {
+        let families = registry.gather();
+        let family = families
+            .iter()
+            .find(|mf| mf.get_name() == name)
+            .unwrap_or_else(|| panic!("metric family {name} not found"));
+        let metric = family
+            .get_metric()
+            .iter()
+            .find(|metric| {
+                metric
+                    .get_label()
+                    .iter()
+                    .any(|label| label.get_name() == label_name && label.get_value() == label_value)
+            })
+            .unwrap_or_else(|| panic!("metric with label {label_name}={label_value} not found"));
+        metric.get_gauge().get_value()
     }
 
     #[test]
