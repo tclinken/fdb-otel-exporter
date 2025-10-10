@@ -479,6 +479,24 @@ mod tests {
         event
     }
 
+    fn base_histogram_event() -> HashMap<String, Value> {
+        let mut event = base_event_with_type("Histogram");
+        event.insert("Group".into(), Value::String("StorageServer".into()));
+        event.insert("Op".into(), Value::String("Read".into()));
+        event
+    }
+
+    fn test_histogram_gauge(meter: &Meter) -> HistogramPercentileFDBGauge {
+        HistogramPercentileFDBGauge::new(
+            "StorageServer",
+            "Read",
+            0.5,
+            "ss_read_latency_p50_test",
+            "Read latency",
+            meter,
+        )
+    }
+
     #[test]
     fn simple_gauge_records_matching_events() {
         let meter = test_meter();
@@ -572,24 +590,114 @@ mod tests {
     #[test]
     fn histogram_percentile_records_matching_histogram() {
         let meter = test_meter();
-        let gauge = HistogramPercentileFDBGauge::new(
-            "StorageServer",
-            "Read",
-            0.5,
-            "ss_read_latency_p50_test",
-            "Read latency",
-            &meter,
-        );
+        let gauge = test_histogram_gauge(&meter);
 
-        let mut event = base_event_with_type("Histogram");
-        event.insert("Group".into(), Value::String("StorageServer".into()));
-        event.insert("Op".into(), Value::String("Read".into()));
+        let mut event = base_histogram_event();
         event.insert("Unit".into(), Value::String("milliseconds".into()));
         event.insert("TotalCount".into(), Value::String("10".into()));
         event.insert("LessThan1.0".into(), Value::String("4".into()));
         event.insert("LessThan2.0".into(), Value::String("6".into()));
 
         gauge.record(&event, &[]).expect("record should succeed");
+    }
+
+    #[test]
+    fn histogram_percentile_skips_non_histogram_events() {
+        let meter = test_meter();
+        let gauge = test_histogram_gauge(&meter);
+
+        let event = base_event_with_type("LatencyMetrics");
+
+        gauge
+            .record(&event, &[])
+            .expect("non-histogram events should be ignored");
+    }
+
+    #[test]
+    fn histogram_percentile_skips_when_group_differs() {
+        let meter = test_meter();
+        let gauge = test_histogram_gauge(&meter);
+
+        let mut event = base_histogram_event();
+        event.insert("Group".into(), Value::String("OtherGroup".into()));
+        event.insert("Unit".into(), Value::String("milliseconds".into()));
+        event.insert("TotalCount".into(), Value::String("5".into()));
+
+        gauge
+            .record(&event, &[])
+            .expect("events for other groups should be ignored");
+    }
+
+    #[test]
+    fn histogram_percentile_skips_when_op_differs() {
+        let meter = test_meter();
+        let gauge = test_histogram_gauge(&meter);
+
+        let mut event = base_histogram_event();
+        event.insert("Op".into(), Value::String("Write".into()));
+        event.insert("Unit".into(), Value::String("milliseconds".into()));
+        event.insert("TotalCount".into(), Value::String("5".into()));
+
+        gauge
+            .record(&event, &[])
+            .expect("events for other ops should be ignored");
+    }
+
+    #[test]
+    fn histogram_percentile_skips_unknown_units() {
+        let meter = test_meter();
+        let gauge = test_histogram_gauge(&meter);
+
+        let mut event = base_histogram_event();
+        event.insert("Unit".into(), Value::String("seconds".into()));
+
+        gauge
+            .record(&event, &[])
+            .expect("unknown histogram units should be ignored");
+    }
+
+    #[test]
+    fn histogram_percentile_skips_zero_total_count() {
+        let meter = test_meter();
+        let gauge = test_histogram_gauge(&meter);
+
+        let mut event = base_histogram_event();
+        event.insert("Unit".into(), Value::String("milliseconds".into()));
+        event.insert("TotalCount".into(), Value::String("0".into()));
+
+        gauge
+            .record(&event, &[])
+            .expect("zero total count histograms should be ignored");
+    }
+
+    #[test]
+    fn histogram_percentile_skips_without_buckets() {
+        let meter = test_meter();
+        let gauge = test_histogram_gauge(&meter);
+
+        let mut event = base_histogram_event();
+        event.insert("Unit".into(), Value::String("milliseconds".into()));
+        event.insert("TotalCount".into(), Value::String("10".into()));
+
+        gauge
+            .record(&event, &[])
+            .expect("histograms without buckets should be ignored");
+    }
+
+    #[test]
+    fn histogram_percentile_handles_missing_intermediate_buckets() {
+        let meter = test_meter();
+        let gauge = test_histogram_gauge(&meter);
+
+        let mut event = base_histogram_event();
+        event.insert("Unit".into(), Value::String("milliseconds".into()));
+        event.insert("TotalCount".into(), Value::String("8".into()));
+        event.insert("LessThan1.0".into(), Value::String("3".into()));
+        event.insert("LessThan8.0".into(), Value::String("5".into()));
+
+        gauge
+            .record(&event, &[])
+            .expect("histograms with gaps should be interpolated");
     }
 
     #[test]
