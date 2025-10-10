@@ -8,6 +8,7 @@
 ## Build, Test, and Development Commands
 - `cargo fmt` (run inside `fdb-otel-exporter/`) formats Rust sources; execute before every commit.
 - `cargo check` validates compilation without producing binaries.
+- `cargo clippy --tests` enforces lint clean builds for code and tests; run after each set of changes.
 - `cargo test` runs the unit and integration suites, including files under `fdb-otel-exporter/tests/`.
 - `docker compose up --build -d` rebuilds the service image, applies env changes (e.g., `LOG_DIR`), and starts the observability stack.
 
