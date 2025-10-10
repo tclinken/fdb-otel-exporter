@@ -304,7 +304,7 @@ impl RollingWindow {
             .samples
             .lock()
             .expect("rolling window sample cache poisoned");
-        let window = samples.entry(key).or_insert_with(VecDeque::new);
+        let window = samples.entry(key).or_default();
         window.push_back(TimedSample { time, value });
         while let Some(front) = window.front() {
             if time - front.time > self.window_seconds {
