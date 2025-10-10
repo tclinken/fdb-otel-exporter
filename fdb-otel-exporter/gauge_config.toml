@@ -568,3 +568,9 @@ trace_type = "ProcessMetrics"
 gauge_name = "process_rss"
 field_name = "ResidentMemory"
 description = "Resident memory for process"
+
+[[simple_gauge]]
+trace_type = "ProcessMetrics"
+gauge_name = "process_conns"
+field_name = "CurrentConnections"
+description = "Current connections for process"
