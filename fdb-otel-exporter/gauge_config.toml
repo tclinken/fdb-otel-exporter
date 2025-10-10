@@ -71,6 +71,24 @@ field_name = "TxnConflicts"
 description = "Transaction conflict rate on commit proxy"
 
 [[counter_rate_gauge]]
+trace_type = "ProxyMetrics"
+gauge_name = "cp_mutations"
+field_name = "Mutations"
+description = "Mutation rate on commit proxy"
+
+[[counter_rate_gauge]]
+trace_type = "ProxyMetrics"
+gauge_name = "cp_mutation_bytes"
+field_name = "MutationBytes"
+description = "Mutation bytes rate on commit proxy"
+
+[[counter_rate_gauge]]
+trace_type = "ProxyMetrics"
+gauge_name = "cp_max_compute"
+field_name = "MaxCompute"
+description = "Maximum compute duration on commit proxy (us)"
+
+[[counter_rate_gauge]]
 trace_type = "GrvProxyMetrics"
 gauge_name = "gp_txn_start_in"
 field_name = "TxnStartIn"
