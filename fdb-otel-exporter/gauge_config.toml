@@ -162,15 +162,39 @@ description = "Rate of non-empty peek requests on the tlog"
 
 [[simple_gauge]]
 trace_type = "GRVLatencyMetrics"
+gauge_name = "gp_p50_grv_latency"
+field_name = "Median"
+description = "P50 server-side GRV latency reported by GRV proxy"
+
+[[simple_gauge]]
+trace_type = "GRVLatencyMetrics"
 gauge_name = "gp_p99_grv_latency"
 field_name = "P99"
 description = "P99 server-side GRV latency reported by GRV proxy"
+
+[[simple_gauge]]
+trace_type = "GRVLatencyMetrics"
+gauge_name = "gp_p999_grv_latency"
+field_name = "P99.9"
+description = "P999 server-side GRV latency reported by GRV proxy"
+
+[[simple_gauge]]
+trace_type = "CommitLatencyMetrics"
+gauge_name = "cp_p50_commit_latency"
+field_name = "Median"
+description = "P50 server-side commit latency reported by commit proxy"
 
 [[simple_gauge]]
 trace_type = "CommitLatencyMetrics"
 gauge_name = "cp_p99_commit_latency"
 field_name = "P99"
 description = "P99 server-side commit latency reported by commit proxy"
+
+[[simple_gauge]]
+trace_type = "CommitLatencyMetrics"
+gauge_name = "cp_p999_commit_latency"
+field_name = "P99.9"
+description = "P999 server-side commit latency reported by commit proxy"
 
 [[simple_gauge]]
 trace_type = "ReadLatencyMetrics"
