@@ -186,6 +186,7 @@ impl FDBGaugeImpl {
 #[derive(Clone)]
 pub struct SimpleFDBGauge {
     gauge_impl: FDBGaugeImpl,
+    samples: Arc<Mutex<HashMap<LabelKey, VecDeque<TimedSample>>>>,
 }
 
 impl SimpleFDBGauge {
@@ -198,6 +199,7 @@ impl SimpleFDBGauge {
     ) -> Self {
         Self {
             gauge_impl: FDBGaugeImpl::new(trace_type, field_name, gauge_name, description, meter),
+            samples: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 }
@@ -211,7 +213,36 @@ impl FDBGauge for SimpleFDBGauge {
                 .get(self.gauge_impl.field_name.as_str())
                 .and_then(|v| v.as_str())
                 .with_context(|| format!("Missing {} field", self.gauge_impl.field_name))?;
-            self.gauge_impl.gauge.record(value.parse::<f64>()?, labels);
+            let sample = value.parse::<f64>()?;
+            let time = get_trace_field(trace_event, "Time")?.parse::<f64>()?;
+
+            let key = LabelKey::from_labels(labels);
+            let averaged = {
+                let mut samples = self
+                    .samples
+                    .lock()
+                    .expect("simple gauge sample cache poisoned");
+                let window = samples.entry(key).or_insert_with(VecDeque::new);
+                window.push_back(TimedSample {
+                    time,
+                    value: sample,
+                });
+                while let Some(front) = window.front() {
+                    if time - front.time > ROLLING_WINDOW_SECONDS {
+                        window.pop_front();
+                    } else {
+                        break;
+                    }
+                }
+                let count = window.len() as f64;
+                if count == 0.0 {
+                    sample
+                } else {
+                    window.iter().map(|s| s.value).sum::<f64>() / count
+                }
+            };
+
+            self.gauge_impl.gauge.record(averaged, labels);
         }
         Ok(())
     }
@@ -269,6 +300,8 @@ impl LabelKey {
     }
 }
 
+const ROLLING_WINDOW_SECONDS: f64 = 15.0;
+
 #[derive(Clone, Copy)]
 struct TimedSample {
     time: f64,
@@ -284,8 +317,6 @@ pub struct RateCounterFDBGauge {
 }
 
 impl RateCounterFDBGauge {
-    const ROLLING_WINDOW_SECONDS: f64 = 15.0;
-
     pub fn new(
         trace_type: impl Into<String>,
         field_name: impl Into<String>,
@@ -325,7 +356,7 @@ impl FDBGauge for RateCounterFDBGauge {
                     value: sample,
                 });
                 while let Some(front) = window.front() {
-                    if time - front.time > Self::ROLLING_WINDOW_SECONDS {
+                    if time - front.time > ROLLING_WINDOW_SECONDS {
                         window.pop_front();
                     } else {
                         break;
@@ -578,8 +609,61 @@ mod tests {
 
         let mut event = base_event_with_type("StorageMetrics");
         event.insert("Version".into(), Value::String("123".into()));
+        event.insert("Time".into(), Value::String("1.0".into()));
 
         gauge.record(&event, &[]).expect("record should succeed");
+    }
+
+    #[test]
+    fn simple_gauge_applies_rolling_window() {
+        let (provider, meter, registry) = prometheus_meter();
+        let _provider = provider;
+        let gauge = SimpleFDBGauge::new(
+            "StorageMetrics",
+            "Version",
+            "ss_version_test",
+            "Test version gauge",
+            &meter,
+        );
+
+        let mut event = base_event_with_type("StorageMetrics");
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        event.insert("Version".into(), Value::String("10".into()));
+        event.insert("Time".into(), Value::String("100.0".into()));
+        gauge
+            .record(&event, &labels)
+            .expect("initial record should succeed");
+
+        event.insert("Version".into(), Value::String("20".into()));
+        event.insert("Time".into(), Value::String("105.0".into()));
+        gauge
+            .record(&event, &labels)
+            .expect("second record should succeed");
+
+        event.insert("Version".into(), Value::String("30".into()));
+        event.insert("Time".into(), Value::String("110.0".into()));
+        gauge
+            .record(&event, &labels)
+            .expect("third record should succeed");
+
+        let avg_three = gauge_value(&registry, "ss_version_test", "machine", "test");
+        assert!(
+            (avg_three - 20.0).abs() < f64::EPSILON,
+            "expected average of first three samples to be 20.0, got {avg_three}"
+        );
+
+        event.insert("Version".into(), Value::String("40".into()));
+        event.insert("Time".into(), Value::String("120.0".into()));
+        gauge
+            .record(&event, &labels)
+            .expect("fourth record should succeed");
+
+        let avg_four = gauge_value(&registry, "ss_version_test", "machine", "test");
+        assert!(
+            (avg_four - 30.0).abs() < f64::EPSILON,
+            "expected average of the most recent samples to be 30.0, got {avg_four}"
+        );
     }
 
     #[test]
