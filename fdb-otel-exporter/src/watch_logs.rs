@@ -2,7 +2,7 @@ use crate::{
     exporter_metrics::ExporterMetrics,
     log_metrics::{LogMetrics, TraceEvent},
 };
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 use async_trait::async_trait;
 use opentelemetry::metrics::MeterProvider;
 use opentelemetry_sdk::metrics::SdkMeterProvider;
@@ -264,10 +264,10 @@ impl TraceFileSystem for RealTraceFileSystem {
 mod tests {
     use super::*;
     use crate::fdb_gauge::FDBGauge;
-    use anyhow::Result;
+    use anyhow::{anyhow, Result};
     use opentelemetry_sdk::metrics::{ManualReader, SdkMeterProvider};
     use serde_json::json;
-    use std::collections::HashMap;
+    use std::collections::{HashMap, VecDeque};
     use std::path::{Path, PathBuf};
     use std::sync::Mutex;
     use tokio::time::{timeout, Duration as TokioDuration};
@@ -338,6 +338,23 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn watch_logs_surfaces_directory_creation_errors() {
+        let fs = MemoryTraceFileSystem::new();
+        fs.fail_next_create_dir(anyhow!("boom"));
+        let log_dir = PathBuf::from("/logs");
+        let provider = test_meter_provider();
+
+        let error = watch_logs_with_fs(&log_dir, provider, TokioDuration::from_millis(50), fs)
+            .await
+            .expect_err("create_dir errors should bubble up");
+
+        assert!(
+            error.to_string().contains("failed to create log directory"),
+            "unexpected error: {error}"
+        );
+    }
+
+    #[tokio::test]
     async fn run_log_directory_records_trace_events() -> Result<()> {
         let fs = MemoryTraceFileSystem::new();
         let log_dir = PathBuf::from("/logs");
@@ -398,6 +415,39 @@ mod tests {
         Ok(())
     }
 
+    #[tokio::test]
+    async fn run_log_directory_continues_after_read_dir_error() -> Result<()> {
+        let fs = MemoryTraceFileSystem::new();
+        let log_dir = PathBuf::from("/logs");
+        fs.create_dir_all(&log_dir).await?;
+        fs.fail_next_read_dir(anyhow!("read dir failure"));
+
+        let provider = test_meter_provider();
+        let meter = provider.meter("run_log_directory_continues_after_read_dir_error");
+        let exporter_metrics = ExporterMetrics::new(&meter);
+        let log_metrics = LogMetrics::from_gauges(Vec::<Arc<dyn FDBGauge>>::new());
+
+        let handle = tokio::spawn(run_log_directory(
+            log_dir.clone(),
+            log_metrics,
+            exporter_metrics,
+            TokioDuration::from_millis(20),
+            fs.clone(),
+        ));
+
+        tokio::time::sleep(TokioDuration::from_millis(80)).await;
+
+        handle.abort();
+        let _ = handle.await;
+
+        assert!(
+            fs.failures.lock().unwrap().read_dir.is_empty(),
+            "read_dir failure queue should be drained"
+        );
+
+        Ok(())
+    }
+
     #[test]
     fn handle_log_line_records_trace_events() {
         let events = Arc::new(Mutex::new(Vec::new()));
@@ -424,10 +474,176 @@ mod tests {
         );
     }
 
+    #[tokio::test]
+    async fn run_log_tailer_retries_open_errors() -> Result<()> {
+        let fs = MemoryTraceFileSystem::new();
+        let log_dir = PathBuf::from("/logs");
+        fs.create_dir_all(&log_dir).await?;
+        let trace_path = log_dir.join("trace.7.json");
+        fs.create_trace_file(&trace_path)?;
+        fs.fail_next_open_reader(anyhow!("open failure"));
+
+        let events = Arc::new(Mutex::new(Vec::new()));
+        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
+        let log_metrics = LogMetrics::from_gauges(gauges);
+
+        let provider = test_meter_provider();
+        let meter = provider.meter("run_log_tailer_retries_open_errors");
+        let exporter_metrics = ExporterMetrics::new(&meter);
+
+        let path_clone = trace_path.clone();
+        let fs_clone = fs.clone();
+        let handle = tokio::spawn(run_log_tailer(
+            path_clone,
+            log_metrics,
+            exporter_metrics,
+            fs_clone,
+        ));
+
+        tokio::time::sleep(TokioDuration::from_millis(1100)).await;
+
+        let event = json!({
+            "Machine": "machine-open",
+            "Roles": "storage",
+            "Type": "TestTrace"
+        });
+        fs.append_line(&trace_path, &serde_json::to_string(&event)?)?;
+        fs.append_line(&trace_path, "\n")?;
+
+        for _ in 0..80 {
+            if !events.lock().unwrap().is_empty() {
+                break;
+            }
+            tokio::time::sleep(TokioDuration::from_millis(20)).await;
+        }
+
+        handle.abort();
+        let _ = handle.await;
+
+        assert_eq!(events.lock().unwrap().len(), 1);
+        assert!(
+            fs.failures.lock().unwrap().open_reader.is_empty(),
+            "open_reader failure queue should be drained"
+        );
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn run_log_tailer_retries_seek_errors() -> Result<()> {
+        let fs = MemoryTraceFileSystem::new();
+        let log_dir = PathBuf::from("/logs");
+        fs.create_dir_all(&log_dir).await?;
+        let trace_path = log_dir.join("trace.8.json");
+        fs.create_trace_file(&trace_path)?;
+        fs.fail_next_seek(anyhow!("seek failure"));
+
+        let events = Arc::new(Mutex::new(Vec::new()));
+        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
+        let log_metrics = LogMetrics::from_gauges(gauges);
+
+        let provider = test_meter_provider();
+        let meter = provider.meter("run_log_tailer_retries_seek_errors");
+        let exporter_metrics = ExporterMetrics::new(&meter);
+
+        let path_clone = trace_path.clone();
+        let fs_clone = fs.clone();
+        let handle = tokio::spawn(run_log_tailer(
+            path_clone,
+            log_metrics,
+            exporter_metrics,
+            fs_clone,
+        ));
+
+        tokio::time::sleep(TokioDuration::from_millis(1100)).await;
+
+        let event = json!({
+            "Machine": "machine-seek",
+            "Roles": "storage",
+            "Type": "TestTrace"
+        });
+        fs.append_line(&trace_path, &serde_json::to_string(&event)?)?;
+        fs.append_line(&trace_path, "\n")?;
+
+        for _ in 0..80 {
+            if !events.lock().unwrap().is_empty() {
+                break;
+            }
+            tokio::time::sleep(TokioDuration::from_millis(20)).await;
+        }
+
+        handle.abort();
+        let _ = handle.await;
+
+        assert_eq!(events.lock().unwrap().len(), 1);
+        assert!(
+            fs.failures.lock().unwrap().seek.is_empty(),
+            "seek failure queue should be drained"
+        );
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn run_log_tailer_retries_read_errors() -> Result<()> {
+        let fs = MemoryTraceFileSystem::new();
+        let log_dir = PathBuf::from("/logs");
+        fs.create_dir_all(&log_dir).await?;
+        let trace_path = log_dir.join("trace.9.json");
+        fs.create_trace_file(&trace_path)?;
+        fs.fail_next_read(anyhow!("read failure"));
+
+        let events = Arc::new(Mutex::new(Vec::new()));
+        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
+        let log_metrics = LogMetrics::from_gauges(gauges);
+
+        let provider = test_meter_provider();
+        let meter = provider.meter("run_log_tailer_retries_read_errors");
+        let exporter_metrics = ExporterMetrics::new(&meter);
+
+        let path_clone = trace_path.clone();
+        let fs_clone = fs.clone();
+        let handle = tokio::spawn(run_log_tailer(
+            path_clone,
+            log_metrics,
+            exporter_metrics,
+            fs_clone,
+        ));
+
+        tokio::time::sleep(TokioDuration::from_millis(1100)).await;
+
+        let event = json!({
+            "Machine": "machine-read",
+            "Roles": "storage",
+            "Type": "TestTrace"
+        });
+        fs.append_line(&trace_path, &serde_json::to_string(&event)?)?;
+        fs.append_line(&trace_path, "\n")?;
+
+        for _ in 0..80 {
+            if !events.lock().unwrap().is_empty() {
+                break;
+            }
+            tokio::time::sleep(TokioDuration::from_millis(20)).await;
+        }
+
+        handle.abort();
+        let _ = handle.await;
+
+        assert_eq!(events.lock().unwrap().len(), 1);
+        assert!(
+            fs.failures.lock().unwrap().read.is_empty(),
+            "read failure queue should be drained"
+        );
+
+        Ok(())
+    }
+
     #[derive(Clone)]
     struct MemoryTraceFileSystem {
         root: VfsPath,
         files: Arc<Mutex<HashMap<String, Arc<MemoryTraceFile>>>>,
+        failures: Arc<Mutex<MemoryFsFailures>>,
     }
 
     impl MemoryTraceFileSystem {
@@ -435,6 +651,7 @@ mod tests {
             Self {
                 root: VfsPath::new(MemoryFS::new()),
                 files: Arc::new(Mutex::new(HashMap::new())),
+                failures: Arc::new(Mutex::new(MemoryFsFailures::default())),
             }
         }
 
@@ -492,6 +709,38 @@ mod tests {
             data.extend_from_slice(contents.as_bytes());
             Ok(())
         }
+
+        fn fail_next_create_dir(&self, error: impl Into<anyhow::Error>) {
+            self.failures
+                .lock()
+                .unwrap()
+                .create_dir
+                .push_back(error.into());
+        }
+
+        fn fail_next_read_dir(&self, error: impl Into<anyhow::Error>) {
+            self.failures
+                .lock()
+                .unwrap()
+                .read_dir
+                .push_back(error.into());
+        }
+
+        fn fail_next_open_reader(&self, error: impl Into<anyhow::Error>) {
+            self.failures
+                .lock()
+                .unwrap()
+                .open_reader
+                .push_back(error.into());
+        }
+
+        fn fail_next_seek(&self, error: impl Into<anyhow::Error>) {
+            self.failures.lock().unwrap().seek.push_back(error.into());
+        }
+
+        fn fail_next_read(&self, error: impl Into<anyhow::Error>) {
+            self.failures.lock().unwrap().read.push_back(error.into());
+        }
     }
 
     #[async_trait]
@@ -499,12 +748,18 @@ mod tests {
         type Reader = MemoryTraceFileReader;
 
         async fn create_dir_all(&self, dir: &Path) -> Result<()> {
+            if let Some(error) = self.failures.lock().unwrap().create_dir.pop_front() {
+                return Err(error);
+            }
             let vpath = self.to_vfs_path(dir)?;
             vpath.create_dir_all().map_err(|error| anyhow!(error))?;
             Ok(())
         }
 
         async fn read_dir(&self, dir: &Path) -> Result<Vec<PathBuf>> {
+            if let Some(error) = self.failures.lock().unwrap().read_dir.pop_front() {
+                return Err(error);
+            }
             let dir_path = self.to_vfs_path(dir)?;
             let entries = dir_path.read_dir().map_err(|error| anyhow!(error))?;
             let mut paths = Vec::new();
@@ -518,6 +773,9 @@ mod tests {
         }
 
         async fn open_reader(&self, path: &Path) -> Result<Self::Reader> {
+            if let Some(error) = self.failures.lock().unwrap().open_reader.pop_front() {
+                return Err(error);
+            }
             let key = normalize_path(path)?;
             let file = self
                 .files
@@ -526,7 +784,11 @@ mod tests {
                 .get(&key)
                 .cloned()
                 .with_context(|| format!("virtual file {} not found", path.display()))?;
-            Ok(MemoryTraceFileReader { file, offset: 0 })
+            Ok(MemoryTraceFileReader {
+                file,
+                offset: 0,
+                failures: Arc::clone(&self.failures),
+            })
         }
     }
 
@@ -538,17 +800,24 @@ mod tests {
     struct MemoryTraceFileReader {
         file: Arc<MemoryTraceFile>,
         offset: usize,
+        failures: Arc<Mutex<MemoryFsFailures>>,
     }
 
     #[async_trait]
     impl TraceFileReader for MemoryTraceFileReader {
         async fn seek_to_end(&mut self) -> Result<()> {
+            if let Some(error) = self.failures.lock().unwrap().seek.pop_front() {
+                return Err(error);
+            }
             let data = self.file.data.lock().unwrap();
             self.offset = data.len();
             Ok(())
         }
 
         async fn read_line(&mut self, buf: &mut String) -> Result<usize> {
+            if let Some(error) = self.failures.lock().unwrap().read.pop_front() {
+                return Err(error);
+            }
             let bytes = {
                 let data = self.file.data.lock().unwrap();
                 if self.offset >= data.len() {
@@ -586,5 +855,14 @@ mod tests {
         }
         let normalized = path.trim_start_matches('/').to_string();
         Ok(normalized)
+    }
+
+    #[derive(Default)]
+    struct MemoryFsFailures {
+        create_dir: VecDeque<anyhow::Error>,
+        read_dir: VecDeque<anyhow::Error>,
+        open_reader: VecDeque<anyhow::Error>,
+        seek: VecDeque<anyhow::Error>,
+        read: VecDeque<anyhow::Error>,
     }
 }
