@@ -562,3 +562,9 @@ trace_type = "StorageMetrics"
 gauge_name = "ss_query_queue_max"
 field_name = "QueryQueueMax"
 description = "Maximum query queue depth on storage server"
+
+[[simple_gauge]]
+trace_type = "ProcessMetrics"
+gauge_name = "process_rss"
+field_name = "ResidentMemory"
+description = "Resident memory for process"
