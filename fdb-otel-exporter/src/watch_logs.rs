@@ -25,7 +25,7 @@ pub async fn watch_logs(
         log_dir_path,
         meter_provider,
         poll_interval,
-        RealTraceFileSystem::default(),
+        RealTraceFileSystem,
     )
     .await
 }
