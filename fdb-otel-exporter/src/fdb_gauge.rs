@@ -379,6 +379,7 @@ impl FDBGauge for RateCounterFDBGauge {
 #[derive(Clone)]
 pub struct ElapsedRateFDBGauge {
     gauge_impl: FDBGaugeImpl,
+    samples: Arc<Mutex<HashMap<LabelKey, VecDeque<TimedSample>>>>,
 }
 
 impl ElapsedRateFDBGauge {
@@ -391,6 +392,7 @@ impl ElapsedRateFDBGauge {
     ) -> Self {
         Self {
             gauge_impl: FDBGaugeImpl::new(trace_type, field_name, gauge_name, description, meter),
+            samples: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 }
@@ -403,7 +405,36 @@ impl FDBGauge for ElapsedRateFDBGauge {
             let value = get_trace_field(trace_event, self.gauge_impl.field_name.as_str())?
                 .parse::<f64>()?;
             let elapsed = get_trace_field(trace_event, "Elapsed")?.parse::<f64>()?;
-            self.gauge_impl.gauge.record(value / elapsed, labels);
+            let time = get_trace_field(trace_event, "Time")?.parse::<f64>()?;
+            let sample = value / elapsed;
+
+            let key = LabelKey::from_labels(labels);
+            let averaged = {
+                let mut samples = self
+                    .samples
+                    .lock()
+                    .expect("elapsed rate sample cache poisoned");
+                let window = samples.entry(key).or_insert_with(VecDeque::new);
+                window.push_back(TimedSample {
+                    time,
+                    value: sample,
+                });
+                while let Some(front) = window.front() {
+                    if time - front.time > ROLLING_WINDOW_SECONDS {
+                        window.pop_front();
+                    } else {
+                        break;
+                    }
+                }
+                let count = window.len() as f64;
+                if count == 0.0 {
+                    sample
+                } else {
+                    window.iter().map(|s| s.value).sum::<f64>() / count
+                }
+            };
+
+            self.gauge_impl.gauge.record(averaged, labels);
         }
         Ok(())
     }
@@ -807,8 +838,65 @@ mod tests {
         let mut event = base_event_with_type("ProcessMetrics");
         event.insert("CPUSeconds".into(), Value::String("10.0".into()));
         event.insert("Elapsed".into(), Value::String("2.0".into()));
+        event.insert("Time".into(), Value::String("1.0".into()));
 
         gauge.record(&event, &[]).expect("record should succeed");
+    }
+
+    #[test]
+    fn elapsed_rate_gauge_applies_rolling_window() {
+        let (provider, meter, registry) = prometheus_meter();
+        let _provider = provider;
+        let gauge = ElapsedRateFDBGauge::new(
+            "ProcessMetrics",
+            "CPUSeconds",
+            "process_cpu_util_test",
+            "CPU utilization",
+            &meter,
+        );
+
+        let mut event = base_event_with_type("ProcessMetrics");
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        event.insert("CPUSeconds".into(), Value::String("10.0".into()));
+        event.insert("Elapsed".into(), Value::String("2.0".into()));
+        event.insert("Time".into(), Value::String("100.0".into()));
+        gauge
+            .record(&event, &labels)
+            .expect("initial record should succeed");
+
+        event.insert("CPUSeconds".into(), Value::String("20.0".into()));
+        event.insert("Elapsed".into(), Value::String("2.0".into()));
+        event.insert("Time".into(), Value::String("105.0".into()));
+        gauge
+            .record(&event, &labels)
+            .expect("second record should succeed");
+
+        event.insert("CPUSeconds".into(), Value::String("30.0".into()));
+        event.insert("Elapsed".into(), Value::String("2.0".into()));
+        event.insert("Time".into(), Value::String("110.0".into()));
+        gauge
+            .record(&event, &labels)
+            .expect("third record should succeed");
+
+        let avg_three = gauge_value(&registry, "process_cpu_util_test", "machine", "test");
+        assert!(
+            (avg_three - 10.0).abs() < f64::EPSILON,
+            "expected average of first three samples to be 10.0, got {avg_three}"
+        );
+
+        event.insert("CPUSeconds".into(), Value::String("40.0".into()));
+        event.insert("Elapsed".into(), Value::String("2.0".into()));
+        event.insert("Time".into(), Value::String("120.0".into()));
+        gauge
+            .record(&event, &labels)
+            .expect("fourth record should succeed");
+
+        let avg_four = gauge_value(&registry, "process_cpu_util_test", "machine", "test");
+        assert!(
+            (avg_four - 15.0).abs() < f64::EPSILON,
+            "expected average of most recent samples to be 15.0, got {avg_four}"
+        );
     }
 
     #[test]
