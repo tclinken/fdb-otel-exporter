@@ -1,5 +1,6 @@
 mod config;
 mod exporter_metrics;
+mod fdb_counter;
 mod fdb_gauge;
 mod gauge_config;
 mod log_metrics;

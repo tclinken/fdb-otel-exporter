@@ -1,4 +1,5 @@
 use crate::{
+    fdb_counter::SevCounter,
     fdb_gauge::{
         ElapsedRateFDBGauge, FDBGauge, HistogramPercentileFDBGauge, RateCounterFDBGauge,
         SimpleFDBGauge, TotalCounterFDBGauge,
@@ -19,6 +20,7 @@ use std::sync::Arc;
 #[derive(Clone)]
 pub struct LogMetrics {
     gauges: Vec<Arc<dyn FDBGauge>>,
+    sev_counters: Vec<SevCounter>,
 }
 
 impl LogMetrics {
@@ -97,7 +99,15 @@ impl LogMetrics {
             })
             .collect();
 
-        Ok(Self { gauges })
+        let sev_counters: Vec<SevCounter> = [10, 20, 30, 40]
+            .iter()
+            .map(|&severity| SevCounter::new(severity, meter))
+            .collect();
+
+        Ok(Self {
+            gauges,
+            sev_counters,
+        })
     }
 
     // Record a single FoundationDB trace event across every configured gauge.
@@ -120,6 +130,9 @@ impl LogMetrics {
         for gauge in self.gauges.iter() {
             gauge.record(trace_event, &storage_labels)?;
         }
+        for sev_counter in self.sev_counters.iter() {
+            sev_counter.record(trace_event, &storage_labels)?;
+        }
         Ok(())
     }
 }
@@ -129,7 +142,10 @@ pub type TraceEvent = HashMap<String, Value>;
 #[cfg(test)]
 impl LogMetrics {
     pub(crate) fn from_gauges(gauges: Vec<Arc<dyn FDBGauge>>) -> Self {
-        Self { gauges }
+        Self {
+            gauges,
+            sev_counters: Vec::new(),
+        }
     }
 }
 
