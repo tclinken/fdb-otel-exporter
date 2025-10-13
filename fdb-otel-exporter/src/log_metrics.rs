@@ -1,5 +1,5 @@
 use crate::{
-    fdb_counter::SevCounter,
+    fdb_counter::{SevCounter, SlowTaskCounter},
     fdb_gauge::{
         ElapsedRateFDBGauge, HistogramPercentileFDBGauge, RateCounterFDBGauge, SimpleFDBGauge,
         TotalCounterFDBGauge,
@@ -104,6 +104,10 @@ impl LogMetrics {
                 .into_iter()
                 .map(|severity| Arc::new(SevCounter::new(severity, meter)) as Arc<dyn FDBMetric>),
         );
+
+        metrics.extend([10, 100, 1000].into_iter().map(|threshold_ms| {
+            Arc::new(SlowTaskCounter::new(threshold_ms, meter)) as Arc<dyn FDBMetric>
+        }));
 
         Ok(Self { metrics })
     }

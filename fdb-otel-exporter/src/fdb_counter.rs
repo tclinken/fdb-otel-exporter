@@ -40,6 +40,51 @@ impl FDBMetric for SevCounter {
     }
 }
 
+pub struct SlowTaskCounter {
+    threshold_ms: u64,
+    counter: Counter<u64>,
+}
+
+impl SlowTaskCounter {
+    pub fn new(threshold_ms: u64, meter: &Meter) -> Self {
+        Self {
+            threshold_ms,
+            counter: meter
+                .u64_counter(format!("process_slow_task_{threshold_ms}_ms"))
+                .with_description(format!(
+                    "Counter of slow tasks longer than {threshold_ms} ms"
+                ))
+                .init(),
+        }
+    }
+}
+
+impl FDBMetric for SlowTaskCounter {
+    fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
+        let trace_type = trace_event
+            .get("Type")
+            .with_context(|| "Missing Type field")?
+            .as_str()
+            .with_context(|| "Invalid Type field")?;
+
+        if trace_type == "SlowTask" {
+            let duration_sec = trace_event
+                .get("Duration")
+                .with_context(|| "Missing Duration field")?
+                .as_str()
+                .with_context(|| "Invalid Duration field")?
+                .parse::<f64>()
+                .with_context(|| "Invalid Duration field")?;
+
+            if duration_sec > ((self.threshold_ms as f64) / 1000.0) {
+                self.counter.add(1, labels);
+            }
+        }
+
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
