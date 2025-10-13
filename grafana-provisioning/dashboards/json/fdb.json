@@ -860,6 +860,7 @@
               },
               "mappings": [],
               "min": 0,
+              "max": 1,
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
@@ -869,11 +870,11 @@
                   },
                   {
                     "color": "red",
-                    "value": 80
+                    "value": 0.8
                   }
                 ]
               },
-              "unit": "percent"
+              "unit": "percentunit"
             },
             "overrides": []
           },
