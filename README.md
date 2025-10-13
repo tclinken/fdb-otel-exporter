@@ -2,7 +2,7 @@
 
 The FDB OTEL exporter tails JSON FoundationDB logs and emits OTEL metrics. This project also sets up simple local Prometheus and Grafana containers for local analysis of FDB logs. So far, this project has only been tested locally on a small 6-process cluster running on a Mac.
 
-The Grafana dashboard has over 100 charts to visualize various FDB metrics:
+The Grafana dashboard has over 150 charts to visualize various FDB metrics:
 
 ![Example Dashboard](./GrafanaImage.png)
 
