@@ -72,3 +72,15 @@ description = "commit proxy TLog logging latency"
 ```
 
 will report interpolated P50, P99, and P999 latency estimates from FDB trace events with `Type="Hisogram"`, `Group="CommitProxy"`, and `Op="TlogLogging"`.
+
+## Recommended Knob Overrides
+
+These charts are most valuable with fine-grained latency metrics and histograms. To achieve this, apply the following knob overrides:
+
+```
+knob_latency_metrics_logging_interval = 10.0
+knob_histogram_report_interval = 10.0
+knob_kaio_latency_logging_interval = 10.0
+```
+
+Tracing these histograms frequently is relatively cheap for FDB, and the increased visibility from more frequent trace events generally outweighs any performance overhead.
