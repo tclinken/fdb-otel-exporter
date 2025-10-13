@@ -161,4 +161,92 @@ mod tests {
             "unexpected error: {error}"
         );
     }
+
+    #[test]
+    fn slow_task_counter_increments_above_threshold() {
+        let (provider, meter, registry) = prometheus_meter();
+        let counter = SlowTaskCounter::new(100, &meter);
+
+        let mut event = HashMap::new();
+        event.insert("Type".into(), Value::String("SlowTask".into()));
+        event.insert("Duration".into(), Value::String("0.150".into()));
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        counter
+            .record(&event, &labels)
+            .expect("record should succeed");
+
+        provider.force_flush().expect("force_flush should succeed");
+
+        let value = counter_value(&registry, "process_slow_task_100_ms", "machine", "test");
+        assert!(
+            (value - 1.0).abs() < f64::EPSILON,
+            "expected counter value 1.0, got {value}"
+        );
+    }
+
+    #[test]
+    fn slow_task_counter_skips_when_duration_below_threshold() {
+        let (provider, meter, registry) = prometheus_meter();
+        let counter = SlowTaskCounter::new(100, &meter);
+
+        let mut event = HashMap::new();
+        event.insert("Type".into(), Value::String("SlowTask".into()));
+        event.insert("Duration".into(), Value::String("0.050".into()));
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        counter
+            .record(&event, &labels)
+            .expect("record should succeed");
+
+        provider.force_flush().expect("force_flush should succeed");
+
+        let value = counter_value(&registry, "process_slow_task_100_ms", "machine", "test");
+        assert!(
+            value.abs() < f64::EPSILON,
+            "expected counter value 0.0, got {value}"
+        );
+    }
+
+    #[test]
+    fn slow_task_counter_skips_non_slow_task_events() {
+        let (provider, meter, registry) = prometheus_meter();
+        let counter = SlowTaskCounter::new(100, &meter);
+
+        let mut event = HashMap::new();
+        event.insert("Type".into(), Value::String("Other".into()));
+        event.insert("Duration".into(), Value::String("1.0".into()));
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        counter
+            .record(&event, &labels)
+            .expect("record should succeed");
+
+        provider.force_flush().expect("force_flush should succeed");
+
+        let value = counter_value(&registry, "process_slow_task_100_ms", "machine", "test");
+        assert!(
+            value.abs() < f64::EPSILON,
+            "expected counter value 0.0, got {value}"
+        );
+    }
+
+    #[test]
+    fn slow_task_counter_errors_without_type() {
+        let (_provider, meter, _registry) = prometheus_meter();
+        let counter = SlowTaskCounter::new(100, &meter);
+
+        let mut event = HashMap::new();
+        event.insert("Duration".into(), Value::String("0.150".into()));
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        let error = counter
+            .record(&event, &labels)
+            .expect_err("missing type should error");
+
+        assert!(
+            error.to_string().contains("Missing Type field"),
+            "unexpected error: {error}"
+        );
+    }
 }
