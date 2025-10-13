@@ -1,3 +1,4 @@
+use crate::fdb_metric::FDBMetric;
 use anyhow::{Context, Result};
 use opentelemetry::metrics::{Counter, Meter};
 use opentelemetry::KeyValue;
@@ -20,8 +21,10 @@ impl SevCounter {
                 .init(),
         }
     }
+}
 
-    pub fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
+impl FDBMetric for SevCounter {
+    fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         if trace_event
             .get("Severity")
             .with_context(|| "Missing Severity field")?
@@ -34,5 +37,83 @@ impl SevCounter {
             self.counter.add(1, labels);
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_helpers::metrics::{find_metric, prometheus_meter};
+    use opentelemetry::KeyValue;
+    use prometheus::Registry;
+
+    fn counter_value(registry: &Registry, name: &str, label_name: &str, label_value: &str) -> f64 {
+        let metric = match find_metric(registry, name, label_name, label_value) {
+            Some(metric) => metric,
+            None => return 0.0,
+        };
+        metric.get_counter().get_value()
+    }
+
+    #[test]
+    fn record_increments_matching_severity() {
+        let (provider, meter, registry) = prometheus_meter();
+        let counter = SevCounter::new(10, &meter);
+
+        let mut event = HashMap::new();
+        event.insert("Severity".into(), Value::String("10".into()));
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        counter
+            .record(&event, &labels)
+            .expect("record should succeed");
+
+        provider.force_flush().expect("force_flush should succeed");
+
+        let value = counter_value(&registry, "process_sev10_counter", "machine", "test");
+        assert!(
+            (value - 1.0).abs() < f64::EPSILON,
+            "expected counter value 1.0, got {value}"
+        );
+    }
+
+    #[test]
+    fn record_skips_mismatched_severity() {
+        let (provider, meter, registry) = prometheus_meter();
+        let counter = SevCounter::new(10, &meter);
+
+        let mut event = HashMap::new();
+        event.insert("Severity".into(), Value::String("20".into()));
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        counter
+            .record(&event, &labels)
+            .expect("record should succeed");
+
+        provider.force_flush().expect("force_flush should succeed");
+
+        let value = counter_value(&registry, "process_sev10_counter", "machine", "test");
+        assert!(
+            value.abs() < f64::EPSILON,
+            "expected counter value 0.0, got {value}"
+        );
+    }
+
+    #[test]
+    fn record_errors_without_severity() {
+        let (_provider, meter, _registry) = prometheus_meter();
+        let counter = SevCounter::new(10, &meter);
+
+        let event = HashMap::new();
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        let error = counter
+            .record(&event, &labels)
+            .expect_err("missing severity should error");
+
+        assert!(
+            error.to_string().contains("Missing Severity field"),
+            "unexpected error: {error}"
+        );
     }
 }

@@ -1,9 +1,10 @@
 use crate::{
     fdb_counter::SevCounter,
     fdb_gauge::{
-        ElapsedRateFDBGauge, FDBGauge, HistogramPercentileFDBGauge, RateCounterFDBGauge,
-        SimpleFDBGauge, TotalCounterFDBGauge,
+        ElapsedRateFDBGauge, HistogramPercentileFDBGauge, RateCounterFDBGauge, SimpleFDBGauge,
+        TotalCounterFDBGauge,
     },
+    fdb_metric::FDBMetric,
     gauge_config::{
         read_gauge_config_file, GaugeDefinition, HistogramPercentileGaugeDefinition,
         StandardGaugeDefinition,
@@ -16,11 +17,10 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 
-// Holds the configured gauges derived from the on-disk gauge configuration.
+// Holds the configured metrics derived from the on-disk gauge configuration.
 #[derive(Clone)]
 pub struct LogMetrics {
-    gauges: Vec<Arc<dyn FDBGauge>>,
-    sev_counters: Vec<SevCounter>,
+    metrics: Vec<Arc<dyn FDBMetric>>,
 }
 
 impl LogMetrics {
@@ -29,9 +29,9 @@ impl LogMetrics {
         let config_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("gauge_config.toml");
         let configs = read_gauge_config_file(&config_path)?;
 
-        let gauges: Vec<Arc<dyn FDBGauge>> = configs
+        let mut metrics: Vec<Arc<dyn FDBMetric>> = configs
             .into_iter()
-            .map(|config| -> Arc<dyn FDBGauge> {
+            .map(|config| -> Arc<dyn FDBMetric> {
                 match config {
                     GaugeDefinition::Simple(StandardGaugeDefinition {
                         trace_type,
@@ -99,18 +99,16 @@ impl LogMetrics {
             })
             .collect();
 
-        let sev_counters: Vec<SevCounter> = [10, 20, 30, 40]
-            .iter()
-            .map(|&severity| SevCounter::new(severity, meter))
-            .collect();
+        metrics.extend(
+            [10, 20, 30, 40]
+                .into_iter()
+                .map(|severity| Arc::new(SevCounter::new(severity, meter)) as Arc<dyn FDBMetric>),
+        );
 
-        Ok(Self {
-            gauges,
-            sev_counters,
-        })
+        Ok(Self { metrics })
     }
 
-    // Record a single FoundationDB trace event across every configured gauge.
+    // Record a single FoundationDB trace event across every configured metric.
     pub fn record(&self, trace_event: &TraceEvent) -> Result<()> {
         let machine = trace_event
             .get("Machine")
@@ -127,11 +125,9 @@ impl LogMetrics {
         if let Some(roles) = roles {
             storage_labels.push(KeyValue::new("Roles", roles));
         }
-        for gauge in self.gauges.iter() {
-            gauge.record(trace_event, &storage_labels)?;
-        }
-        for sev_counter in self.sev_counters.iter() {
-            sev_counter.record(trace_event, &storage_labels)?;
+
+        for metric in self.metrics.iter() {
+            metric.record(trace_event, &storage_labels)?;
         }
         Ok(())
     }
@@ -141,11 +137,8 @@ pub type TraceEvent = HashMap<String, Value>;
 
 #[cfg(test)]
 impl LogMetrics {
-    pub(crate) fn from_gauges(gauges: Vec<Arc<dyn FDBGauge>>) -> Self {
-        Self {
-            gauges,
-            sev_counters: Vec::new(),
-        }
+    pub(crate) fn from_metrics(metrics: Vec<Arc<dyn FDBMetric>>) -> Self {
+        Self { metrics }
     }
 }
 
@@ -168,7 +161,7 @@ mod tests {
         }
     }
 
-    impl FDBGauge for TestGauge {
+    impl FDBMetric for TestGauge {
         fn record(&self, _trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
             self.calls.lock().unwrap().push(labels.to_vec());
             Ok(())
@@ -190,8 +183,8 @@ mod tests {
     #[test]
     fn record_requires_machine_field() {
         let calls = Arc::new(Mutex::new(Vec::new()));
-        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(TestGauge::new(Arc::clone(&calls)))];
-        let log_metrics = LogMetrics::from_gauges(gauges);
+        let metrics: Vec<Arc<dyn FDBMetric>> = vec![Arc::new(TestGauge::new(Arc::clone(&calls)))];
+        let log_metrics = LogMetrics::from_metrics(metrics);
 
         let mut event = HashMap::new();
         event.insert("Type".to_string(), Value::String("StorageMetrics".into()));
@@ -210,8 +203,8 @@ mod tests {
     #[test]
     fn record_invokes_gauges_with_machine_label() {
         let calls = Arc::new(Mutex::new(Vec::new()));
-        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(TestGauge::new(Arc::clone(&calls)))];
-        let log_metrics = LogMetrics::from_gauges(gauges);
+        let metrics: Vec<Arc<dyn FDBMetric>> = vec![Arc::new(TestGauge::new(Arc::clone(&calls)))];
+        let log_metrics = LogMetrics::from_metrics(metrics);
 
         let mut event = HashMap::new();
         event.insert("Machine".to_string(), Value::String("10.0.0.1".into()));

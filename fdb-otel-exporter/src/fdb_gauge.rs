@@ -1,3 +1,4 @@
+use crate::fdb_metric::FDBMetric;
 use anyhow::{Context, Result};
 use opentelemetry::metrics::{Gauge, Meter};
 use opentelemetry::KeyValue;
@@ -141,10 +142,6 @@ fn interpolate_exponential_percentile(
     Some(value.clamp(bucket_lower_value, bucket_upper_value))
 }
 
-pub trait FDBGauge: Send + Sync {
-    fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()>;
-}
-
 #[derive(Clone)]
 struct FDBGaugeImpl {
     trace_type: String,
@@ -204,7 +201,7 @@ impl SimpleFDBGauge {
     }
 }
 
-impl FDBGauge for SimpleFDBGauge {
+impl FDBMetric for SimpleFDBGauge {
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         let trace_type = get_trace_field(trace_event, "Type")?;
 
@@ -243,7 +240,7 @@ impl TotalCounterFDBGauge {
     }
 }
 
-impl FDBGauge for TotalCounterFDBGauge {
+impl FDBMetric for TotalCounterFDBGauge {
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         let trace_type = get_trace_field(trace_event, "Type")?;
 
@@ -345,7 +342,7 @@ impl RateCounterFDBGauge {
     }
 }
 
-impl FDBGauge for RateCounterFDBGauge {
+impl FDBMetric for RateCounterFDBGauge {
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         let trace_type = get_trace_field(trace_event, "Type")?;
 
@@ -387,7 +384,7 @@ impl ElapsedRateFDBGauge {
     }
 }
 
-impl FDBGauge for ElapsedRateFDBGauge {
+impl FDBMetric for ElapsedRateFDBGauge {
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         let trace_type = get_trace_field(trace_event, "Type")?;
 
@@ -439,7 +436,7 @@ impl HistogramPercentileFDBGauge {
     }
 }
 
-impl FDBGauge for HistogramPercentileFDBGauge {
+impl FDBMetric for HistogramPercentileFDBGauge {
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         if get_trace_field(trace_event, "Type")? != "Histogram" {
             return Ok(());
@@ -537,9 +534,9 @@ impl FDBGauge for HistogramPercentileFDBGauge {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_helpers::metrics::{find_metric, prometheus_meter};
     use opentelemetry::metrics::{Meter, MeterProvider};
     use opentelemetry::KeyValue;
-    use opentelemetry_prometheus::exporter as prometheus_exporter;
     use opentelemetry_sdk::metrics::{ManualReader, SdkMeterProvider};
     use prometheus::Registry;
 
@@ -556,17 +553,6 @@ mod tests {
         let reader = ManualReader::builder().build();
         let provider = SdkMeterProvider::builder().with_reader(reader).build();
         provider.meter("test")
-    }
-
-    fn prometheus_meter() -> (SdkMeterProvider, Meter, Registry) {
-        let registry = Registry::new();
-        let reader = prometheus_exporter()
-            .with_registry(registry.clone())
-            .build()
-            .expect("prometheus exporter");
-        let provider = SdkMeterProvider::builder().with_reader(reader).build();
-        let meter = provider.meter("test");
-        (provider, meter, registry)
     }
 
     fn base_event_with_type(trace_type: &str) -> HashMap<String, Value> {
@@ -772,21 +758,8 @@ mod tests {
     }
 
     fn gauge_value(registry: &Registry, name: &str, label_name: &str, label_value: &str) -> f64 {
-        let families = registry.gather();
-        let family = families
-            .iter()
-            .find(|mf| mf.get_name() == name)
-            .unwrap_or_else(|| panic!("metric family {name} not found"));
-        let metric = family
-            .get_metric()
-            .iter()
-            .find(|metric| {
-                metric
-                    .get_label()
-                    .iter()
-                    .any(|label| label.get_name() == label_name && label.get_value() == label_value)
-            })
-            .unwrap_or_else(|| panic!("metric with label {label_name}={label_value} not found"));
+        let metric = find_metric(registry, name, label_name, label_value)
+            .unwrap_or_else(|| panic!("metric {name} with {label_name}={label_value} not found"));
         metric.get_gauge().get_value()
     }
 

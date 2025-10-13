@@ -263,7 +263,7 @@ impl TraceFileSystem for RealTraceFileSystem {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::fdb_gauge::FDBGauge;
+    use crate::fdb_metric::FDBMetric;
     use anyhow::{anyhow, Result};
     use opentelemetry_sdk::metrics::{ManualReader, SdkMeterProvider};
     use serde_json::json;
@@ -289,7 +289,7 @@ mod tests {
         }
     }
 
-    impl FDBGauge for RecordingGauge {
+    impl FDBMetric for RecordingGauge {
         fn record(
             &self,
             trace_event: &TraceEvent,
@@ -368,8 +368,8 @@ mod tests {
         fs.create_regular_file(&ignored_path)?;
 
         let events = Arc::new(Mutex::new(Vec::new()));
-        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
-        let log_metrics = LogMetrics::from_gauges(gauges);
+        let metrics: Vec<Arc<dyn FDBMetric>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
+        let log_metrics = LogMetrics::from_metrics(metrics);
 
         let provider = test_meter_provider();
         let meter = provider.meter("run_log_directory_records_trace_events");
@@ -425,7 +425,7 @@ mod tests {
         let provider = test_meter_provider();
         let meter = provider.meter("run_log_directory_continues_after_read_dir_error");
         let exporter_metrics = ExporterMetrics::new(&meter);
-        let log_metrics = LogMetrics::from_gauges(Vec::<Arc<dyn FDBGauge>>::new());
+        let log_metrics = LogMetrics::from_metrics(Vec::<Arc<dyn FDBMetric>>::new());
 
         let handle = tokio::spawn(run_log_directory(
             log_dir.clone(),
@@ -451,8 +451,8 @@ mod tests {
     #[test]
     fn handle_log_line_records_trace_events() {
         let events = Arc::new(Mutex::new(Vec::new()));
-        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
-        let log_metrics = LogMetrics::from_gauges(gauges);
+        let metrics: Vec<Arc<dyn FDBMetric>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
+        let log_metrics = LogMetrics::from_metrics(metrics);
 
         let provider = test_meter_provider();
         let meter = provider.meter("handle_log_line_records_trace_events");
@@ -484,8 +484,8 @@ mod tests {
         fs.fail_next_open_reader(anyhow!("open failure"));
 
         let events = Arc::new(Mutex::new(Vec::new()));
-        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
-        let log_metrics = LogMetrics::from_gauges(gauges);
+        let metrics: Vec<Arc<dyn FDBMetric>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
+        let log_metrics = LogMetrics::from_metrics(metrics);
 
         let provider = test_meter_provider();
         let meter = provider.meter("run_log_tailer_retries_open_errors");
@@ -539,8 +539,8 @@ mod tests {
         fs.fail_next_seek(anyhow!("seek failure"));
 
         let events = Arc::new(Mutex::new(Vec::new()));
-        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
-        let log_metrics = LogMetrics::from_gauges(gauges);
+        let metrics: Vec<Arc<dyn FDBMetric>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
+        let log_metrics = LogMetrics::from_metrics(metrics);
 
         let provider = test_meter_provider();
         let meter = provider.meter("run_log_tailer_retries_seek_errors");
@@ -594,8 +594,8 @@ mod tests {
         fs.fail_next_read(anyhow!("read failure"));
 
         let events = Arc::new(Mutex::new(Vec::new()));
-        let gauges: Vec<Arc<dyn FDBGauge>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
-        let log_metrics = LogMetrics::from_gauges(gauges);
+        let metrics: Vec<Arc<dyn FDBMetric>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
+        let log_metrics = LogMetrics::from_metrics(metrics);
 
         let provider = test_meter_provider();
         let meter = provider.meter("run_log_tailer_retries_read_errors");

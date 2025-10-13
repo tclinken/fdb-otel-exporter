@@ -2,9 +2,12 @@ mod config;
 mod exporter_metrics;
 mod fdb_counter;
 mod fdb_gauge;
+mod fdb_metric;
 mod gauge_config;
 mod log_metrics;
 mod metrics_handler;
+#[cfg(test)]
+mod test_helpers;
 mod watch_logs;
 
 use std::{
