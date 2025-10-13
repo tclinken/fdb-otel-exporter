@@ -136,6 +136,12 @@ gauge_name = "process_cpu_util"
 field_name = "CPUSeconds"
 description = "Process CPU utilization as a ratio"
 
+[[elapsed_rate_gauge]]
+trace_type = "ProcessMetrics"
+gauge_name = "process_disk_idle"
+field_name = "DiskIdleSeconds"
+description = "Process disk idle time as a ratio"
+
 [[simple_gauge]]
 trace_type = "DDTrackerStats"
 gauge_name = "dd_total_kv_size"
