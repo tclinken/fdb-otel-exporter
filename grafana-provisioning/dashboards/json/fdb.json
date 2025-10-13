@@ -118,7 +118,7 @@
           "targets": [
             {
               "editorMode": "code",
-              "expr": "gp_txn_start_in{job=\"fdb-otel-exporter\"}",
+              "expr": "sum(gp_txn_start_in{job=\"fdb-otel-exporter\"})",
               "legendFormat": "Cluster TPS",
               "range": true,
               "refId": "A"
