@@ -492,12 +492,6 @@ field_name = "StatusRequests"
 description = "Rate of status requests, reported by cluster controller"
 
 [[simple_gauge]]
-trace_type = "MasterRecoveryState"
-gauge_name = "cc_recovery_state"
-field_name = "StatusCode"
-description = "Recovery state, reported by cluster controller"
-
-[[simple_gauge]]
 trace_type = "CommitBatchingWindowSize"
 gauge_name = "cp_p50_commit_batching_window"
 field_name = "Median"
