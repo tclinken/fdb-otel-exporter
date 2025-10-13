@@ -1,5 +1,3 @@
-#![cfg(test)]
-
 pub mod metrics {
     use opentelemetry::metrics::{Meter, MeterProvider};
     use opentelemetry_prometheus::exporter as prometheus_exporter;
@@ -29,11 +27,8 @@ pub mod metrics {
             let fallback = format!("{name}_total");
             family = families.iter().find(|mf| mf.get_name() == fallback);
         }
-        let Some(family) = family else {
-            return None;
-        };
 
-        family.get_metric().iter().find_map(|metric| {
+        family?.get_metric().iter().find_map(|metric| {
             if metric
                 .get_label()
                 .iter()
