@@ -31,6 +31,37 @@ impl HistogramUnit {
             Self::Bytes | Self::Count => bucket_value as u64,
         }
     }
+
+    fn bucket_lower_bound(&self, upper_bound: u64) -> u64 {
+        match self {
+            Self::Milliseconds | Self::Bytes => power_of_two_bucket_lower_bound(upper_bound),
+            Self::Count => upper_bound.saturating_sub(1),
+        }
+    }
+
+    fn interpolate_percentile(
+        &self,
+        buckets: &[HistogramBucket],
+        total_count: u64,
+        percentile: f64,
+    ) -> Option<f64> {
+        match self {
+            Self::Milliseconds | Self::Bytes => {
+                interpolate_geometric_percentile(buckets, total_count, percentile, self.divisor())
+            }
+            Self::Count => {
+                interpolate_linear_percentile(buckets, total_count, percentile, self.divisor())
+            }
+        }
+    }
+}
+
+fn power_of_two_bucket_lower_bound(upper_bound: u64) -> u64 {
+    if upper_bound == 2 {
+        0
+    } else {
+        upper_bound / 2
+    }
 }
 
 // Snapshot of a histogram bucket expressed in the trace's base units (microseconds, bytes, or counts),
@@ -43,18 +74,41 @@ struct HistogramBucket {
     cumulative_count: u64,
 }
 
-// Interpolate a percentile value from histogram buckets assuming an exponential distribution.
+type BucketInterpolator = fn(f64, f64, f64) -> f64;
+
+fn interpolate_geometric(lower_bound: f64, upper_bound: f64, fraction: f64) -> f64 {
+    // Log-space interpolation is undefined at zero, so use linear interpolation
+    // for the first FDB bucket, which contains values in [0, 2).
+    if lower_bound <= 0.0 {
+        return interpolate_linear(lower_bound, upper_bound, fraction);
+    }
+
+    lower_bound * (fraction * (upper_bound / lower_bound).ln()).exp()
+}
+
+fn interpolate_linear(lower_bound: f64, upper_bound: f64, fraction: f64) -> f64 {
+    lower_bound + fraction * (upper_bound - lower_bound)
+}
+
+// Interpolate a percentile value from histogram buckets using the supplied
+// within-bucket interpolation function.
 // The buckets are derived from FoundationDB `LessThan` lines, converted to their base units
 // (microseconds for latency histograms, bytes for size histograms, or counts for raw counters),
 // and paired with running cumulative counts so this helper can locate the bucket that spans the
-// percentile and solve for the interpolated value.
-fn interpolate_exponential_percentile(
+// percentile and interpolate within it.
+fn interpolate_percentile(
     buckets: &[HistogramBucket],
     total_count: u64,
     percentile: f64,
     unit_divisor: f64,
+    interpolate_bucket: BucketInterpolator,
 ) -> Option<f64> {
-    if buckets.is_empty() || total_count == 0 || unit_divisor <= 0.0 || !unit_divisor.is_finite() {
+    if buckets.is_empty()
+        || total_count == 0
+        || !percentile.is_finite()
+        || unit_divisor <= 0.0
+        || !unit_divisor.is_finite()
+    {
         return None;
     }
 
@@ -85,61 +139,63 @@ fn interpolate_exponential_percentile(
     let bucket_lower_value = bucket.lower_bound as f64 / unit_divisor;
     let bucket_upper_value = bucket.upper_bound as f64 / unit_divisor;
 
-    if bucket_upper_value <= 0.0 {
-        return Some(bucket_upper_value);
+    if !bucket_lower_value.is_finite()
+        || !bucket_upper_value.is_finite()
+        || bucket_lower_value < 0.0
+        || bucket_upper_value < bucket_lower_value
+    {
+        return None;
     }
 
-    let bucket_cdf = (bucket.cumulative_count as f64) / total_count_f64;
     let lower_cumulative_count = bucket.cumulative_count.saturating_sub(bucket.count);
-    let prev_cdf = (lower_cumulative_count as f64) / total_count_f64;
-    let bucket_mass = (bucket.count as f64) / total_count_f64;
 
-    if bucket_mass <= 0.0 {
+    if bucket.count == 0 {
         return Some(bucket_upper_value);
     }
 
-    if percentile <= prev_cdf {
-        return Some(bucket_lower_value);
-    }
-
-    let lambda = if bucket_cdf >= 1.0 {
-        if bucket_lower_value > 0.0 && prev_cdf < 1.0 {
-            -((1.0 - prev_cdf).ln()) / bucket_lower_value
-        } else {
-            f64::INFINITY
-        }
-    } else {
-        -((1.0 - bucket_cdf).ln()) / bucket_upper_value
-    };
-
-    if !lambda.is_finite() || lambda <= 0.0 {
-        return Some(bucket_upper_value);
-    }
-
-    let relative_percentile =
-        ((percentile - prev_cdf) / bucket_mass).clamp(0.0, 1.0 - f64::EPSILON);
-
-    let exp_neg_lambda_lower = (-lambda * bucket_lower_value).exp();
-    let exp_neg_lambda_upper = (-lambda * bucket_upper_value).exp();
-
-    let denom = exp_neg_lambda_lower - exp_neg_lambda_upper;
-    if denom <= 0.0 {
-        return Some(bucket_upper_value);
-    }
-
-    let target = exp_neg_lambda_lower - relative_percentile * denom;
-
-    if target <= 0.0 {
-        return Some(bucket_upper_value);
-    }
-
-    let value = -target.ln() / lambda;
+    let relative_rank =
+        ((target_rank - lower_cumulative_count as f64) / bucket.count as f64).clamp(0.0, 1.0);
+    let value = interpolate_bucket(bucket_lower_value, bucket_upper_value, relative_rank);
 
     if !value.is_finite() {
         return Some(bucket_upper_value);
     }
 
     Some(value.clamp(bucket_lower_value, bucket_upper_value))
+}
+
+// FDB's latency and byte histograms use power-of-two bucket boundaries. Treat
+// observations as uniformly distributed in log space within those buckets.
+fn interpolate_geometric_percentile(
+    buckets: &[HistogramBucket],
+    total_count: u64,
+    percentile: f64,
+    unit_divisor: f64,
+) -> Option<f64> {
+    interpolate_percentile(
+        buckets,
+        total_count,
+        percentile,
+        unit_divisor,
+        interpolate_geometric,
+    )
+}
+
+// FDB also has linearly spaced count histograms, which must not use geometric
+// interpolation.
+fn interpolate_linear_percentile(
+    buckets: &[HistogramBucket],
+    total_count: u64,
+    percentile: f64,
+    unit_divisor: f64,
+) -> Option<f64> {
+    interpolate_percentile(
+        buckets,
+        total_count,
+        percentile,
+        unit_divisor,
+        interpolate_linear,
+    )
 }
 
 #[derive(Clone)]
@@ -415,7 +471,8 @@ impl HistogramPercentileFDBGauge {
     // Record pre-aggregated histogram percentiles as gauges. FoundationDB log files contain
     // histogram buckets (with upper-bound thresholds) for each `(Group, Op)` combination. This
     // gauge collects buckets from the matching log event and interpolates the requested percentile
-    // under an exponential assumption.
+    // according to the bucket layout: geometric for power-of-two latency and byte buckets, and
+    // linear for unit-width count buckets.
     pub fn new(
         group: impl Into<String>,
         op: impl Into<String>,
@@ -455,8 +512,6 @@ impl FDBMetric for HistogramPercentileFDBGauge {
             "count" => HistogramUnit::Count,
             _ => return Ok(()),
         };
-        let unit_divisor = unit.divisor();
-
         let total_count = get_trace_field(trace_event, "TotalCount")?.parse::<u64>()?;
         if total_count == 0 {
             return Ok(());
@@ -482,47 +537,19 @@ impl FDBMetric for HistogramPercentileFDBGauge {
 
         let mut buckets: Vec<HistogramBucket> = Vec::new();
         let mut cumulative = 0u64;
-        let hist_entries: Vec<(u64, u64)> = hist
-            .iter()
-            .map(|(upper_bound, count)| (*upper_bound, *count))
-            .collect();
-
-        let Some((mut expected_upper, _)) = hist_entries.first().copied() else {
-            return Ok(());
-        };
-
-        for (upper_bound, count) in hist_entries {
-            while expected_upper < upper_bound {
-                let lower_bound = expected_upper / 2;
-                buckets.push(HistogramBucket {
-                    lower_bound,
-                    upper_bound: expected_upper,
-                    count: 0,
-                    cumulative_count: cumulative,
-                });
-                expected_upper = expected_upper.saturating_mul(2);
-                if expected_upper == 0 {
-                    break;
-                }
-            }
-
+        for (upper_bound, count) in hist {
             cumulative += count;
 
             buckets.push(HistogramBucket {
-                lower_bound: upper_bound / 2,
+                lower_bound: unit.bucket_lower_bound(upper_bound),
                 upper_bound,
                 count,
                 cumulative_count: cumulative,
             });
-
-            expected_upper = match upper_bound.checked_mul(2) {
-                Some(value) => value,
-                None => upper_bound,
-            };
         }
 
         if let Some(interpolated_value) =
-            interpolate_exponential_percentile(&buckets, total_count, self.percentile, unit_divisor)
+            unit.interpolate_percentile(&buckets, total_count, self.percentile)
         {
             self.gauge.record(interpolated_value, labels);
         }
@@ -540,9 +567,9 @@ mod tests {
     use opentelemetry_sdk::metrics::{ManualReader, SdkMeterProvider};
     use prometheus::Registry;
 
-    fn bucket(upper_bound: u64, count: u64, cumulative: u64) -> HistogramBucket {
+    fn bucket(lower_bound: u64, upper_bound: u64, count: u64, cumulative: u64) -> HistogramBucket {
         HistogramBucket {
-            lower_bound: upper_bound / 2,
+            lower_bound,
             upper_bound,
             count,
             cumulative_count: cumulative,
@@ -853,6 +880,53 @@ mod tests {
     }
 
     #[test]
+    fn histogram_percentile_uses_zero_lower_bound_for_first_fdb_bucket() {
+        let (provider, meter, registry) = prometheus_meter();
+        let _provider = provider;
+        let gauge = test_histogram_gauge(&meter);
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        let mut event = base_histogram_event();
+        event.insert("Unit".into(), Value::String("milliseconds".into()));
+        event.insert("TotalCount".into(), Value::String("4".into()));
+        event.insert("LessThan0.002".into(), Value::String("4".into()));
+
+        gauge
+            .record(&event, &labels)
+            .expect("first histogram bucket should be interpolated");
+
+        let value = gauge_value(&registry, "ss_read_latency_p50_test", "machine", "test");
+        assert!(
+            (value - 0.000_001).abs() < 1e-12,
+            "expected midpoint of [0, 2) microseconds, got {value}"
+        );
+    }
+
+    #[test]
+    fn histogram_percentile_interpolates_count_buckets_linearly() {
+        let (provider, meter, registry) = prometheus_meter();
+        let _provider = provider;
+        let gauge = test_histogram_gauge(&meter);
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        let mut event = base_histogram_event();
+        event.insert("Unit".into(), Value::String("count".into()));
+        event.insert("TotalCount".into(), Value::String("6".into()));
+        event.insert("LessThan1".into(), Value::String("2".into()));
+        event.insert("LessThan2".into(), Value::String("4".into()));
+
+        gauge
+            .record(&event, &labels)
+            .expect("count histogram should be interpolated");
+
+        let value = gauge_value(&registry, "ss_read_latency_p50_test", "machine", "test");
+        assert!(
+            (value - 1.25).abs() < 1e-12,
+            "expected linear interpolation within [1, 2), got {value}"
+        );
+    }
+
+    #[test]
     fn histogram_percentile_skips_non_histogram_events() {
         let meter = test_meter();
         let gauge = test_histogram_gauge(&meter);
@@ -952,19 +1026,12 @@ mod tests {
     }
 
     #[test]
-    fn interpolates_percentile_within_bucket() {
-        let buckets = vec![bucket(1_000, 50, 50), bucket(2_000, 50, 100)];
+    fn geometric_interpolation_uses_bucket_midpoint() {
+        let buckets = vec![bucket(500, 1_000, 50, 50), bucket(1_000, 2_000, 50, 100)];
         let unit_divisor = 1_000_000.0;
-        let value = interpolate_exponential_percentile(&buckets, 100, 0.25, unit_divisor)
+        let value = interpolate_geometric_percentile(&buckets, 100, 0.25, unit_divisor)
             .expect("percentile value");
-        let expected = {
-            let bucket_upper_seconds = 1_000f64 / unit_divisor;
-            let lambda = -((1.0 - 0.5f64).ln()) / bucket_upper_seconds;
-            let exp_lower = (-lambda * (bucket_upper_seconds / 2.0)).exp();
-            let exp_upper = (-lambda * bucket_upper_seconds).exp();
-            let target = exp_lower - 0.5 * (exp_lower - exp_upper);
-            -target.ln() / lambda
-        };
+        let expected = (500.0_f64 * 1_000.0).sqrt() / unit_divisor;
         assert!(
             (value - expected).abs() < 1e-12,
             "value {value} != {expected}"
@@ -972,33 +1039,17 @@ mod tests {
     }
 
     #[test]
-    fn interpolates_percentile_in_middle_bucket() {
+    fn geometric_interpolation_uses_rank_within_middle_bucket() {
         let buckets = vec![
-            bucket(1_000, 50, 50),
-            bucket(2_000, 30, 80),
-            bucket(4_000, 20, 100),
+            bucket(500, 1_000, 50, 50),
+            bucket(1_000, 2_000, 30, 80),
+            bucket(2_000, 4_000, 20, 100),
         ];
-        let total_count = 100u64;
-        let percentile = 0.6;
         let unit_divisor = 1_000_000.0;
 
-        let value =
-            interpolate_exponential_percentile(&buckets, total_count, percentile, unit_divisor)
-                .expect("percentile value");
-
-        let middle_bucket = buckets[1];
-        let bucket_upper_seconds = middle_bucket.upper_bound as f64 / unit_divisor;
-        let bucket_lower_seconds = middle_bucket.lower_bound as f64 / unit_divisor;
-        let bucket_cdf = middle_bucket.cumulative_count as f64 / total_count as f64;
-        let prev_cdf = buckets[0].cumulative_count as f64 / total_count as f64;
-        let bucket_mass = middle_bucket.count as f64 / total_count as f64;
-
-        let lambda = -((1.0 - bucket_cdf).ln()) / bucket_upper_seconds;
-        let exp_lower = (-lambda * bucket_lower_seconds).exp();
-        let exp_upper = (-lambda * bucket_upper_seconds).exp();
-        let relative = ((percentile - prev_cdf) / bucket_mass).clamp(0.0, 1.0 - f64::EPSILON);
-        let target = exp_lower - relative * (exp_lower - exp_upper);
-        let expected = -target.ln() / lambda;
+        let value = interpolate_geometric_percentile(&buckets, 100, 0.6, unit_divisor)
+            .expect("percentile value");
+        let expected = 1_000.0 * 2.0_f64.powf(1.0 / 3.0) / unit_divisor;
 
         assert!(
             (value - expected).abs() < 1e-12,
@@ -1007,37 +1058,17 @@ mod tests {
     }
 
     #[test]
-    fn interpolates_percentile_in_last_bucket() {
+    fn geometric_interpolation_uses_rank_within_final_bucket() {
         let buckets = vec![
-            bucket(1_000, 50, 50),
-            bucket(2_000, 30, 80),
-            bucket(4_000, 20, 100),
+            bucket(500, 1_000, 50, 50),
+            bucket(1_000, 2_000, 30, 80),
+            bucket(2_000, 4_000, 20, 100),
         ];
-        let total_count = 100u64;
-        let percentile = 0.95;
         let unit_divisor = 1_000_000.0;
 
-        let value =
-            interpolate_exponential_percentile(&buckets, total_count, percentile, unit_divisor)
-                .expect("percentile value");
-
-        let last_bucket = buckets[2];
-        let bucket_upper_seconds = last_bucket.upper_bound as f64 / unit_divisor;
-        let bucket_lower_seconds = last_bucket.lower_bound as f64 / unit_divisor;
-        let bucket_cdf = last_bucket.cumulative_count as f64 / total_count as f64;
-        let prev_cdf = buckets[1].cumulative_count as f64 / total_count as f64;
-        let bucket_mass = last_bucket.count as f64 / total_count as f64;
-
-        let lambda = if bucket_cdf >= 1.0 && bucket_lower_seconds > 0.0 && prev_cdf < 1.0 {
-            -((1.0 - prev_cdf).ln()) / bucket_lower_seconds
-        } else {
-            -((1.0 - bucket_cdf).ln()) / bucket_upper_seconds
-        };
-        let exp_lower = (-lambda * bucket_lower_seconds).exp();
-        let exp_upper = (-lambda * bucket_upper_seconds).exp();
-        let relative = ((percentile - prev_cdf) / bucket_mass).clamp(0.0, 1.0 - f64::EPSILON);
-        let target = exp_lower - relative * (exp_lower - exp_upper);
-        let expected = -target.ln() / lambda;
+        let value = interpolate_geometric_percentile(&buckets, 100, 0.95, unit_divisor)
+            .expect("percentile value");
+        let expected = 2_000.0 * 2.0_f64.powf(0.75) / unit_divisor;
 
         assert!(
             (value - expected).abs() < 1e-12,
@@ -1046,44 +1077,56 @@ mod tests {
     }
 
     #[test]
-    fn clamps_to_bucket_lower_for_zero_percentile() {
-        let buckets = vec![bucket(1_000, 50, 50), bucket(2_000, 50, 100)];
-        let value = interpolate_exponential_percentile(&buckets, 100, 0.0, 1_000_000.0)
+    fn geometric_interpolation_returns_bucket_lower_for_zero_percentile() {
+        let buckets = vec![bucket(500, 1_000, 50, 50), bucket(1_000, 2_000, 50, 100)];
+        let value = interpolate_geometric_percentile(&buckets, 100, 0.0, 1_000_000.0)
             .expect("percentile value");
         assert!((value - 0.0005).abs() < 1e-12);
     }
 
     #[test]
-    fn returns_bucket_upper_for_full_percentile() {
-        let buckets = vec![bucket(1_000, 50, 50), bucket(2_000, 50, 100)];
-        let value = interpolate_exponential_percentile(&buckets, 100, 1.0, 1_000_000.0)
+    fn geometric_interpolation_returns_bucket_upper_for_full_percentile() {
+        let buckets = vec![bucket(500, 1_000, 50, 50), bucket(1_000, 2_000, 50, 100)];
+        let value = interpolate_geometric_percentile(&buckets, 100, 1.0, 1_000_000.0)
             .expect("percentile value");
         assert!((value - 0.002).abs() < 1e-12);
     }
 
     #[test]
     fn none_for_empty_input() {
-        assert!(interpolate_exponential_percentile(&[], 0, 0.5, 1.0).is_none());
+        assert!(interpolate_geometric_percentile(&[], 0, 0.5, 1.0).is_none());
     }
 
     #[test]
-    fn interpolates_histogram_without_scaling_for_unit_one() {
+    fn geometric_interpolation_works_without_unit_scaling() {
         for &upper in &[128u64, 32u64] {
-            let buckets = vec![bucket(upper, 50, 50), bucket(upper * 2, 50, 100)];
-            let value = interpolate_exponential_percentile(&buckets, 100, 0.25, 1.0)
+            let buckets = vec![
+                bucket(upper / 2, upper, 50, 50),
+                bucket(upper, upper * 2, 50, 100),
+            ];
+            let value = interpolate_geometric_percentile(&buckets, 100, 0.25, 1.0)
                 .expect("percentile value");
-
-            let bucket_upper = upper as f64;
-            let lambda = -((1.0 - 0.5f64).ln()) / bucket_upper;
-            let exp_lower = (-lambda * (bucket_upper / 2.0)).exp();
-            let exp_upper = (-lambda * bucket_upper).exp();
-            let target = exp_lower - 0.5 * (exp_lower - exp_upper);
-            let expected = -target.ln() / lambda;
+            let expected = ((upper / 2) as f64 * upper as f64).sqrt();
 
             assert!(
                 (value - expected).abs() < 1e-12,
                 "upper {upper} value {value} != {expected}"
             );
         }
+    }
+
+    #[test]
+    fn geometric_interpolation_is_linear_at_zero() {
+        let buckets = vec![bucket(0, 2, 100, 100)];
+        let value =
+            interpolate_geometric_percentile(&buckets, 100, 0.25, 1.0).expect("percentile value");
+        assert!((value - 0.5).abs() < 1e-12);
+    }
+
+    #[test]
+    fn linear_interpolation_supports_unit_width_count_buckets() {
+        let buckets = vec![bucket(0, 1, 2, 2), bucket(1, 2, 4, 6)];
+        let value = interpolate_linear_percentile(&buckets, 6, 0.5, 1.0).expect("percentile value");
+        assert!((value - 1.25).abs() < 1e-12);
     }
 }
