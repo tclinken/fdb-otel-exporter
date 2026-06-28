@@ -43,7 +43,7 @@ Reported metrics are configured in the `gauge_config.toml` file. There are curre
 - `CounterTotal`: Reports the total value from a counter (the third space-delimited value of the field)
 - `CounterRate`: Reports the rate from a counter (the first space-delimited value of the field)
 - `ElapsedRate`: Reports the numeric value of the field divided by the `Elapsed` field in the same trace event
-- `HistogramPercentile`: Interpolates (assuming an exponential distribution) percentiles from histogram buckets aggregated by FDB
+- `HistogramPercentile`: Interpolates percentiles from histogram buckets aggregated by FDB, using geometric interpolation for power-of-two latency and byte buckets and linear interpolation for count buckets
 
 For each gauge, the `trace_type`, `field_name`, `gauge_name`, and `description` must be configured. For example, the following gauge configuration:
 
