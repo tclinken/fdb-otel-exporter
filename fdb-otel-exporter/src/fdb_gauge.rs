@@ -32,10 +32,10 @@ impl HistogramUnit {
         }
     }
 
-    fn bucket_lower_bound(&self, upper_bound: u64) -> u64 {
+    fn bucket_lower_bound(&self, previous_upper_bound: Option<u64>, upper_bound: u64) -> u64 {
         match self {
             Self::Milliseconds | Self::Bytes => power_of_two_bucket_lower_bound(upper_bound),
-            Self::Count => upper_bound.saturating_sub(1),
+            Self::Count => previous_upper_bound.unwrap_or(0),
         }
     }
 
@@ -537,15 +537,17 @@ impl FDBMetric for HistogramPercentileFDBGauge {
 
         let mut buckets: Vec<HistogramBucket> = Vec::new();
         let mut cumulative = 0u64;
+        let mut previous_upper_bound = None;
         for (upper_bound, count) in hist {
             cumulative += count;
 
             buckets.push(HistogramBucket {
-                lower_bound: unit.bucket_lower_bound(upper_bound),
+                lower_bound: unit.bucket_lower_bound(previous_upper_bound, upper_bound),
                 upper_bound,
                 count,
                 cumulative_count: cumulative,
             });
+            previous_upper_bound = Some(upper_bound);
         }
 
         if let Some(interpolated_value) =
@@ -923,6 +925,50 @@ mod tests {
         assert!(
             (value - 1.25).abs() < 1e-12,
             "expected linear interpolation within [1, 2), got {value}"
+        );
+    }
+
+    #[test]
+    fn histogram_percentile_interpolates_count_buckets_from_trace_boundaries() {
+        let (provider, meter, registry) = prometheus_meter();
+        let _provider = provider;
+        let gauge = HistogramPercentileFDBGauge::new(
+            "modifyItemCount",
+            "L1",
+            0.5,
+            "modify_item_count_p50_test",
+            "Modify item count p50",
+            &meter,
+        );
+        let labels = vec![KeyValue::new("machine", "10.0.221.58:4500")];
+        let event: HashMap<String, Value> = serde_json::from_str(
+            r#"{
+                "Type": "Histogram",
+                "Group": "modifyItemCount",
+                "Op": "L1",
+                "Unit": "count",
+                "LessThan20": "18",
+                "LessThan40": "4",
+                "LessThan60": "109",
+                "TotalCount": "183"
+            }"#,
+        )
+        .expect("example histogram event should parse");
+
+        gauge
+            .record(&event, &labels)
+            .expect("count histogram should be interpolated");
+
+        let value = gauge_value(
+            &registry,
+            "modify_item_count_p50_test",
+            "machine",
+            "10.0.221.58:4500",
+        );
+        let expected = 40.0 + ((0.5 * 183.0 - 22.0) / 109.0) * 20.0;
+        assert!(
+            (value - expected).abs() < 1e-12,
+            "expected p50 interpolation within the [40, 60) bucket, got {value}"
         );
     }
 
