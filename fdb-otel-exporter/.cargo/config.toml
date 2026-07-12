@@ -9,10 +9,29 @@ coverage = [
     "target/coverage",
 ]
 
-# Emits a concise table so CI or local scripts can fail on low coverage without generating reports.
+# Emits a concise table without enforcing a threshold.
 coverage-summary = [
     "llvm-cov",
     "--tests",
     "--workspace",
     "--summary-only",
+]
+
+# Enforces the project's line-coverage floor while still printing a useful summary.
+coverage-check = [
+    "llvm-cov",
+    "--fail-under-lines",
+    "89",
+    "--tests",
+    "--workspace",
+    "--summary-only",
+]
+
+# protobuf 2.x is pinned by opentelemetry-prometheus 0.16. The advisory affects
+# parsing untrusted protobuf, while this exporter only constructs metric models
+# and emits Prometheus text. Keep all other cargo-audit findings fatal.
+security-audit = [
+    "audit",
+    "--ignore",
+    "RUSTSEC-2024-0437",
 ]

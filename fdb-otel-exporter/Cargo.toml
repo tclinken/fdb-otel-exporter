@@ -2,14 +2,23 @@
 name = "fdb-otel-exporter"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.88"
+description = "Exports FoundationDB trace-log metrics through OpenTelemetry and Prometheus"
+repository = "https://github.com/tclinken/fdb-otel-exporter"
+homepage = "https://github.com/tclinken/fdb-otel-exporter"
+keywords = ["foundationdb", "grafana", "observability", "opentelemetry", "prometheus"]
+categories = ["command-line-utilities", "development-tools::profiling"]
+publish = false
 
 [dependencies]
 axum = "0.7"
-opentelemetry = { version = "0.23", features = ["metrics"] }
-opentelemetry_sdk = { version = "0.23", features = ["metrics", "rt-tokio"] }
+# Keep this family in sync. Moving to 0.29.1 or newer removes protobuf 2.x but is
+# an API migration; until then, `cargo security-audit` carries a scoped exception.
+opentelemetry = { version = "0.23", default-features = false, features = ["metrics"] }
+opentelemetry_sdk = { version = "0.23", default-features = false, features = ["metrics"] }
 opentelemetry-prometheus = "0.16"
 prometheus = "0.13"
-tokio = { version = "1", features = ["fs", "io-util", "macros", "rt-multi-thread", "signal"] }
+tokio = { version = "1", features = ["fs", "io-util", "macros", "net", "rt-multi-thread", "signal", "sync", "time"] }
 anyhow = "1"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
