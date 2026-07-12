@@ -2,20 +2,68 @@ use axum::extract::State;
 use axum::http::{header, StatusCode};
 use axum::response::IntoResponse;
 use prometheus::{proto::MetricFamily, Encoder, Registry, TextEncoder};
-use std::sync::Arc;
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc,
+};
+
+// Shared health state for the log ingestion task. Readiness requires both a live
+// directory watcher and a successful latest directory scan.
+#[derive(Clone, Default)]
+pub struct IngestionReadiness {
+    state: Arc<IngestionReadinessState>,
+}
+
+#[derive(Default)]
+struct IngestionReadinessState {
+    watcher_running: AtomicBool,
+    directory_scan_successful: AtomicBool,
+}
+
+impl IngestionReadiness {
+    pub fn is_ready(&self) -> bool {
+        self.state.watcher_running.load(Ordering::Acquire)
+            && self.state.directory_scan_successful.load(Ordering::Acquire)
+    }
+
+    pub(crate) fn set_watcher_running(&self, running: bool) {
+        self.state.watcher_running.store(running, Ordering::Release);
+
+        if !running {
+            self.set_directory_scan_successful(false);
+        }
+    }
+
+    pub(crate) fn set_directory_scan_successful(&self, successful: bool) {
+        self.state
+            .directory_scan_successful
+            .store(successful, Ordering::Release);
+    }
+}
 
 // Shared state passed to the `/metrics` endpoint so requests can scrape the Prometheus registry.
 #[derive(Clone)]
 pub struct AppState {
     registry: Arc<Registry>,
+    readiness: IngestionReadiness,
 }
 
 impl AppState {
     // Store the Prometheus registry in an `Arc` for cheap cloning across requests.
-    pub fn new(registry: Arc<Registry>) -> Self {
+    pub fn new(registry: Arc<Registry>, readiness: IngestionReadiness) -> Self {
         Self {
             registry: registry.clone(),
+            readiness,
         }
+    }
+}
+
+// Report whether log ingestion is currently able to discover trace files.
+pub async fn readiness_handler(State(state): State<AppState>) -> StatusCode {
+    if state.readiness.is_ready() {
+        StatusCode::OK
+    } else {
+        StatusCode::SERVICE_UNAVAILABLE
     }
 }
 
@@ -119,7 +167,7 @@ mod tests {
             .register(Box::new(gauge.clone()))
             .expect("register gauge");
 
-        let app_state = AppState::new(Arc::new(registry));
+        let app_state = AppState::new(Arc::new(registry), IngestionReadiness::default());
         let response = metrics_handler(State(app_state)).await.into_response();
 
         assert_eq!(response.status(), StatusCode::OK);
@@ -134,6 +182,42 @@ mod tests {
         assert!(
             payload.contains("test_metric_total"),
             "payload missing metric: {payload}"
+        );
+    }
+
+    #[tokio::test]
+    async fn readiness_requires_running_watcher_and_successful_scan() {
+        let readiness = IngestionReadiness::default();
+        let state = AppState::new(Arc::new(Registry::new()), readiness.clone());
+
+        assert_eq!(
+            readiness_handler(State(state.clone())).await,
+            StatusCode::SERVICE_UNAVAILABLE
+        );
+
+        readiness.set_watcher_running(true);
+        assert_eq!(
+            readiness_handler(State(state.clone())).await,
+            StatusCode::SERVICE_UNAVAILABLE
+        );
+
+        readiness.set_directory_scan_successful(true);
+        assert_eq!(
+            readiness_handler(State(state.clone())).await,
+            StatusCode::OK
+        );
+
+        readiness.set_directory_scan_successful(false);
+        assert_eq!(
+            readiness_handler(State(state.clone())).await,
+            StatusCode::SERVICE_UNAVAILABLE
+        );
+
+        readiness.set_directory_scan_successful(true);
+        readiness.set_watcher_running(false);
+        assert_eq!(
+            readiness_handler(State(state)).await,
+            StatusCode::SERVICE_UNAVAILABLE
         );
     }
 

@@ -1,6 +1,7 @@
 use crate::{
     exporter_metrics::ExporterMetrics,
     log_metrics::{LogMetrics, TraceEvent},
+    metrics_handler::IngestionReadiness,
 };
 use anyhow::{Context, Result};
 use async_trait::async_trait;
@@ -26,12 +27,66 @@ const EOF_POLL_DELAY: Duration = Duration::from_millis(10);
 #[cfg(not(test))]
 const EOF_POLL_DELAY: Duration = Duration::from_millis(250);
 
+const LOG_LINE_PREVIEW_CHARS: usize = 256;
+
+// Owns the directory watcher task and the readiness state it updates.
+pub struct LogWatcher {
+    task: JoinHandle<Result<()>>,
+    readiness: IngestionReadiness,
+}
+
+impl LogWatcher {
+    pub fn readiness(&self) -> IngestionReadiness {
+        self.readiness.clone()
+    }
+
+    // Wait for an unexpected watcher exit so the service can fail rather than
+    // continuing to serve stale metrics indefinitely.
+    pub async fn wait(&mut self) -> Result<()> {
+        let result = (&mut self.task).await;
+        self.readiness.set_watcher_running(false);
+        result.context("log directory watcher task failed")?
+    }
+
+    // Stop the parent watcher. Dropping its TailTasks aborts every child tailer.
+    pub async fn shutdown(mut self) {
+        self.readiness.set_watcher_running(false);
+        self.task.abort();
+
+        match (&mut self.task).await {
+            Ok(Ok(())) => {}
+            Ok(Err(error)) => {
+                tracing::warn!(?error, "log directory watcher failed during shutdown");
+            }
+            Err(error) if error.is_cancelled() => {}
+            Err(error) => {
+                tracing::warn!(?error, "log directory watcher task failed during shutdown");
+            }
+        }
+    }
+}
+
+impl Drop for LogWatcher {
+    fn drop(&mut self) {
+        self.readiness.set_watcher_running(false);
+        self.task.abort();
+    }
+}
+
+struct WatcherStatusGuard(IngestionReadiness);
+
+impl Drop for WatcherStatusGuard {
+    fn drop(&mut self) {
+        self.0.set_watcher_running(false);
+    }
+}
+
 // Discover JSON trace logs under `log_dir_path` and push their events through the configured gauges.
 pub async fn watch_logs(
     log_dir_path: &Path,
     meter_provider: Arc<SdkMeterProvider>,
     poll_interval: Duration,
-) -> Result<()> {
+) -> Result<LogWatcher> {
     watch_logs_with_fs(
         log_dir_path,
         meter_provider,
@@ -46,7 +101,7 @@ async fn watch_logs_with_fs<F>(
     meter_provider: Arc<SdkMeterProvider>,
     poll_interval: Duration,
     fs: F,
-) -> Result<()>
+) -> Result<LogWatcher>
 where
     F: TraceFileSystem,
 {
@@ -63,20 +118,22 @@ where
     let dir_metrics = log_metrics.clone();
     let directory_metrics = exporter_metrics.clone();
     let dir_fs = fs.clone();
-    tokio::spawn(async move {
-        if let Err(error) = run_log_directory(
+    let readiness = IngestionReadiness::default();
+    let task_readiness = readiness.clone();
+    let task = tokio::spawn(async move {
+        task_readiness.set_watcher_running(true);
+        let _status_guard = WatcherStatusGuard(task_readiness.clone());
+        run_log_directory(
             watcher_dir,
             dir_metrics,
             directory_metrics,
             poll_interval,
+            task_readiness,
             dir_fs,
         )
         .await
-        {
-            tracing::error!(?error, "log directory watcher terminated");
-        }
     });
-    Ok(())
+    Ok(LogWatcher { task, readiness })
 }
 
 // Poll the log directory, spawning a tail task for each new `trace.*.json` file encountered.
@@ -85,6 +142,7 @@ async fn run_log_directory(
     metrics: LogMetrics,
     exporter_metrics: ExporterMetrics,
     poll_interval: Duration,
+    readiness: IngestionReadiness,
     fs: impl TraceFileSystem,
 ) -> Result<()> {
     let mut tailers = TailTasks::default();
@@ -94,6 +152,7 @@ async fn run_log_directory(
 
         match fs.read_dir(&dir).await {
             Ok(entries) => {
+                readiness.set_directory_scan_successful(true);
                 let trace_paths: HashSet<PathBuf> = entries
                     .into_iter()
                     .filter(|path| {
@@ -135,6 +194,7 @@ async fn run_log_directory(
                 }
             }
             Err(error) => {
+                readiness.set_directory_scan_successful(false);
                 tracing::warn!(?error, dir = %dir.display(), "failed to read log directory");
             }
         }
@@ -309,18 +369,29 @@ fn handle_log_line(trimmed: &str, metrics: &LogMetrics, exporter_metrics: &Expor
             Ok(()) => exporter_metrics.record_processed(),
             Err(error) => {
                 exporter_metrics.record_record_error();
+                let line_preview = log_line_preview(trimmed);
                 tracing::warn!(
                     ?error,
-                    raw_line = %trimmed,
+                    line_preview = %line_preview,
                     "failed to record log line"
                 );
             }
         },
         Err(error) => {
             exporter_metrics.record_parse_error();
-            tracing::warn!(?error, raw_line = %trimmed, "failed to parse log line");
+            let line_preview = log_line_preview(trimmed);
+            tracing::warn!(?error, line_preview = %line_preview, "failed to parse log line");
         }
     }
+}
+
+fn log_line_preview(line: &str) -> String {
+    let mut chars = line.chars();
+    let mut preview: String = chars.by_ref().take(LOG_LINE_PREVIEW_CHARS).collect();
+    if chars.next().is_some() {
+        preview.push('…');
+    }
+    preview
 }
 
 #[async_trait]
@@ -522,7 +593,7 @@ mod tests {
             "log dir should not exist before watch_logs"
         );
 
-        watch_logs_with_fs(
+        let watcher = watch_logs_with_fs(
             &log_dir,
             provider,
             TokioDuration::from_millis(50),
@@ -538,6 +609,8 @@ mod tests {
             fs.exists(&log_dir),
             "watch_logs should create log directory"
         );
+
+        watcher.shutdown().await;
     }
 
     #[tokio::test]
@@ -547,14 +620,44 @@ mod tests {
         let log_dir = PathBuf::from("/logs");
         let provider = test_meter_provider();
 
-        let error = watch_logs_with_fs(&log_dir, provider, TokioDuration::from_millis(50), fs)
+        let error = match watch_logs_with_fs(&log_dir, provider, TokioDuration::from_millis(50), fs)
             .await
-            .expect_err("create_dir errors should bubble up");
+        {
+            Ok(watcher) => {
+                watcher.shutdown().await;
+                panic!("create_dir errors should bubble up");
+            }
+            Err(error) => error,
+        };
 
         assert!(
             error.to_string().contains("failed to create log directory"),
             "unexpected error: {error}"
         );
+    }
+
+    #[tokio::test]
+    async fn watch_logs_reports_readiness_and_stops_child_tailers() -> Result<()> {
+        let fs = MemoryTraceFileSystem::new();
+        let log_dir = PathBuf::from("/logs");
+        fs.create_dir_all(&log_dir).await?;
+        fs.create_trace_file(&log_dir.join("trace.supervised.json"))?;
+
+        let watcher = watch_logs_with_fs(
+            &log_dir,
+            test_meter_provider(),
+            TokioDuration::from_millis(10),
+            fs.clone(),
+        )
+        .await?;
+        let readiness = watcher.readiness();
+
+        wait_for(|| readiness.is_ready() && fs.active_reader_count() == 1).await;
+
+        watcher.shutdown().await;
+        wait_for(|| fs.active_reader_count() == 0).await;
+        assert!(!readiness.is_ready());
+        Ok(())
     }
 
     #[tokio::test]
@@ -585,6 +688,7 @@ mod tests {
             log_metrics,
             exporter_metrics,
             poll_interval,
+            IngestionReadiness::default(),
             fs.clone(),
         ));
 
@@ -629,12 +733,15 @@ mod tests {
         let meter = provider.meter("run_log_directory_continues_after_read_dir_error");
         let exporter_metrics = ExporterMetrics::new(&meter);
         let log_metrics = LogMetrics::from_metrics(Vec::<Arc<dyn FDBMetric>>::new());
+        let readiness = IngestionReadiness::default();
+        readiness.set_watcher_running(true);
 
         let handle = tokio::spawn(run_log_directory(
             log_dir.clone(),
             log_metrics,
             exporter_metrics,
             TokioDuration::from_millis(20),
+            readiness.clone(),
             fs.clone(),
         ));
 
@@ -646,6 +753,10 @@ mod tests {
         assert!(
             fs.failures.lock().unwrap().read_dir.is_empty(),
             "read_dir failure queue should be drained"
+        );
+        assert!(
+            readiness.is_ready(),
+            "readiness should recover after a successful directory scan"
         );
 
         Ok(())
@@ -818,6 +929,7 @@ mod tests {
             LogMetrics::from_metrics(Vec::<Arc<dyn FDBMetric>>::new()),
             exporter_metrics,
             TokioDuration::from_millis(10),
+            IngestionReadiness::default(),
             fs.clone(),
         ));
 
@@ -857,6 +969,17 @@ mod tests {
             1,
             "expected exactly one trace event to be recorded"
         );
+    }
+
+    #[test]
+    fn log_line_preview_is_bounded_on_character_boundaries() {
+        let line = "é".repeat(LOG_LINE_PREVIEW_CHARS + 1);
+        let preview = log_line_preview(&line);
+
+        assert_eq!(preview.chars().count(), LOG_LINE_PREVIEW_CHARS + 1);
+        assert!(preview.ends_with('…'));
+        assert!(!preview.contains(&line));
+        assert_eq!(log_line_preview("short line"), "short line");
     }
 
     #[tokio::test]
