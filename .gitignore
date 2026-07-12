@@ -1,2 +1,3 @@
 **/target
 fdb-otel-exporter/logs/
+fdb-otel-exporter/lcov.info

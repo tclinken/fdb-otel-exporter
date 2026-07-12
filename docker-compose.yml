@@ -1,28 +1,47 @@
 services:
   grafana:
     image: grafana/grafana-oss:12.2.0-17142428006
+    restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER?required}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD?required}
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./grafana-provisioning:/etc/grafana/provisioning
+      - ./grafana-provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
   prometheus:
     image: prom/prometheus:v3.6.0
+    restart: unless-stopped
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      fdb-otel-exporter:
+        condition: service_healthy
   fdb-otel-exporter:
     build: ./fdb-otel-exporter
+    restart: unless-stopped
     ports:
-      - "9200:9200"
+      - "127.0.0.1:9200:9200"
     environment:
       - LOG_DIR=/fdb-logs
+      - TRACE_LOG_FILE=/logs/tracing.log
     volumes:
-      - ${FDB_LOG_DIR}:/fdb-logs:ro
-      - ./fdb-otel-exporter/logs:/logs
+      - ${FDB_LOG_DIR:?Set FDB_LOG_DIR to the FoundationDB trace-log directory}:/fdb-logs:ro
+      - exporter-logs:/logs
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
 volumes:
   grafana-data: {}
+  prometheus-data: {}
+  exporter-logs: {}
