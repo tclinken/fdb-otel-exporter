@@ -1,5 +1,5 @@
 use axum::extract::State;
-use axum::http::StatusCode;
+use axum::http::{header, StatusCode};
 use axum::response::IntoResponse;
 use prometheus::{proto::MetricFamily, Encoder, Registry, TextEncoder};
 use std::sync::Arc;
@@ -22,9 +22,15 @@ impl AppState {
 // Render all collected metrics using the text exposition format expected by Prometheus.
 pub async fn metrics_handler(State(state): State<AppState>) -> impl IntoResponse {
     let metric_families = state.registry.gather();
+    let encoder = TextEncoder::new();
 
-    match encode_metrics(&metric_families) {
-        Ok(payload) => (StatusCode::OK, payload).into_response(),
+    match encode_metrics_with(&encoder, &metric_families) {
+        Ok(payload) => (
+            StatusCode::OK,
+            [(header::CONTENT_TYPE, encoder.format_type().to_owned())],
+            payload,
+        )
+            .into_response(),
         Err(MetricsEncodeError::Encode(error)) => {
             tracing::error!(?error, "failed to encode metrics");
             (StatusCode::INTERNAL_SERVER_ERROR, "metrics encoding failed").into_response()
@@ -52,10 +58,6 @@ impl From<std::string::FromUtf8Error> for MetricsEncodeError {
     fn from(value: std::string::FromUtf8Error) -> Self {
         Self::Utf8(value)
     }
-}
-
-fn encode_metrics(metric_families: &[MetricFamily]) -> Result<String, MetricsEncodeError> {
-    encode_metrics_with(&TextEncoder::new(), metric_families)
 }
 
 fn encode_metrics_with<E: Encoder>(
@@ -121,6 +123,10 @@ mod tests {
         let response = metrics_handler(State(app_state)).await.into_response();
 
         assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(
+            response.headers().get(header::CONTENT_TYPE).unwrap(),
+            TextEncoder::new().format_type()
+        );
         let body = to_bytes(response.into_body(), 64 * 1024)
             .await
             .expect("body bytes");
