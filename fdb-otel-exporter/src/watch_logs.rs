@@ -28,6 +28,7 @@ const EOF_POLL_DELAY: Duration = Duration::from_millis(10);
 const EOF_POLL_DELAY: Duration = Duration::from_millis(250);
 
 const LOG_LINE_PREVIEW_CHARS: usize = 256;
+const MAX_LOG_LINE_BYTES: usize = 1024 * 1024;
 
 // Owns the directory watcher task and the readiness state it updates.
 pub struct LogWatcher {
@@ -308,6 +309,7 @@ async fn run_log_tailer(
                 let opened_identity = opened_state.identity;
                 let mut read_offset = committed_offset;
                 let mut pending_line = String::new();
+                let mut discarding_oversized_line = false;
 
                 loop {
                     let mut chunk = String::new();
@@ -338,9 +340,35 @@ async fn run_log_tailer(
                         },
                         Ok(bytes_read) => {
                             read_offset += bytes_read as u64;
+                            let line_complete = chunk.ends_with('\n');
+
+                            if discarding_oversized_line {
+                                if line_complete {
+                                    committed_offset = read_offset;
+                                    discarding_oversized_line = false;
+                                }
+                                continue;
+                            }
+
+                            if pending_line.len().saturating_add(chunk.len()) > MAX_LOG_LINE_BYTES {
+                                exporter_metrics.record_parse_error();
+                                tracing::warn!(
+                                    file = %path.display(),
+                                    max_bytes = MAX_LOG_LINE_BYTES,
+                                    "discarding oversized log line"
+                                );
+                                pending_line.clear();
+                                if line_complete {
+                                    committed_offset = read_offset;
+                                } else {
+                                    discarding_oversized_line = true;
+                                }
+                                continue;
+                            }
+
                             pending_line.push_str(&chunk);
 
-                            if pending_line.ends_with('\n') {
+                            if line_complete {
                                 let trimmed = pending_line.trim();
                                 if !trimmed.is_empty() {
                                     handle_log_line(trimmed, &metrics, &exporter_metrics);
@@ -823,6 +851,38 @@ mod tests {
             "an incomplete JSON line must not be parsed at temporary EOF"
         );
 
+        fs.append_line(&trace_path, "\n")?;
+        wait_for(|| events.lock().unwrap().len() == 1).await;
+
+        handle.abort();
+        let _ = handle.await;
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn run_log_tailer_discards_oversized_line_and_recovers() -> Result<()> {
+        let fs = MemoryTraceFileSystem::new();
+        let trace_path = PathBuf::from("/logs/trace.oversized.json");
+        fs.create_trace_file(&trace_path)?;
+
+        let events = Arc::new(Mutex::new(Vec::new()));
+        let metrics: Vec<Arc<dyn FDBMetric>> = vec![Arc::new(RecordingGauge::new(events.clone()))];
+        let provider = test_meter_provider();
+        let exporter_metrics = ExporterMetrics::new(&provider.meter("oversized_line"));
+        let handle = tokio::spawn(run_log_tailer(
+            trace_path.clone(),
+            LogMetrics::from_metrics(metrics),
+            exporter_metrics,
+            fs.clone(),
+        ));
+
+        wait_for(|| fs.active_reader_count() == 1).await;
+        fs.append_line(&trace_path, &"x".repeat(MAX_LOG_LINE_BYTES + 1))?;
+        tokio::time::sleep(TokioDuration::from_millis(40)).await;
+        assert!(events.lock().unwrap().is_empty());
+
+        fs.append_line(&trace_path, "\n")?;
+        fs.append_line(&trace_path, &trace_payload("machine-after-oversized")?)?;
         fs.append_line(&trace_path, "\n")?;
         wait_for(|| events.lock().unwrap().len() == 1).await;
 
