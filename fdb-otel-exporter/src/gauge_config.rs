@@ -892,4 +892,85 @@ mod tests {
         assert_eq!(percentile_suffix(0.995), "p99_5");
         assert_eq!(percentile_suffix(0.000_123), "p0_0123");
     }
+
+    #[test]
+    fn dashboard_queries_match_every_exported_metric() {
+        let definitions = parse_gauge_config(
+            include_str!("../gauge_config.toml"),
+            Path::new("<embedded gauge_config.toml>"),
+        )
+        .expect("embedded gauge configuration should parse");
+        let mut expected: HashSet<String> = definitions
+            .iter()
+            .map(|definition| match definition {
+                GaugeDefinition::Simple(definition)
+                | GaugeDefinition::CounterTotal(definition)
+                | GaugeDefinition::CounterRate(definition)
+                | GaugeDefinition::ElapsedRate(definition) => definition.gauge_name.clone(),
+                GaugeDefinition::HistogramPercentile(definition) => {
+                    definition.gauge_name.clone()
+                }
+            })
+            .collect();
+        expected.extend(
+            [10, 20, 30, 40]
+                .map(|severity| format!("process_sev{severity}_counter_total")),
+        );
+        expected.extend(
+            [10, 100, 1000]
+                .map(|threshold| format!("process_slow_task_{threshold}_ms_total")),
+        );
+
+        let dashboard: serde_json::Value = serde_json::from_str(include_str!(
+            "../../grafana-provisioning/dashboards/json/fdb.json"
+        ))
+        .expect("dashboard JSON should parse");
+        let mut actual = HashSet::new();
+        collect_dashboard_metric_names(&dashboard, &mut actual);
+
+        let missing: Vec<_> = expected.difference(&actual).cloned().collect();
+        let unexpected: Vec<_> = actual.difference(&expected).cloned().collect();
+        assert!(
+            missing.is_empty() && unexpected.is_empty(),
+            "dashboard/config metric drift; missing={missing:?}, unexpected={unexpected:?}"
+        );
+    }
+
+    fn collect_dashboard_metric_names(value: &serde_json::Value, names: &mut HashSet<String>) {
+        match value {
+            serde_json::Value::Object(object) => {
+                if let Some(expression) = object.get("expr").and_then(serde_json::Value::as_str) {
+                    collect_expression_metric_names(expression, names);
+                }
+                for child in object.values() {
+                    collect_dashboard_metric_names(child, names);
+                }
+            }
+            serde_json::Value::Array(values) => {
+                for child in values {
+                    collect_dashboard_metric_names(child, names);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    fn collect_expression_metric_names(expression: &str, names: &mut HashSet<String>) {
+        const SELECTOR: &str = "{job=\"fdb-otel-exporter\"";
+        let mut remaining = expression;
+
+        while let Some(selector_index) = remaining.find(SELECTOR) {
+            let prefix = &remaining[..selector_index];
+            if let Some(name) = prefix
+                .rsplit(|character: char| {
+                    !character.is_ascii_alphanumeric() && !matches!(character, '_' | ':')
+                })
+                .next()
+                .filter(|name| !name.is_empty())
+            {
+                names.insert(name.to_owned());
+            }
+            remaining = &remaining[selector_index + SELECTOR.len()..];
+        }
+    }
 }
