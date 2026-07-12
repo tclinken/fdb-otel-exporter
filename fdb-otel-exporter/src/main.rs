@@ -69,6 +69,7 @@ async fn run_service(
         &config.log_dir,
         Arc::clone(&meter_provider),
         config.log_poll_interval,
+        config.gauge_config_path.as_deref(),
     )
     .await
     .context("failed to start log directory watcher")?;

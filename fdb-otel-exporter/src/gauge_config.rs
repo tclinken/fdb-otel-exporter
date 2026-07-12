@@ -238,18 +238,19 @@ pub fn read_gauge_config_file(toml_config: &Path) -> Result<Vec<GaugeDefinition>
     let contents = fs::read_to_string(toml_config)
         .with_context(|| format!("failed to read gauge config file {}", toml_config.display()))?;
 
+    parse_gauge_config(&contents, toml_config)
+}
+
+// Parse gauge configuration from an embedded or caller-provided TOML string.
+pub(crate) fn parse_gauge_config(contents: &str, source: &Path) -> Result<Vec<GaugeDefinition>> {
     if contents.trim().is_empty() {
         return Ok(Vec::new());
     }
 
-    let parsed_value: Value = toml::from_str(&contents).with_context(|| {
-        format!(
-            "failed to parse gauge config file {}",
-            toml_config.display()
-        )
-    })?;
+    let parsed_value: Value = toml::from_str(contents)
+        .with_context(|| format!("failed to parse gauge config file {}", source.display()))?;
 
-    parse_typed_gauge_configs(&parsed_value, toml_config)
+    parse_typed_gauge_configs(&parsed_value, source)
 }
 
 // Expand the parsed TOML value into strongly-typed gauge definitions.

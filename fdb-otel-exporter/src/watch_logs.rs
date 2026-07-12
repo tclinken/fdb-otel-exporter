@@ -86,12 +86,14 @@ pub async fn watch_logs(
     log_dir_path: &Path,
     meter_provider: Arc<SdkMeterProvider>,
     poll_interval: Duration,
+    gauge_config_path: Option<&Path>,
 ) -> Result<LogWatcher> {
     watch_logs_with_fs(
         log_dir_path,
         meter_provider,
         poll_interval,
         RealTraceFileSystem,
+        gauge_config_path,
     )
     .await
 }
@@ -101,14 +103,18 @@ async fn watch_logs_with_fs<F>(
     meter_provider: Arc<SdkMeterProvider>,
     poll_interval: Duration,
     fs: F,
+    gauge_config_path: Option<&Path>,
 ) -> Result<LogWatcher>
 where
     F: TraceFileSystem,
 {
     let meter = meter_provider.meter("fdb-otel-exporter");
     let exporter_metrics = ExporterMetrics::new(&meter);
-    let log_metrics =
-        LogMetrics::new(&meter).with_context(|| "failed to load gauge configuration")?;
+    let log_metrics = match gauge_config_path {
+        Some(path) => LogMetrics::from_config_path(&meter, path),
+        None => LogMetrics::new(&meter),
+    }
+    .with_context(|| "failed to load gauge configuration")?;
 
     fs.create_dir_all(log_dir_path)
         .await
@@ -598,6 +604,7 @@ mod tests {
             provider,
             TokioDuration::from_millis(50),
             fs.clone(),
+            None,
         )
         .await
         .expect("watch_logs should succeed");
@@ -620,15 +627,16 @@ mod tests {
         let log_dir = PathBuf::from("/logs");
         let provider = test_meter_provider();
 
-        let error = match watch_logs_with_fs(&log_dir, provider, TokioDuration::from_millis(50), fs)
-            .await
-        {
-            Ok(watcher) => {
-                watcher.shutdown().await;
-                panic!("create_dir errors should bubble up");
-            }
-            Err(error) => error,
-        };
+        let error =
+            match watch_logs_with_fs(&log_dir, provider, TokioDuration::from_millis(50), fs, None)
+                .await
+            {
+                Ok(watcher) => {
+                    watcher.shutdown().await;
+                    panic!("create_dir errors should bubble up");
+                }
+                Err(error) => error,
+            };
 
         assert!(
             error.to_string().contains("failed to create log directory"),
@@ -648,6 +656,7 @@ mod tests {
             test_meter_provider(),
             TokioDuration::from_millis(10),
             fs.clone(),
+            None,
         )
         .await?;
         let readiness = watcher.readiness();

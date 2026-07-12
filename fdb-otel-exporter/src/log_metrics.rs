@@ -6,8 +6,8 @@ use crate::{
     },
     fdb_metric::FDBMetric,
     gauge_config::{
-        read_gauge_config_file, GaugeDefinition, HistogramPercentileGaugeDefinition,
-        StandardGaugeDefinition,
+        parse_gauge_config, read_gauge_config_file, GaugeDefinition,
+        HistogramPercentileGaugeDefinition, StandardGaugeDefinition,
     },
 };
 use anyhow::{Context, Result};
@@ -15,8 +15,11 @@ use opentelemetry::{metrics::Meter, KeyValue};
 use serde_json::Value;
 use std::collections::{BTreeMap, HashMap};
 use std::fmt;
-use std::path::PathBuf;
+use std::path::Path;
 use std::sync::Arc;
+
+const EMBEDDED_GAUGE_CONFIG: &str = include_str!("../gauge_config.toml");
+const EMBEDDED_GAUGE_CONFIG_SOURCE: &str = "<embedded gauge_config.toml>";
 
 type HistogramOutputConfig = (f64, String, String);
 type HistogramConfigGroups = BTreeMap<(String, String), Vec<HistogramOutputConfig>>;
@@ -61,11 +64,22 @@ pub struct LogMetrics {
 }
 
 impl LogMetrics {
-    // Load gauge definitions from `gauge_config.toml` and instantiate their implementations.
+    // Load the build-time default gauge definitions and instantiate their implementations.
     pub fn new(meter: &Meter) -> Result<Self> {
-        let config_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("gauge_config.toml");
-        let configs = read_gauge_config_file(&config_path)?;
+        let configs = parse_gauge_config(
+            EMBEDDED_GAUGE_CONFIG,
+            Path::new(EMBEDDED_GAUGE_CONFIG_SOURCE),
+        )?;
+        Ok(Self::from_definitions(configs, meter))
+    }
 
+    // Load gauge definitions from a caller-selected runtime path.
+    pub fn from_config_path(meter: &Meter, config_path: &Path) -> Result<Self> {
+        let configs = read_gauge_config_file(config_path)?;
+        Ok(Self::from_definitions(configs, meter))
+    }
+
+    fn from_definitions(configs: Vec<GaugeDefinition>, meter: &Meter) -> Self {
         let mut metrics: Vec<Arc<dyn FDBMetric>> = Vec::new();
         let mut histogram_groups = HistogramConfigGroups::new();
 
@@ -160,7 +174,7 @@ impl LogMetrics {
             Arc::new(SlowTaskCounter::new(threshold_ms, meter)) as Arc<dyn FDBMetric>
         }));
 
-        Ok(Self::route_metrics(metrics))
+        Self::route_metrics(metrics)
     }
 
     fn route_metrics(metrics: Vec<Arc<dyn FDBMetric>>) -> Self {
@@ -362,9 +376,29 @@ mod tests {
     }
 
     #[test]
-    fn new_loads_gauge_config() {
+    fn new_loads_embedded_gauge_config() {
         let meter = test_meter();
         LogMetrics::new(&meter).expect("should load gauges from config");
+    }
+
+    #[test]
+    fn from_config_path_loads_runtime_override() {
+        let file = tempfile::NamedTempFile::new().expect("temporary gauge config");
+        std::fs::write(
+            file.path(),
+            r#"
+            [[simple_gauge]]
+            trace_type = "StorageMetrics"
+            gauge_name = "runtime_override_metric"
+            field_name = "Version"
+            description = "Runtime override"
+            "#,
+        )
+        .expect("write gauge config");
+
+        let meter = test_meter();
+        LogMetrics::from_config_path(&meter, file.path())
+            .expect("runtime gauge configuration should load");
     }
 
     #[test]

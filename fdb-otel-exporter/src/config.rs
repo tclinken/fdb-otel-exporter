@@ -10,6 +10,7 @@ pub const LOG_DIR_ENV: &str = "LOG_DIR";
 pub const TRACE_LOG_FILE_ENV: &str = "TRACE_LOG_FILE";
 pub const LISTEN_ADDR_ENV: &str = "LISTEN_ADDR";
 pub const LOG_POLL_INTERVAL_ENV: &str = "LOG_POLL_INTERVAL_SECS";
+pub const GAUGE_CONFIG_PATH_ENV: &str = "GAUGE_CONFIG_PATH";
 const DEFAULT_LOG_DIR: &str = "logs";
 const DEFAULT_TRACE_LOG_FILE: &str = "logs/tracing.log";
 const DEFAULT_LISTEN_ADDR: &str = "0.0.0.0:9200";
@@ -21,6 +22,7 @@ pub struct AppConfig {
     pub log_dir: PathBuf,
     pub trace_log_file: PathBuf,
     pub log_poll_interval: Duration,
+    pub gauge_config_path: Option<PathBuf>,
 }
 
 impl AppConfig {
@@ -43,11 +45,16 @@ impl AppConfig {
         let log_poll_interval =
             parse_duration_env(LOG_POLL_INTERVAL_ENV, DEFAULT_POLL_INTERVAL_SECS)?;
 
+        let gauge_config_path = env::var_os(GAUGE_CONFIG_PATH_ENV)
+            .map(PathBuf::from)
+            .filter(|path| !path.as_os_str().is_empty());
+
         Ok(Self {
             listen_addr,
             log_dir,
             trace_log_file,
             log_poll_interval,
+            gauge_config_path,
         })
     }
 }
@@ -162,6 +169,7 @@ mod tests {
                 (LOG_DIR_ENV, Some("/tmp/fdb")),
                 (TRACE_LOG_FILE_ENV, Some("/tmp/tracing.log")),
                 (LOG_POLL_INTERVAL_ENV, Some("5")),
+                (GAUGE_CONFIG_PATH_ENV, Some("/tmp/gauges.toml")),
             ],
             || {
                 let config = AppConfig::from_env().expect("config should load with overrides");
@@ -169,6 +177,10 @@ mod tests {
                 assert_eq!(config.log_dir, PathBuf::from("/tmp/fdb"));
                 assert_eq!(config.trace_log_file, PathBuf::from("/tmp/tracing.log"));
                 assert_eq!(config.log_poll_interval, Duration::from_secs_f64(5.0));
+                assert_eq!(
+                    config.gauge_config_path,
+                    Some(PathBuf::from("/tmp/gauges.toml"))
+                );
             },
         );
     }
@@ -181,6 +193,7 @@ mod tests {
                 (LOG_DIR_ENV, None),
                 (TRACE_LOG_FILE_ENV, None),
                 (LOG_POLL_INTERVAL_ENV, None),
+                (GAUGE_CONFIG_PATH_ENV, None),
             ],
             || {
                 let config = AppConfig::from_env().expect("config should load with defaults");
@@ -191,6 +204,7 @@ mod tests {
                     config.log_poll_interval,
                     Duration::from_secs_f64(DEFAULT_POLL_INTERVAL_SECS)
                 );
+                assert_eq!(config.gauge_config_path, None);
             },
         );
     }
