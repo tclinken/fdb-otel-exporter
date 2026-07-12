@@ -907,18 +907,14 @@ mod tests {
                 | GaugeDefinition::CounterTotal(definition)
                 | GaugeDefinition::CounterRate(definition)
                 | GaugeDefinition::ElapsedRate(definition) => definition.gauge_name.clone(),
-                GaugeDefinition::HistogramPercentile(definition) => {
-                    definition.gauge_name.clone()
-                }
+                GaugeDefinition::HistogramPercentile(definition) => definition.gauge_name.clone(),
             })
             .collect();
         expected.extend(
-            [10, 20, 30, 40]
-                .map(|severity| format!("process_sev{severity}_counter_total")),
+            [10, 20, 30, 40].map(|severity| format!("process_sev{severity}_counter_total")),
         );
         expected.extend(
-            [10, 100, 1000]
-                .map(|threshold| format!("process_slow_task_{threshold}_ms_total")),
+            [10, 100, 1000].map(|threshold| format!("process_slow_task_{threshold}_ms_total")),
         );
 
         let dashboard: serde_json::Value = serde_json::from_str(include_str!(
