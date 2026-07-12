@@ -221,6 +221,7 @@ struct CachedGaugeValue {
 
 #[derive(Clone)]
 struct PersistentGauge {
+    name: String,
     values: Arc<Mutex<HashMap<LabelKey, CachedGaugeValue>>>,
     // Retain the observable instrument for as long as the metric is registered.
     _instrument: ObservableGauge<f64>,
@@ -228,10 +229,11 @@ struct PersistentGauge {
 
 impl PersistentGauge {
     fn new(gauge_name: impl Into<String>, description: impl Into<String>, meter: &Meter) -> Self {
+        let name = gauge_name.into();
         let values = Arc::new(Mutex::new(HashMap::<LabelKey, CachedGaugeValue>::new()));
         let callback_values = Arc::clone(&values);
         let instrument = meter
-            .f64_observable_gauge(gauge_name.into())
+            .f64_observable_gauge(name.clone())
             .with_description(description.into())
             .with_callback(move |observer| {
                 let now = Instant::now();
@@ -249,9 +251,14 @@ impl PersistentGauge {
             .init();
 
         Self {
+            name,
             values,
             _instrument: instrument,
         }
+    }
+
+    fn name(&self) -> &str {
+        &self.name
     }
 
     fn record(&self, value: f64, labels: &[KeyValue]) -> Result<()> {
@@ -336,6 +343,14 @@ impl SimpleFDBGauge {
 }
 
 impl FDBMetric for SimpleFDBGauge {
+    fn name(&self) -> &str {
+        self.gauge_impl.gauge.name()
+    }
+
+    fn event_type(&self) -> Option<&str> {
+        Some(&self.gauge_impl.trace_type)
+    }
+
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         let trace_type = get_trace_field(trace_event, "Type")?;
 
@@ -371,6 +386,14 @@ impl TotalCounterFDBGauge {
 }
 
 impl FDBMetric for TotalCounterFDBGauge {
+    fn name(&self) -> &str {
+        self.gauge_impl.gauge.name()
+    }
+
+    fn event_type(&self) -> Option<&str> {
+        Some(&self.gauge_impl.trace_type)
+    }
+
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         let trace_type = get_trace_field(trace_event, "Type")?;
 
@@ -496,6 +519,14 @@ impl RateCounterFDBGauge {
 }
 
 impl FDBMetric for RateCounterFDBGauge {
+    fn name(&self) -> &str {
+        self.gauge_impl.gauge.name()
+    }
+
+    fn event_type(&self) -> Option<&str> {
+        Some(&self.gauge_impl.trace_type)
+    }
+
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         let trace_type = get_trace_field(trace_event, "Type")?;
 
@@ -538,6 +569,14 @@ impl ElapsedRateFDBGauge {
 }
 
 impl FDBMetric for ElapsedRateFDBGauge {
+    fn name(&self) -> &str {
+        self.gauge_impl.gauge.name()
+    }
+
+    fn event_type(&self) -> Option<&str> {
+        Some(&self.gauge_impl.trace_type)
+    }
+
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         let trace_type = get_trace_field(trace_event, "Type")?;
 
@@ -558,9 +597,14 @@ impl FDBMetric for ElapsedRateFDBGauge {
 
 // Because histograms are precomputed, interpolate percentiles and emit as gauge
 pub struct HistogramPercentileFDBGauge {
-    percentile: f64,
     group: String,
     op: String,
+    name: String,
+    percentiles: Vec<HistogramPercentileOutput>,
+}
+
+struct HistogramPercentileOutput {
+    percentile: f64,
     gauge: PersistentGauge,
 }
 
@@ -570,6 +614,7 @@ impl HistogramPercentileFDBGauge {
     // gauge collects buckets from the matching log event and interpolates the requested percentile
     // according to the bucket layout: geometric for power-of-two latency and byte buckets, and
     // linear between the available boundaries for count buckets.
+    #[cfg(test)]
     pub fn new(
         group: impl Into<String>,
         op: impl Into<String>,
@@ -578,16 +623,54 @@ impl HistogramPercentileFDBGauge {
         description: impl Into<String>,
         meter: &Meter,
     ) -> Self {
+        Self::new_grouped(
+            group,
+            op,
+            vec![(percentile, gauge_name.into(), description.into())],
+            meter,
+        )
+    }
+
+    /// Build one histogram handler for every configured percentile sharing the same `(Group, Op)`.
+    /// The trace buckets are parsed once per event and reused for all output gauges.
+    pub fn new_grouped(
+        group: impl Into<String>,
+        op: impl Into<String>,
+        percentiles: Vec<(f64, String, String)>,
+        meter: &Meter,
+    ) -> Self {
+        let group = group.into();
+        let op = op.into();
         Self {
-            percentile,
-            group: group.into(),
-            op: op.into(),
-            gauge: PersistentGauge::new(gauge_name, description, meter),
+            name: format!("Histogram[{group}/{op}]"),
+            group,
+            op,
+            percentiles: percentiles
+                .into_iter()
+                .map(
+                    |(percentile, gauge_name, description)| HistogramPercentileOutput {
+                        percentile,
+                        gauge: PersistentGauge::new(gauge_name, description, meter),
+                    },
+                )
+                .collect(),
         }
     }
 }
 
 impl FDBMetric for HistogramPercentileFDBGauge {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn event_type(&self) -> Option<&str> {
+        Some("Histogram")
+    }
+
+    fn histogram_key(&self) -> Option<(&str, &str)> {
+        Some((&self.group, &self.op))
+    }
+
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         if get_trace_field(trace_event, "Type")? != "Histogram" {
             return Ok(());
@@ -653,10 +736,23 @@ impl FDBMetric for HistogramPercentileFDBGauge {
             previous_upper_bound = Some(upper_bound);
         }
 
-        if let Some(interpolated_value) =
-            unit.interpolate_percentile(&buckets, total_count, self.percentile)
-        {
-            self.gauge.record(interpolated_value, labels)?;
+        let mut failures = Vec::new();
+        for output in &self.percentiles {
+            if let Some(interpolated_value) =
+                unit.interpolate_percentile(&buckets, total_count, output.percentile)
+            {
+                if let Err(error) = output.gauge.record(interpolated_value, labels) {
+                    failures.push(format!("{}: {error:#}", output.gauge.name()));
+                }
+            }
+        }
+
+        if !failures.is_empty() {
+            anyhow::bail!(
+                "failed to update {} histogram percentile gauge(s): {}",
+                failures.len(),
+                failures.join("; ")
+            );
         }
 
         Ok(())
@@ -1097,6 +1193,57 @@ mod tests {
         event.insert("LessThan2.0".into(), Value::String("6".into()));
 
         gauge.record(&event, &[]).expect("record should succeed");
+    }
+
+    #[test]
+    fn grouped_histogram_handler_emits_multiple_percentiles() {
+        let (provider, meter, registry) = prometheus_meter();
+        let _provider = provider;
+        let gauge = HistogramPercentileFDBGauge::new_grouped(
+            "StorageServer",
+            "Read",
+            vec![
+                (
+                    0.5,
+                    "ss_read_latency_grouped_p50_test".to_owned(),
+                    "Read latency p50".to_owned(),
+                ),
+                (
+                    0.9,
+                    "ss_read_latency_grouped_p90_test".to_owned(),
+                    "Read latency p90".to_owned(),
+                ),
+            ],
+            &meter,
+        );
+        let labels = vec![KeyValue::new("machine", "test")];
+        let mut event = base_histogram_event();
+        event.insert("Unit".into(), Value::String("milliseconds".into()));
+        event.insert("TotalCount".into(), Value::String("10".into()));
+        event.insert("LessThan1.0".into(), Value::String("5".into()));
+        event.insert("LessThan2.0".into(), Value::String("5".into()));
+
+        gauge
+            .record(&event, &labels)
+            .expect("all grouped percentiles should be recorded");
+
+        let p50 = gauge_value(
+            &registry,
+            "ss_read_latency_grouped_p50_test",
+            "machine",
+            "test",
+        );
+        let p90 = gauge_value(
+            &registry,
+            "ss_read_latency_grouped_p90_test",
+            "machine",
+            "test",
+        );
+        assert!((p50 - 0.001).abs() < 1e-12, "unexpected p50: {p50}");
+        assert!(
+            (p90 - 0.001_741_101_126_592_248_2).abs() < 1e-12,
+            "unexpected p90: {p90}"
+        );
     }
 
     #[test]
