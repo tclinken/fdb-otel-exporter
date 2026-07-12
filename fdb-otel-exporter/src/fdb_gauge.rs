@@ -1,13 +1,16 @@
 use crate::fdb_metric::FDBMetric;
-use anyhow::{Context, Result};
-use opentelemetry::metrics::{Gauge, Meter};
+use anyhow::{ensure, Context, Result};
+use opentelemetry::metrics::{Meter, ObservableGauge};
 use opentelemetry::KeyValue;
 use serde_json::Value;
 use std::{
     collections::{BTreeMap, HashMap, VecDeque},
     f64,
     sync::{Arc, Mutex},
+    time::{Duration, Instant},
 };
+
+const GAUGE_VALUE_TTL: Duration = Duration::from_secs(5 * 60);
 
 #[derive(Debug, Clone, Copy)]
 enum HistogramUnit {
@@ -32,10 +35,14 @@ impl HistogramUnit {
         }
     }
 
-    fn bucket_lower_bound(&self, upper_bound: u64) -> u64 {
+    fn bucket_lower_bound(&self, upper_bound: u64, previous_upper_bound: Option<u64>) -> u64 {
         match self {
             Self::Milliseconds | Self::Bytes => power_of_two_bucket_lower_bound(upper_bound),
-            Self::Count => upper_bound.saturating_sub(1),
+            // FoundationDB's countLinear histogram width is configured at the call site and is
+            // not included in the trace event. It also omits empty buckets. The previous emitted
+            // boundary is therefore the only defensible lower bound available to the exporter;
+            // assuming a unit-width bucket substantially overstates percentiles for wider ranges.
+            Self::Count => previous_upper_bound.unwrap_or(0),
         }
     }
 
@@ -202,7 +209,71 @@ fn interpolate_linear_percentile(
 struct FDBGaugeImpl {
     trace_type: String,
     field_name: String,
-    gauge: Gauge<f64>,
+    gauge: PersistentGauge,
+}
+
+#[derive(Clone)]
+struct CachedGaugeValue {
+    value: f64,
+    labels: Vec<KeyValue>,
+    updated_at: Instant,
+}
+
+#[derive(Clone)]
+struct PersistentGauge {
+    values: Arc<Mutex<HashMap<LabelKey, CachedGaugeValue>>>,
+    // Retain the observable instrument for as long as the metric is registered.
+    _instrument: ObservableGauge<f64>,
+}
+
+impl PersistentGauge {
+    fn new(gauge_name: impl Into<String>, description: impl Into<String>, meter: &Meter) -> Self {
+        let values = Arc::new(Mutex::new(HashMap::<LabelKey, CachedGaugeValue>::new()));
+        let callback_values = Arc::clone(&values);
+        let instrument = meter
+            .f64_observable_gauge(gauge_name.into())
+            .with_description(description.into())
+            .with_callback(move |observer| {
+                let now = Instant::now();
+                let Ok(mut values) = callback_values.lock() else {
+                    return;
+                };
+
+                values.retain(|_, sample| {
+                    now.saturating_duration_since(sample.updated_at) <= GAUGE_VALUE_TTL
+                });
+                for sample in values.values() {
+                    observer.observe(sample.value, &sample.labels);
+                }
+            })
+            .init();
+
+        Self {
+            values,
+            _instrument: instrument,
+        }
+    }
+
+    fn record(&self, value: f64, labels: &[KeyValue]) -> Result<()> {
+        ensure!(value.is_finite(), "gauge value must be finite");
+        let now = Instant::now();
+        let mut values = self
+            .values
+            .lock()
+            .map_err(|_| anyhow::anyhow!("gauge value cache poisoned"))?;
+        values.retain(|_, sample| {
+            now.saturating_duration_since(sample.updated_at) <= GAUGE_VALUE_TTL
+        });
+        values.insert(
+            LabelKey::from_labels(labels),
+            CachedGaugeValue {
+                value,
+                labels: labels.to_vec(),
+                updated_at: now,
+            },
+        );
+        Ok(())
+    }
 }
 
 fn get_trace_field<'a>(
@@ -213,6 +284,18 @@ fn get_trace_field<'a>(
         .get(field_name)
         .and_then(|value| value.as_str())
         .with_context(|| format!("Missing {field_name} field"))
+}
+
+fn parse_finite_value(value: &str, field_name: &str) -> Result<f64> {
+    let value = value
+        .parse::<f64>()
+        .with_context(|| format!("Invalid {field_name} field"))?;
+    ensure!(value.is_finite(), "{field_name} field must be finite");
+    Ok(value)
+}
+
+fn parse_finite_trace_field(trace_event: &HashMap<String, Value>, field_name: &str) -> Result<f64> {
+    parse_finite_value(get_trace_field(trace_event, field_name)?, field_name)
 }
 
 impl FDBGaugeImpl {
@@ -228,10 +311,7 @@ impl FDBGaugeImpl {
         Self {
             trace_type: trace_type.into(),
             field_name: field_name.into(),
-            gauge: meter
-                .f64_gauge(gauge_name)
-                .with_description(description)
-                .init(),
+            gauge: PersistentGauge::new(gauge_name, description, meter),
         }
     }
 }
@@ -239,7 +319,6 @@ impl FDBGaugeImpl {
 #[derive(Clone)]
 pub struct SimpleFDBGauge {
     gauge_impl: FDBGaugeImpl,
-    rolling_window: RollingWindow,
 }
 
 impl SimpleFDBGauge {
@@ -252,7 +331,6 @@ impl SimpleFDBGauge {
     ) -> Self {
         Self {
             gauge_impl: FDBGaugeImpl::new(trace_type, field_name, gauge_name, description, meter),
-            rolling_window: RollingWindow::new(ROLLING_WINDOW_SECONDS),
         }
     }
 }
@@ -266,12 +344,8 @@ impl FDBMetric for SimpleFDBGauge {
                 .get(self.gauge_impl.field_name.as_str())
                 .and_then(|v| v.as_str())
                 .with_context(|| format!("Missing {} field", self.gauge_impl.field_name))?;
-            let sample = value.parse::<f64>()?;
-            let time = get_trace_field(trace_event, "Time")?.parse::<f64>()?;
-
-            let averaged = self.rolling_window.observe(labels, time, sample);
-
-            self.gauge_impl.gauge.record(averaged, labels);
+            let sample = parse_finite_value(value, self.gauge_impl.field_name.as_str())?;
+            self.gauge_impl.gauge.record(sample, labels)?;
         }
         Ok(())
     }
@@ -302,14 +376,12 @@ impl FDBMetric for TotalCounterFDBGauge {
 
         if trace_type == self.gauge_impl.trace_type {
             let value = get_trace_field(trace_event, self.gauge_impl.field_name.as_str())?;
-            self.gauge_impl.gauge.record(
-                value
-                    .split(' ')
-                    .nth(2)
-                    .with_context(|| format!("Malformed {} counter", self.gauge_impl.field_name))?
-                    .parse::<f64>()?,
-                labels,
-            );
+            let value = value
+                .split_whitespace()
+                .nth(2)
+                .with_context(|| format!("Malformed {} counter", self.gauge_impl.field_name))?;
+            let value = parse_finite_value(value, self.gauge_impl.field_name.as_str())?;
+            self.gauge_impl.gauge.record(value, labels)?;
         }
         Ok(())
     }
@@ -340,7 +412,12 @@ struct TimedSample {
 #[derive(Clone)]
 struct RollingWindow {
     window_seconds: f64,
-    samples: Arc<Mutex<HashMap<LabelKey, VecDeque<TimedSample>>>>,
+    samples: Arc<Mutex<HashMap<LabelKey, RollingSeries>>>,
+}
+
+struct RollingSeries {
+    samples: VecDeque<TimedSample>,
+    updated_at: Instant,
 }
 
 impl RollingWindow {
@@ -351,26 +428,46 @@ impl RollingWindow {
         }
     }
 
-    fn observe(&self, labels: &[KeyValue], time: f64, value: f64) -> f64 {
+    fn observe(&self, labels: &[KeyValue], time: f64, value: f64) -> Result<f64> {
         let key = LabelKey::from_labels(labels);
+        let now = Instant::now();
         let mut samples = self
             .samples
             .lock()
-            .expect("rolling window sample cache poisoned");
-        let window = samples.entry(key).or_default();
-        window.push_back(TimedSample { time, value });
-        while let Some(front) = window.front() {
-            if time - front.time > self.window_seconds {
-                window.pop_front();
+            .map_err(|_| anyhow::anyhow!("rolling window sample cache poisoned"))?;
+        samples.retain(|_, series| {
+            now.saturating_duration_since(series.updated_at) <= GAUGE_VALUE_TTL
+        });
+
+        let series = samples.entry(key).or_insert_with(|| RollingSeries {
+            samples: VecDeque::new(),
+            updated_at: now,
+        });
+        series.updated_at = now;
+        series.samples.push_back(TimedSample { time, value });
+        series
+            .samples
+            .make_contiguous()
+            .sort_by(|left, right| left.time.total_cmp(&right.time));
+
+        let newest_time = series.samples.back().map_or(time, |sample| sample.time);
+        while let Some(front) = series.samples.front() {
+            if newest_time - front.time > self.window_seconds {
+                series.samples.pop_front();
             } else {
                 break;
             }
         }
-        let count = window.len() as f64;
+        let count = series.samples.len() as f64;
         if count == 0.0 {
-            value
+            Ok(value)
         } else {
-            window.iter().map(|s| s.value).sum::<f64>() / count
+            Ok(series
+                .samples
+                .iter()
+                .map(|sample| sample.value)
+                .sum::<f64>()
+                / count)
         }
     }
 }
@@ -405,15 +502,15 @@ impl FDBMetric for RateCounterFDBGauge {
         if trace_type == self.gauge_impl.trace_type {
             let value = get_trace_field(trace_event, self.gauge_impl.field_name.as_str())?;
             let sample = value
-                .split(' ')
+                .split_whitespace()
                 .next()
-                .with_context(|| format!("Malformed {} counter", self.gauge_impl.field_name))?
-                .parse::<f64>()?;
-            let time = get_trace_field(trace_event, "Time")?.parse::<f64>()?;
+                .with_context(|| format!("Malformed {} counter", self.gauge_impl.field_name))?;
+            let sample = parse_finite_value(sample, self.gauge_impl.field_name.as_str())?;
+            let time = parse_finite_trace_field(trace_event, "Time")?;
 
-            let averaged = self.rolling_window.observe(labels, time, sample);
+            let averaged = self.rolling_window.observe(labels, time, sample)?;
 
-            self.gauge_impl.gauge.record(averaged, labels);
+            self.gauge_impl.gauge.record(averaged, labels)?;
         }
         Ok(())
     }
@@ -445,15 +542,15 @@ impl FDBMetric for ElapsedRateFDBGauge {
         let trace_type = get_trace_field(trace_event, "Type")?;
 
         if trace_type == self.gauge_impl.trace_type {
-            let value = get_trace_field(trace_event, self.gauge_impl.field_name.as_str())?
-                .parse::<f64>()?;
-            let elapsed = get_trace_field(trace_event, "Elapsed")?.parse::<f64>()?;
-            let time = get_trace_field(trace_event, "Time")?.parse::<f64>()?;
+            let value = parse_finite_trace_field(trace_event, self.gauge_impl.field_name.as_str())?;
+            let elapsed = parse_finite_trace_field(trace_event, "Elapsed")?;
+            ensure!(elapsed > 0.0, "Elapsed field must be greater than zero");
+            let time = parse_finite_trace_field(trace_event, "Time")?;
             let sample = value / elapsed;
 
-            let averaged = self.rolling_window.observe(labels, time, sample);
+            let averaged = self.rolling_window.observe(labels, time, sample)?;
 
-            self.gauge_impl.gauge.record(averaged, labels);
+            self.gauge_impl.gauge.record(averaged, labels)?;
         }
         Ok(())
     }
@@ -464,7 +561,7 @@ pub struct HistogramPercentileFDBGauge {
     percentile: f64,
     group: String,
     op: String,
-    gauge: Gauge<f64>,
+    gauge: PersistentGauge,
 }
 
 impl HistogramPercentileFDBGauge {
@@ -472,7 +569,7 @@ impl HistogramPercentileFDBGauge {
     // histogram buckets (with upper-bound thresholds) for each `(Group, Op)` combination. This
     // gauge collects buckets from the matching log event and interpolates the requested percentile
     // according to the bucket layout: geometric for power-of-two latency and byte buckets, and
-    // linear for unit-width count buckets.
+    // linear between the available boundaries for count buckets.
     pub fn new(
         group: impl Into<String>,
         op: impl Into<String>,
@@ -485,10 +582,7 @@ impl HistogramPercentileFDBGauge {
             percentile,
             group: group.into(),
             op: op.into(),
-            gauge: meter
-                .f64_gauge(gauge_name.into())
-                .with_description(description.into())
-                .init(),
+            gauge: PersistentGauge::new(gauge_name, description, meter),
         }
     }
 }
@@ -521,7 +615,14 @@ impl FDBMetric for HistogramPercentileFDBGauge {
 
         for (k, v) in trace_event {
             if k.starts_with("LessThan") {
-                let bucket_value = k.strip_prefix("LessThan").unwrap().parse::<f64>()?;
+                let bucket_value = parse_finite_value(
+                    k.strip_prefix("LessThan").unwrap(),
+                    "histogram bucket boundary",
+                )?;
+                ensure!(
+                    bucket_value >= 0.0,
+                    "histogram bucket boundary must not be negative"
+                );
                 let bucket_upper = unit.convert_bucket_upper(bucket_value);
                 let count = v
                     .as_str()
@@ -537,21 +638,25 @@ impl FDBMetric for HistogramPercentileFDBGauge {
 
         let mut buckets: Vec<HistogramBucket> = Vec::new();
         let mut cumulative = 0u64;
+        let mut previous_upper_bound = None;
         for (upper_bound, count) in hist {
-            cumulative += count;
+            cumulative = cumulative
+                .checked_add(count)
+                .context("histogram bucket count overflow")?;
 
             buckets.push(HistogramBucket {
-                lower_bound: unit.bucket_lower_bound(upper_bound),
+                lower_bound: unit.bucket_lower_bound(upper_bound, previous_upper_bound),
                 upper_bound,
                 count,
                 cumulative_count: cumulative,
             });
+            previous_upper_bound = Some(upper_bound);
         }
 
         if let Some(interpolated_value) =
             unit.interpolate_percentile(&buckets, total_count, self.percentile)
         {
-            self.gauge.record(interpolated_value, labels);
+            self.gauge.record(interpolated_value, labels)?;
         }
 
         Ok(())
@@ -619,13 +724,12 @@ mod tests {
 
         let mut event = base_event_with_type("StorageMetrics");
         event.insert("Version".into(), Value::String("123".into()));
-        event.insert("Time".into(), Value::String("1.0".into()));
 
         gauge.record(&event, &[]).expect("record should succeed");
     }
 
     #[test]
-    fn simple_gauge_applies_rolling_window() {
+    fn simple_gauge_records_latest_value_and_persists_across_gathers() {
         let (provider, meter, registry) = prometheus_meter();
         let _provider = provider;
         let gauge = SimpleFDBGauge::new(
@@ -640,40 +744,55 @@ mod tests {
         let labels = vec![KeyValue::new("machine", "test")];
 
         event.insert("Version".into(), Value::String("10".into()));
-        event.insert("Time".into(), Value::String("100.0".into()));
         gauge
             .record(&event, &labels)
             .expect("initial record should succeed");
 
         event.insert("Version".into(), Value::String("20".into()));
-        event.insert("Time".into(), Value::String("105.0".into()));
         gauge
             .record(&event, &labels)
             .expect("second record should succeed");
 
         event.insert("Version".into(), Value::String("30".into()));
-        event.insert("Time".into(), Value::String("110.0".into()));
         gauge
             .record(&event, &labels)
             .expect("third record should succeed");
 
-        let avg_three = gauge_value(&registry, "ss_version_test", "machine", "test");
+        let first_gather = gauge_value(&registry, "ss_version_test", "machine", "test");
         assert!(
-            (avg_three - 20.0).abs() < f64::EPSILON,
-            "expected average of first three samples to be 20.0, got {avg_three}"
+            (first_gather - 30.0).abs() < f64::EPSILON,
+            "expected the latest point-in-time value, got {first_gather}"
         );
 
-        event.insert("Version".into(), Value::String("40".into()));
-        event.insert("Time".into(), Value::String("120.0".into()));
-        gauge
-            .record(&event, &labels)
-            .expect("fourth record should succeed");
-
-        let avg_four = gauge_value(&registry, "ss_version_test", "machine", "test");
+        let second_gather = gauge_value(&registry, "ss_version_test", "machine", "test");
         assert!(
-            (avg_four - 30.0).abs() < f64::EPSILON,
-            "expected average of the most recent samples to be 30.0, got {avg_four}"
+            (second_gather - 30.0).abs() < f64::EPSILON,
+            "expected the gauge to remain present on a consecutive gather, got {second_gather}"
         );
+    }
+
+    #[test]
+    fn simple_gauge_rejects_non_finite_values() {
+        let meter = test_meter();
+        let gauge = SimpleFDBGauge::new(
+            "StorageMetrics",
+            "Version",
+            "ss_version_test",
+            "Test version gauge",
+            &meter,
+        );
+
+        for value in ["NaN", "inf", "-inf"] {
+            let mut event = base_event_with_type("StorageMetrics");
+            event.insert("Version".into(), Value::String(value.into()));
+            let error = gauge
+                .record(&event, &[])
+                .expect_err("non-finite values must be rejected");
+            assert!(
+                error.to_string().contains("finite"),
+                "unexpected error: {error}"
+            );
+        }
     }
 
     #[test]
@@ -715,6 +834,29 @@ mod tests {
     }
 
     #[test]
+    fn total_counter_gauge_rejects_non_finite_value() {
+        let meter = test_meter();
+        let gauge = TotalCounterFDBGauge::new(
+            "StorageMetrics",
+            "BytesDurable",
+            "ss_bytes_durable_test",
+            "Total bytes durable",
+            &meter,
+        );
+
+        let mut event = base_event_with_type("StorageMetrics");
+        event.insert("BytesDurable".into(), Value::String("1 2 NaN".into()));
+
+        let error = gauge
+            .record(&event, &[])
+            .expect_err("non-finite counter values must be rejected");
+        assert!(
+            error.to_string().contains("finite"),
+            "unexpected error: {error}"
+        );
+    }
+
+    #[test]
     fn rate_counter_gauge_parses_first_component() {
         let meter = test_meter();
         let gauge = RateCounterFDBGauge::new(
@@ -730,6 +872,39 @@ mod tests {
         event.insert("Time".into(), Value::String("1.0".into()));
 
         gauge.record(&event, &[]).expect("record should succeed");
+    }
+
+    #[test]
+    fn rate_counter_gauge_rejects_non_finite_sample_and_time() {
+        let meter = test_meter();
+        let gauge = RateCounterFDBGauge::new(
+            "ProxyMetrics",
+            "TxnCommitIn",
+            "cp_txn_commit_in_test",
+            "Txn commit rate",
+            &meter,
+        );
+
+        let mut event = base_event_with_type("ProxyMetrics");
+        event.insert("TxnCommitIn".into(), Value::String("NaN 0 0".into()));
+        event.insert("Time".into(), Value::String("1.0".into()));
+        let error = gauge
+            .record(&event, &[])
+            .expect_err("non-finite samples must be rejected");
+        assert!(
+            error.to_string().contains("finite"),
+            "unexpected error: {error}"
+        );
+
+        event.insert("TxnCommitIn".into(), Value::String("42 0 0".into()));
+        event.insert("Time".into(), Value::String("inf".into()));
+        let error = gauge
+            .record(&event, &[])
+            .expect_err("non-finite timestamps must be rejected");
+        assert!(
+            error.to_string().contains("finite"),
+            "unexpected error: {error}"
+        );
     }
 
     #[test]
@@ -784,6 +959,28 @@ mod tests {
         );
     }
 
+    #[test]
+    fn rolling_window_discards_expired_out_of_order_samples() {
+        let window = RollingWindow::new(ROLLING_WINDOW_SECONDS);
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        window
+            .observe(&labels, 100.0, 10.0)
+            .expect("initial sample should be accepted");
+        let latest = window
+            .observe(&labels, 120.0, 30.0)
+            .expect("newer sample should be accepted");
+        assert!((latest - 30.0).abs() < f64::EPSILON);
+
+        let after_late_sample = window
+            .observe(&labels, 90.0, 5.0)
+            .expect("late sample should be handled");
+        assert!(
+            (after_late_sample - 30.0).abs() < f64::EPSILON,
+            "expired late samples must not re-enter the active window"
+        );
+    }
+
     fn gauge_value(registry: &Registry, name: &str, label_name: &str, label_value: &str) -> f64 {
         let metric = find_metric(registry, name, label_name, label_value)
             .unwrap_or_else(|| panic!("metric {name} with {label_name}={label_value} not found"));
@@ -807,6 +1004,29 @@ mod tests {
         event.insert("Time".into(), Value::String("1.0".into()));
 
         gauge.record(&event, &[]).expect("record should succeed");
+    }
+
+    #[test]
+    fn elapsed_rate_gauge_rejects_non_positive_and_non_finite_elapsed() {
+        let meter = test_meter();
+        let gauge = ElapsedRateFDBGauge::new(
+            "ProcessMetrics",
+            "CPUSeconds",
+            "process_cpu_util_test",
+            "CPU utilization",
+            &meter,
+        );
+
+        for elapsed in ["0", "-1", "NaN", "inf"] {
+            let mut event = base_event_with_type("ProcessMetrics");
+            event.insert("CPUSeconds".into(), Value::String("10.0".into()));
+            event.insert("Elapsed".into(), Value::String(elapsed.into()));
+            event.insert("Time".into(), Value::String("1.0".into()));
+
+            gauge
+                .record(&event, &[])
+                .expect_err("invalid elapsed values must be rejected");
+        }
     }
 
     #[test]
@@ -923,6 +1143,30 @@ mod tests {
         assert!(
             (value - 1.25).abs() < 1e-12,
             "expected linear interpolation within [1, 2), got {value}"
+        );
+    }
+
+    #[test]
+    fn histogram_percentile_uses_reported_count_boundaries_instead_of_unit_width() {
+        let (provider, meter, registry) = prometheus_meter();
+        let _provider = provider;
+        let gauge = test_histogram_gauge(&meter);
+        let labels = vec![KeyValue::new("machine", "test")];
+
+        let mut event = base_histogram_event();
+        event.insert("Unit".into(), Value::String("count".into()));
+        event.insert("TotalCount".into(), Value::String("6".into()));
+        event.insert("LessThan10".into(), Value::String("2".into()));
+        event.insert("LessThan20".into(), Value::String("4".into()));
+
+        gauge
+            .record(&event, &labels)
+            .expect("count histogram should be interpolated");
+
+        let value = gauge_value(&registry, "ss_read_latency_p50_test", "machine", "test");
+        assert!(
+            (value - 12.5).abs() < 1e-12,
+            "expected linear interpolation within [10, 20), got {value}"
         );
     }
 

@@ -10,17 +10,17 @@ pub struct ExporterMetrics {
 impl ExporterMetrics {
     pub fn new(meter: &Meter) -> Self {
         let processed_events = meter
-            .u64_counter("fdb_exporter_events_total")
+            .u64_counter("fdb_exporter_events")
             .with_description("Number of FoundationDB log events successfully processed")
             .init();
 
         let parse_errors = meter
-            .u64_counter("fdb_exporter_parse_errors_total")
+            .u64_counter("fdb_exporter_parse_errors")
             .with_description("Number of FoundationDB log lines that failed JSON parsing")
             .init();
 
         let record_errors = meter
-            .u64_counter("fdb_exporter_record_errors_total")
+            .u64_counter("fdb_exporter_record_errors")
             .with_description("Number of FoundationDB log events that failed metric recording")
             .init();
 
@@ -47,6 +47,7 @@ impl ExporterMetrics {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_helpers::metrics::prometheus_meter;
     use opentelemetry::metrics::MeterProvider;
     use opentelemetry_sdk::metrics::{ManualReader, SdkMeterProvider};
 
@@ -64,5 +65,37 @@ mod tests {
         metrics.record_processed();
         metrics.record_parse_error();
         metrics.record_record_error();
+    }
+
+    #[test]
+    fn prometheus_counter_names_have_one_total_suffix() {
+        let (provider, meter, registry) = prometheus_meter();
+        let _provider = provider;
+        let metrics = ExporterMetrics::new(&meter);
+
+        metrics.record_processed();
+        metrics.record_parse_error();
+        metrics.record_record_error();
+
+        let names: Vec<String> = registry
+            .gather()
+            .into_iter()
+            .map(|family| family.get_name().to_string())
+            .collect();
+
+        for name in [
+            "fdb_exporter_events_total",
+            "fdb_exporter_parse_errors_total",
+            "fdb_exporter_record_errors_total",
+        ] {
+            assert!(
+                names.iter().any(|candidate| candidate == name),
+                "missing {name}"
+            );
+        }
+        assert!(
+            names.iter().all(|name| !name.ends_with("_total_total")),
+            "counter names must not contain duplicate suffixes: {names:?}"
+        );
     }
 }
