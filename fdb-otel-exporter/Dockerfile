@@ -10,6 +10,7 @@ RUN apt-get update \
 
 # Fetch dependencies before copying frequently changing application sources.
 COPY Cargo.toml Cargo.lock ./
+RUN mkdir src && touch src/main.rs
 RUN --mount=type=cache,id=fdb-otel-exporter-cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
     cargo fetch --locked
 
