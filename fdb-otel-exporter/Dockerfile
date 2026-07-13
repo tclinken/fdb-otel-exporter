@@ -27,7 +27,8 @@ RUN --mount=type=cache,id=fdb-otel-exporter-cargo-registry,target=/usr/local/car
 FROM gcr.io/distroless/cc-debian12
 
 WORKDIR /app
-ENV GAUGE_CONFIG_PATH=/app/gauge_config.toml
+ENV GAUGE_CONFIG_PATH=/app/gauge_config.toml \
+    TRACE_LOG_FILE=/logs/tracing.log
 
 COPY --from=builder /bin/busybox /bin/busybox
 COPY --from=builder --chmod=0555 /tmp/fdb-otel-exporter /usr/local/bin/fdb-otel-exporter
