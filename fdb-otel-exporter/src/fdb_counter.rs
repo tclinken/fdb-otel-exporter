@@ -8,15 +8,18 @@ use std::collections::HashMap;
 #[derive(Clone)]
 pub struct SevCounter {
     severity: u64,
+    name: String,
     counter: Counter<u64>,
 }
 
 impl SevCounter {
     pub fn new(severity: u64, meter: &Meter) -> Self {
+        let name = format!("process_sev{severity}_counter");
         Self {
             severity,
+            name: name.clone(),
             counter: meter
-                .u64_counter(format!("process_sev{severity}_counter"))
+                .u64_counter(name)
                 .with_description(format!("Counter of severity {severity} trace events"))
                 .init(),
         }
@@ -24,6 +27,10 @@ impl SevCounter {
 }
 
 impl FDBMetric for SevCounter {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         if trace_event
             .get("Severity")
@@ -42,15 +49,18 @@ impl FDBMetric for SevCounter {
 
 pub struct SlowTaskCounter {
     threshold_ms: u64,
+    name: String,
     counter: Counter<u64>,
 }
 
 impl SlowTaskCounter {
     pub fn new(threshold_ms: u64, meter: &Meter) -> Self {
+        let name = format!("process_slow_task_{threshold_ms}_ms");
         Self {
             threshold_ms,
+            name: name.clone(),
             counter: meter
-                .u64_counter(format!("process_slow_task_{threshold_ms}_ms"))
+                .u64_counter(name)
                 .with_description(format!(
                     "Counter of slow tasks longer than {threshold_ms} ms"
                 ))
@@ -60,6 +70,14 @@ impl SlowTaskCounter {
 }
 
 impl FDBMetric for SlowTaskCounter {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn event_type(&self) -> Option<&str> {
+        Some("SlowTask")
+    }
+
     fn record(&self, trace_event: &HashMap<String, Value>, labels: &[KeyValue]) -> Result<()> {
         let trace_type = trace_event
             .get("Type")
@@ -248,5 +266,15 @@ mod tests {
             error.to_string().contains("Missing Type field"),
             "unexpected error: {error}"
         );
+    }
+
+    #[test]
+    fn severity_is_global_and_slow_task_is_type_specific() {
+        let (_provider, meter, _registry) = prometheus_meter();
+        let severity = SevCounter::new(10, &meter);
+        let slow_task = SlowTaskCounter::new(100, &meter);
+
+        assert_eq!(severity.event_type(), None);
+        assert_eq!(slow_task.event_type(), Some("SlowTask"));
     }
 }

@@ -9,9 +9,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   rust:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: fdb-otel-exporter
@@ -20,21 +25,26 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1.88.0
         with:
           components: clippy,rustfmt,llvm-tools-preview
 
       - name: Cache cargo build artifacts
         uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: fdb-otel-exporter -> target
 
       - name: Verify formatting
         run: cargo fmt --all --check
 
+      - name: Check all targets
+        run: cargo check --all-targets --all-features --locked
+
       - name: Lint with clippy
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --all-targets --all-features --locked -- -D warnings
 
       - name: Run tests
-        run: cargo test --all --locked
+        run: cargo test --all-targets --all-features --locked
 
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@v2
@@ -42,7 +52,43 @@ jobs:
           tool: cargo-llvm-cov
 
       - name: Generate coverage report
-        run: cargo llvm-cov --workspace --lcov --output-path lcov.info
+        run: cargo llvm-cov --fail-under-lines 89 --tests --workspace --all-features --lcov --output-path lcov.info
+
+      - name: Install cargo-audit
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit
+
+      - name: Audit dependencies
+        run: cargo security-audit
+
+      - name: Build container image
+        run: docker build --tag fdb-otel-exporter:ci .
+
+      - name: Smoke-test container readiness
+        run: |
+          mkdir -p /tmp/fdb-logs
+          container_id=$(docker run --detach --rm --publish 127.0.0.1:19200:9200 --env LOG_DIR=/fdb-logs --volume /tmp/fdb-logs:/fdb-logs:ro fdb-otel-exporter:ci)
+          trap 'docker rm --force "$container_id" >/dev/null 2>&1 || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:19200/ready >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs "$container_id"
+          exit 1
+
+      - name: Validate dashboard JSON
+        run: jq empty ../grafana-provisioning/dashboards/json/fdb.json
+
+      - name: Validate Compose configuration
+        working-directory: .
+        env:
+          FDB_LOG_DIR: /tmp/fdb-logs
+          GF_SECURITY_ADMIN_USER: ci
+          GF_SECURITY_ADMIN_PASSWORD: ci-only
+        run: docker compose config --quiet
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4

@@ -1,0 +1,14 @@
+# Rust build products and local runtime data
+target/
+logs/
+coverage/
+*.profraw
+*.profdata
+lcov.info
+cobertura.xml
+
+# Version-control metadata never belongs in the image build context
+.git
+.git/
+.gitignore
+.gitattributes
